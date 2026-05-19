@@ -7,76 +7,227 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg: #ffffff; --bg2: #f7f7f5; --border: rgba(0,0,0,0.12); --text: #1a1a1a; --text2: #666; --text3: #aaa; --radius: 12px; --radius-sm: 8px; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg2); min-height: 100vh; padding: 20px; color: var(--text); }
-    .wrap { background: var(--bg); border-radius: var(--radius); border: 0.5px solid var(--border); overflow: hidden; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 0.5px solid var(--border); background: var(--bg2); }
-    .topbar-left { display: flex; align-items: center; gap: 10px; }
-    .dot { width: 10px; height: 10px; border-radius: 50%; background: #CD1719; flex-shrink: 0; }
-    .topbar-title { font-size: 16px; font-weight: 500; }
-    .topbar-date { font-size: 13px; color: var(--text3); }
-    .topbar-right { display: flex; align-items: center; gap: 10px; }
-    .sync-status { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 5px; }
-    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; flex-shrink: 0; transition: background 0.3s; }
-    .sync-dot.ok { background: #639922; }
-    .sync-dot.saving { background: #EF9F27; }
-    .sync-dot.error { background: #E24B4A; }
-    .reset-btn { font-size: 13px; color: var(--text2); background: none; border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 6px 14px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-    .reset-btn:hover { background: var(--bg); }
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    thead th { padding: 12px 14px; font-size: 13px; font-weight: 500; color: var(--text2); border-left: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); background: var(--bg2); text-align: left; }
-    thead th:first-child { border-left: none; width: 36px; text-align: center; }
-    .th-inner { display: flex; align-items: center; gap: 8px; }
-    .avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 500; flex-shrink: 0; }
-    .av-c { background: #E6F1FB; color: #0C447C; }
-    .av-ca { background: #E1F5EE; color: #085041; }
-    .av-l { background: #EEEDFE; color: #3C3489; }
-    tbody td { border-left: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); vertical-align: middle; padding: 0; }
-    tbody td:first-child { border-left: none; text-align: center; font-size: 13px; color: var(--text3); width: 36px; }
-    tbody tr:last-child td { border-bottom: none; }
-    .cell-inner { display: flex; align-items: stretch; min-height: 80px; }
-    .task-area { display: flex; align-items: flex-start; gap: 10px; padding: 10px 10px 10px 14px; flex: 1; transition: background 0.1s; }
-    .task-area:hover { background: var(--bg2); }
-    .task-area input[type=checkbox] { width: 24px; height: 24px; cursor: pointer; accent-color: #004472; flex-shrink: 0; margin-top: 14px; }
-    .task-area textarea { flex: 1; font-size: 15px; font-family: inherit; color: var(--text); background: none; border: none; outline: none; resize: none; line-height: 1.6; padding: 10px 0; min-height: 56px; overflow: hidden; }
-    .task-area textarea::placeholder { color: var(--text3); }
-    .task-area textarea.done { text-decoration: line-through; color: var(--text3); }
-    .del-btn { background: none; border: none; cursor: pointer; color: var(--text3); padding: 2px; border-radius: 4px; opacity: 0; transition: opacity 0.15s; font-size: 15px; margin-top: 12px; flex-shrink: 0; }
-    .task-area:hover .del-btn { opacity: 1; }
-    .del-btn:hover { color: #CD1719; }
-    .prio-area { width: 80px; border-left: 0.5px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; flex-shrink: 0; padding: 8px 4px; transition: background 0.2s; }
-    .prio-canvas { width: 64px; height: 56px; border: 1.5px dashed rgba(0,0,0,0.15); border-radius: 8px; cursor: crosshair; touch-action: none; background: white; display: block; }
-    .prio-canvas.active { border-color: #004472; border-style: solid; }
-    .prio-result { font-size: 24px; font-weight: 500; color: #004472; line-height: 1; min-height: 30px; text-align: center; }
-    .prio-clear { font-size: 10px; color: var(--text3); background: none; border: none; cursor: pointer; padding: 0; line-height: 1; visibility: hidden; }
-    .prio-area:hover .prio-clear { visibility: visible; }
-    .prio-clear:hover { color: #CD1719; }
 
-    tfoot td { border-left: 0.5px solid var(--border); border-top: 0.5px solid var(--border); background: var(--bg2); }
-    tfoot td:first-child { border-left: none; text-align: center; }
-    .add-inner { display: flex; align-items: center; gap: 8px; padding: 10px 12px; }
-    .add-inner input { flex: 1; font-size: 14px; background: none; border: none; outline: none; font-family: inherit; color: var(--text); padding: 4px 0; }
-    .add-inner input::placeholder { color: var(--text3); }
-    .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--text2); z-index: 100; }
+    :root {
+      --bg: #ffffff;
+      --bg2: #f5f5f3;
+      --border: rgba(0,0,0,0.1);
+      --text: #1a1a1a;
+      --text2: #777;
+      --text3: #bbb;
+      --blue: #004472;
+      --red: #CD1719;
+      --r: 12px;
+      --rs: 8px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg2);
+      min-height: 100vh;
+      padding: 24px;
+      color: var(--text);
+    }
+
+    .wrap {
+      background: var(--bg);
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); }
+    .title { font-size: 15px; font-weight: 500; }
+    .date { font-size: 13px; color: var(--text3); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .sync { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 5px; }
+    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; transition: background 0.3s; }
+    .sync-dot.ok { background: #5a9a2a; }
+    .sync-dot.saving { background: #e0920a; }
+    .sync-dot.error { background: #d03030; }
+    .btn-reset {
+      font-size: 12px; color: var(--text2);
+      background: none; border: 1px solid var(--border);
+      border-radius: var(--rs); padding: 5px 12px;
+      cursor: pointer; display: flex; align-items: center; gap: 4px;
+    }
+    .btn-reset:hover { background: var(--bg2); }
+
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+
+    thead th {
+      padding: 11px 14px;
+      font-size: 13px; font-weight: 500; color: var(--text2);
+      border-left: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2); text-align: left;
+    }
+    thead th:first-child { border-left: none; width: 38px; text-align: center; color: var(--text3); font-weight: 400; }
+
+    .th-inner { display: flex; align-items: center; gap: 7px; }
+    .avatar {
+      width: 24px; height: 24px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 500;
+    }
+    .av-c  { background: #deeefb; color: #0a4a7c; }
+    .av-ca { background: #d6f0e6; color: #08503e; }
+    .av-l  { background: #eae8fc; color: #3a338a; }
+
+    tbody td {
+      border-left: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 0; vertical-align: top;
+    }
+    tbody td:first-child { border-left: none; vertical-align: middle; text-align: center; font-size: 12px; color: var(--text3); width: 38px; }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .cell { display: flex; align-items: stretch; min-height: 76px; }
+
+    .task {
+      flex: 1; display: flex; align-items: flex-start;
+      gap: 10px; padding: 12px 10px 12px 14px;
+      transition: background 0.1s;
+    }
+    .task:hover { background: var(--bg2); }
+
+    .task input[type=checkbox] {
+      width: 22px; height: 22px;
+      accent-color: var(--blue);
+      flex-shrink: 0; margin-top: 12px; cursor: pointer;
+    }
+
+    .task textarea {
+      flex: 1; font-size: 15px; font-family: inherit;
+      color: var(--text); background: none;
+      border: none; outline: none; resize: none;
+      line-height: 1.55; padding: 9px 0;
+      min-height: 52px; overflow: hidden;
+    }
+    .task textarea::placeholder { color: var(--text3); }
+    .task textarea.done { text-decoration: line-through; color: var(--text3); }
+
+    .del {
+      background: none; border: none; cursor: pointer;
+      color: var(--text3); font-size: 14px;
+      margin-top: 12px; padding: 2px; border-radius: 4px;
+      opacity: 0; transition: opacity 0.15s; flex-shrink: 0;
+    }
+    .task:hover .del { opacity: 1; }
+    .del:hover { color: var(--red); }
+
+    /* Priorité — bouton qui ouvre le pavé */
+    .prio {
+      width: 64px; flex-shrink: 0;
+      border-left: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      padding: 6px;
+    }
+    .prio-btn {
+      width: 100%; height: 60px;
+      background: white;
+      border: 1.5px dashed var(--border);
+      border-radius: 8px;
+      font-size: 22px; font-weight: 500;
+      color: var(--blue);
+      cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.15s;
+    }
+    .prio-btn.filled { border-style: solid; border-color: var(--blue); }
+    .prio-btn:hover { border-color: var(--blue); }
+    .prio-btn .placeholder { color: var(--text3); font-size: 14px; font-weight: 400; }
+
+    /* Modal pavé numérique */
+    .modal-bg {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none; align-items: center; justify-content: center;
+      z-index: 200;
+    }
+    .modal-bg.open { display: flex; }
+    .modal {
+      background: white; border-radius: 16px;
+      padding: 24px; min-width: 280px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    .modal-title { font-size: 14px; color: var(--text2); text-align: center; margin-bottom: 16px; }
+    .modal-display {
+      width: 100%; height: 64px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 500; color: var(--blue);
+    }
+    .modal-display .ph { color: var(--text3); font-size: 16px; font-weight: 400; }
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
+      gap: 10px;
+      justify-content: center;
+    }
+    .key {
+      height: 60px; font-size: 22px; font-weight: 500;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer; font-family: inherit;
+      color: var(--text);
+      transition: background 0.1s, transform 0.05s;
+    }
+    .key:hover { background: var(--bg2); }
+    .key:active { transform: scale(0.95); background: #e0e0de; }
+    .key.action { font-size: 14px; color: var(--text2); }
+    .key.ok { background: var(--blue); color: white; border-color: var(--blue); font-weight: 500; }
+    .key.ok:hover { background: #003560; }
+    .key.del-key { color: var(--red); }
+
+    tfoot td {
+      border-left: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+      background: var(--bg2); padding: 0;
+    }
+    tfoot td:first-child { border-left: none; text-align: center; color: var(--text3); }
+    .add-cell { display: flex; align-items: center; gap: 6px; padding: 10px 12px; }
+    .add-cell input {
+      flex: 1; font-size: 14px; background: none;
+      border: none; outline: none; font-family: inherit;
+      color: var(--text); padding: 3px 0;
+    }
+    .add-cell input::placeholder { color: var(--text3); }
+
+    #loader {
+      position: fixed; inset: 0;
+      background: rgba(255,255,255,0.92);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--text2); z-index: 100;
+    }
   </style>
 </head>
 <body>
 
-<div class="loading-overlay" id="loader">Chargement…</div>
+<div id="loader">Chargement…</div>
 
 <div class="wrap">
   <div class="topbar">
     <div class="topbar-left">
       <div class="dot"></div>
-      <span class="topbar-title">Tâches du jour</span>
-      <span class="topbar-date" id="tdate"></span>
+      <span class="title">Tâches du jour</span>
+      <span class="date" id="tdate"></span>
     </div>
     <div class="topbar-right">
-      <div class="sync-status">
-        <div class="sync-dot" id="sync-dot"></div>
-        <span id="sync-label">—</span>
+      <div class="sync">
+        <div class="sync-dot" id="sdot"></div>
+        <span id="slabel">—</span>
       </div>
-      <button class="reset-btn" onclick="resetAll()">
+      <button class="btn-reset" onclick="resetAll()">
         <i class="ti ti-refresh"></i> Reset
       </button>
     </div>
@@ -94,53 +245,64 @@
     <tbody id="tbody"></tbody>
     <tfoot>
       <tr>
-        <td><i class="ti ti-plus" style="font-size:14px;color:var(--text3);"></i></td>
-        <td><div class="add-inner"><input id="add-0" placeholder="Ajouter une tâche…" onkeydown="handleAdd(event,0)"/></div></td>
-        <td><div class="add-inner"><input id="add-1" placeholder="Ajouter une tâche…" onkeydown="handleAdd(event,1)"/></div></td>
-        <td><div class="add-inner"><input id="add-2" placeholder="Ajouter une tâche…" onkeydown="handleAdd(event,2)"/></div></td>
+        <td><i class="ti ti-plus" style="font-size:13px;"></i></td>
+        <td><div class="add-cell"><input id="a0" placeholder="Ajouter…" onkeydown="addTask(event,0)"/></div></td>
+        <td><div class="add-cell"><input id="a1" placeholder="Ajouter…" onkeydown="addTask(event,1)"/></div></td>
+        <td><div class="add-cell"><input id="a2" placeholder="Ajouter…" onkeydown="addTask(event,2)"/></div></td>
       </tr>
     </tfoot>
   </table>
+</div>
+
+<div class="modal-bg" id="modal-bg" onclick="closeKeypadIfBg(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">Priorité</div>
+    <div class="modal-display" id="modal-display"><span class="ph">—</span></div>
+    <div class="keypad">
+      <button class="key" onclick="kpAdd('1')">1</button>
+      <button class="key" onclick="kpAdd('2')">2</button>
+      <button class="key" onclick="kpAdd('3')">3</button>
+      <button class="key" onclick="kpAdd('4')">4</button>
+      <button class="key" onclick="kpAdd('5')">5</button>
+      <button class="key" onclick="kpAdd('6')">6</button>
+      <button class="key" onclick="kpAdd('7')">7</button>
+      <button class="key" onclick="kpAdd('8')">8</button>
+      <button class="key" onclick="kpAdd('9')">9</button>
+      <button class="key action del-key" onclick="kpDel()">←</button>
+      <button class="key" onclick="kpAdd('0')">0</button>
+      <button class="key action ok" onclick="kpOk()">OK</button>
+    </div>
+  </div>
 </div>
 
 <script>
 const COLS = 3;
 let data = [];
 let saveTimer = null;
-let hwrRecognizer = null;
+let kpTarget = null;
+let kpValue = '';
 
-async function initHWR() {
-  if ('createHandwritingRecognizer' in navigator) {
-    try {
-      hwrRecognizer = await navigator.createHandwritingRecognizer({ languages: ['fr', 'en'] });
-    } catch(e) {}
-  }
-}
-
-function defaultData() {
-  return Array.from({ length: 10 }, () =>
-    Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '' }))
-  );
-}
+function blank() { return Array.from({length:10}, () => Array.from({length:COLS}, () => ({text:'',done:false,prio:''}))); }
 
 function setSyncStatus(s) {
-  document.getElementById('sync-dot').className = 'sync-dot ' + s;
-  document.getElementById('sync-label').textContent = s === 'ok' ? 'Synchronisé' : s === 'saving' ? 'Enregistrement…' : 'Erreur sync';
+  document.getElementById('sdot').className = 'sync-dot ' + s;
+  document.getElementById('slabel').textContent = s==='ok'?'Synchronisé':s==='saving'?'Enregistrement…':'Erreur sync';
 }
 
-async function loadFromServer() {
+async function load() {
   try {
     const r = await fetch('/api/tasks');
-    if (!r.ok) throw new Error();
+    if (!r.ok) throw 0;
     data = await r.json();
     setSyncStatus('ok');
-  } catch(e) { data = defaultData(); setSyncStatus('error'); }
+  } catch(e) { data = blank(); setSyncStatus('error'); }
   document.getElementById('loader').style.display = 'none';
   render();
-  setInterval(pollServer, 5000);
+  setInterval(poll, 5000);
 }
 
-async function pollServer() {
+async function poll() {
+  if (kpTarget) return; // ne pas recharger pendant l'édition du pavé
   try {
     const r = await fetch('/api/tasks');
     if (!r.ok) return;
@@ -149,241 +311,151 @@ async function pollServer() {
   } catch(e) { setSyncStatus('error'); }
 }
 
-function scheduleSave() {
+function save() {
   setSyncStatus('saving');
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     try {
-      const r = await fetch('/api/tasks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      if (!r.ok) throw new Error();
+      const r = await fetch('/api/tasks', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+      if (!r.ok) throw 0;
       setSyncStatus('ok');
     } catch(e) { setSyncStatus('error'); }
-  }, 800);
+  }, 700);
 }
 
-function sortedData() {
-  const numRows = data.length;
-  const result = Array.from({ length: numRows }, () => Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '', rank: -1 })));
+/* Tri par colonne — toujours appliqué au rendu */
+function sortedIndexes() {
+  const n = data.length;
+  const result = Array.from({length:n}, () => Array(COLS).fill(null));
   for (let ci = 0; ci < COLS; ci++) {
-    const col = data.map(row => row[ci]);
-    const withPrio = col.filter(c => c.prio !== '' && c.text !== '');
-    const withoutPrio = col.filter(c => c.prio === '' && c.text !== '');
-    const empty = col.filter(c => c.text === '');
-    const sortedWithPrio = withPrio.sort((a, b) => {
-      const av = parseFloat(a.prio);
-      const bv = parseFloat(b.prio);
-      if (!isNaN(av) && !isNaN(bv)) return av - bv;
-      if (!isNaN(av)) return -1;
-      if (!isNaN(bv)) return 1;
-      return a.prio.localeCompare(b.prio);
+    const col = data.map((row, ri) => ({ ri, cell: row[ci] }));
+    const withPrio  = col.filter(x => x.cell.prio !== '' && x.cell.text !== '');
+    const noPrio    = col.filter(x => x.cell.prio === '' && x.cell.text !== '');
+    const empty     = col.filter(x => x.cell.text === '');
+    withPrio.sort((a, b) => {
+      const an = parseFloat(a.cell.prio), bn = parseFloat(b.cell.prio);
+      if (!isNaN(an) && !isNaN(bn)) return an - bn;
+      if (!isNaN(an)) return -1;
+      if (!isNaN(bn)) return 1;
+      return a.cell.prio.localeCompare(b.cell.prio);
     });
-    const sorted = [...sortedWithPrio, ...withoutPrio, ...empty];
-    sorted.forEach((cell, ri) => {
-      result[ri][ci] = { ...cell, rank: cell.prio !== '' ? ri : -1 };
-    });
+    [...withPrio, ...noPrio, ...empty].forEach((x, di) => { result[di][ci] = x.ri; });
   }
   return result;
 }
 
-function rankColorClass(rank) { return ''; }
-
-function prioColorClass(v) { return ''; }
-
-function esc(s) { return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
-
 function render() {
   const tb = document.getElementById('tbody');
   tb.innerHTML = '';
-  const display = sortedData();
-  display.forEach((row, ri) => {
+  const idx = sortedIndexes();
+  idx.forEach((row, di) => {
     const tr = document.createElement('tr');
-    let cells = `<td>${ri + 1}</td>`;
-    row.forEach((cell, ci) => {
-      cells += `<td>
-        <div class="cell-inner">
-          <div class="task-area">
-            <input type="checkbox" ${cell.done ? 'checked' : ''} aria-label="Fait" onchange="toggleCell('${esc(cell.text)}',${ci})"/>
-            <textarea rows="1" placeholder="—" class="${cell.done ? 'done' : ''}"
-              onblur="editCell('${esc(cell.text)}',${ci},this.value)"
+    let html = `<td>${di + 1}</td>`;
+    row.forEach((ri, ci) => {
+      const cell = data[ri][ci];
+      const prioDisplay = cell.prio ? cell.prio : '<span class="placeholder">P</span>';
+      html += `<td>
+        <div class="cell">
+          <div class="task">
+            <input type="checkbox" ${cell.done?'checked':''} onchange="toggle(${ri},${ci})"/>
+            <textarea rows="1" placeholder="—" class="${cell.done?'done':''}"
+              onblur="editText(${ri},${ci},this.value)"
               oninput="resize(this)"
             >${cell.text}</textarea>
-            <button class="del-btn" onclick="clearByText('${esc(cell.text)}',${ci})" aria-label="Effacer">
+            <button class="del" onclick="clearCell(${ri},${ci})" aria-label="Effacer">
               <i class="ti ti-x"></i>
             </button>
           </div>
-          <div class="prio-area ${rankColorClass(cell.rank)}">
-            <canvas class="prio-canvas" width="64" height="56"
-              data-text="${esc(cell.text)}" data-ci="${ci}"></canvas>
-            <div class="prio-result">${cell.prio || ''}</div>
-            <button class="prio-clear" onclick="clearPrio('${esc(cell.text)}',${ci})">effacer</button>
+          <div class="prio">
+            <button class="prio-btn ${cell.prio?'filled':''}" onclick="openKeypad(${ri},${ci})">${prioDisplay}</button>
           </div>
         </div>
       </td>`;
     });
-    tr.innerHTML = cells;
+    tr.innerHTML = html;
     tb.appendChild(tr);
-    row.forEach((_, ci) => {
+    row.forEach((ri, ci) => {
       const ta = tr.querySelectorAll('textarea')[ci];
       if (ta) setTimeout(() => resize(ta), 0);
     });
   });
-  attachCanvasListeners();
 }
 
-function resize(el) { el.style.height = 'auto'; el.style.height = Math.max(56, el.scrollHeight) + 'px'; }
+function resize(el) { el.style.height='auto'; el.style.height=Math.max(52,el.scrollHeight)+'px'; }
 
-function findCell(text, ci) { return data.find(row => row[ci].text === text); }
+function toggle(ri, ci) { data[ri][ci].done = !data[ri][ci].done; save(); render(); }
+function editText(ri, ci, val) { data[ri][ci].text = val; save(); }
+function clearCell(ri, ci) { data[ri][ci] = { text:'', done:false, prio:'' }; save(); render(); }
 
-function toggleCell(text, ci) {
-  const cell = findCell(text, ci);
-  if (cell) { cell.done = !cell.done; scheduleSave(); render(); }
-}
-
-function editCell(oldText, ci, newVal) {
-  const cell = findCell(oldText, ci);
-  if (cell) { cell.text = newVal; scheduleSave(); }
-}
-
-function clearByText(text, ci) {
-  const idx = data.findIndex(row => row[ci].text === text);
-  if (idx >= 0) { data[idx][ci] = { text: '', done: false, prio: '' }; scheduleSave(); render(); }
-}
-
-function clearPrio(text, ci) {
-  const cell = findCell(text, ci);
-  if (cell) { cell.prio = ''; scheduleSave(); render(); }
-}
-
-function handleAdd(e, ci) {
+function addTask(e, ci) {
   if (e.key !== 'Enter') return;
   e.preventDefault();
   const val = e.target.value.trim();
   if (!val) return;
-  const emptyRow = data.findIndex(row => !row[ci].text);
-  if (emptyRow >= 0) { data[emptyRow][ci].text = val; }
-  else { const nr = Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '' })); nr[ci].text = val; data.push(nr); }
+  const emptyRi = data.findIndex(row => !row[ci].text);
+  if (emptyRi >= 0) { data[emptyRi][ci].text = val; }
+  else {
+    const nr = Array.from({length:COLS}, () => ({text:'',done:false,prio:''}));
+    nr[ci].text = val; data.push(nr);
+  }
   e.target.value = '';
-  scheduleSave(); render();
+  save(); render();
 }
 
 function resetAll() {
   if (!confirm('Remettre à zéro toutes les cases ?')) return;
-  data = data.map(row => row.map(c => ({ ...c, done: false, prio: '' })));
-  scheduleSave(); render();
+  data = data.map(row => row.map(c => ({...c, done:false, prio:''})));
+  save(); render();
 }
 
-function attachCanvasListeners() {
-  document.querySelectorAll('.prio-canvas').forEach(canvas => {
-    const ctx = canvas.getContext('2d');
-    ctx.strokeStyle = '#004472';
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    let drawing = false;
-    let strokes = [];
-    let currentStroke = [];
-    let recTimer = null;
-
-    function pos(e) {
-      const rect = canvas.getBoundingClientRect();
-      const src = (e.touches && e.touches[0]) ? e.touches[0] : e;
-      return { x: src.clientX - rect.left, y: src.clientY - rect.top, t: Date.now() };
-    }
-
-    canvas.addEventListener('pointerdown', e => {
-      e.preventDefault();
-      drawing = true;
-      currentStroke = [];
-      const p = pos(e);
-      currentStroke.push(p);
-      ctx.beginPath();
-      ctx.moveTo(p.x, p.y);
-      canvas.classList.add('active');
-    });
-
-    canvas.addEventListener('pointermove', e => {
-      if (!drawing) return;
-      e.preventDefault();
-      const p = pos(e);
-      currentStroke.push(p);
-      ctx.lineTo(p.x, p.y);
-      ctx.stroke();
-    });
-
-    canvas.addEventListener('pointerup', e => {
-      if (!drawing) return;
-      drawing = false;
-      if (currentStroke.length) strokes.push([...currentStroke]);
-      currentStroke = [];
-      if (recTimer) clearTimeout(recTimer);
-      recTimer = setTimeout(() => recognize(canvas, strokes), 700);
-    });
-
-    canvas.addEventListener('pointerleave', e => {
-      if (!drawing) return;
-      drawing = false;
-      if (currentStroke.length) strokes.push([...currentStroke]);
-      currentStroke = [];
-    });
-  });
+/* Pavé numérique */
+function openKeypad(ri, ci) {
+  kpTarget = { ri, ci };
+  kpValue = data[ri][ci].prio || '';
+  updateKeypadDisplay();
+  document.getElementById('modal-bg').classList.add('open');
 }
 
-async function recognize(canvas, strokes) {
-  const text = canvas.dataset.text;
-  const ci = parseInt(canvas.dataset.ci);
-
-  // Tentative API Chrome HWR
-  if (hwrRecognizer) {
-    try {
-      const drawing = hwrRecognizer.startDrawing({ recognitionType: 'text' });
-      strokes.forEach(stroke => {
-        drawing.addStroke(new HandwritingStroke(stroke.map(p => ({ x: p.x, y: p.y, t: p.t }))));
-      });
-      const results = await drawing.getPrediction();
-      if (results && results[0] && results[0].text.trim()) {
-        applyPrio(text, ci, results[0].text.trim());
-        return;
-      }
-    } catch(e) {}
-  }
-
-  // Fallback : analyse géométrique simple
-  const result = geometricRecognize(canvas);
-  if (result) applyPrio(text, ci, result);
+function closeKeypadIfBg(e) {
+  if (e.target.id === 'modal-bg') closeKeypad();
 }
 
-function geometricRecognize(canvas) {
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
-  const d = ctx.getImageData(0, 0, w, h).data;
-  let pts = [];
-  for (let i = 0; i < d.length; i += 4) {
-    if (d[i+3] > 50) {
-      pts.push({ x: (i/4) % w, y: Math.floor((i/4) / w) });
-    }
-  }
-  if (pts.length < 8) return null;
-  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
-  const bw = Math.max(...xs) - Math.min(...xs);
-  const bh = Math.max(...ys) - Math.min(...ys);
-  const ratio = bh / Math.max(1, bw);
-  // 1 = très étroit et haut
-  if (ratio > 2.5) return '1';
-  return null;
+function closeKeypad() {
+  kpTarget = null;
+  kpValue = '';
+  document.getElementById('modal-bg').classList.remove('open');
 }
 
-function applyPrio(text, ci, value) {
-  const cell = findCell(text, ci);
-  if (!cell) return;
-  cell.prio = value;
-  scheduleSave();
+function updateKeypadDisplay() {
+  const d = document.getElementById('modal-display');
+  if (kpValue === '') d.innerHTML = '<span class="ph">—</span>';
+  else d.textContent = kpValue;
+}
+
+function kpAdd(digit) {
+  if (kpValue.length >= 4) return;
+  kpValue += digit;
+  updateKeypadDisplay();
+}
+
+function kpDel() {
+  kpValue = kpValue.slice(0, -1);
+  updateKeypadDisplay();
+}
+
+function kpOk() {
+  if (!kpTarget) return;
+  const { ri, ci } = kpTarget;
+  data[ri][ci].prio = kpValue;
+  save();
+  closeKeypad();
   render();
 }
 
 document.getElementById('tdate').textContent =
-  '— ' + new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  '— ' + new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
 
-initHWR().then(() => loadFromServer());
+load();
 </script>
 </body>
 </html>
