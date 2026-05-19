@@ -144,20 +144,18 @@
     .del-btn:hover { color: #CD1719; }
 
     .prio-area {
-      width: 50px; border-left: 0.5px solid var(--border);
+      width: 64px; border-left: 0.5px solid var(--border);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
     .prio-input {
       width: 100%; height: 100%; border: none; outline: none;
-      background: none; font-size: 20px; font-weight: 500;
+      background: none; font-size: 22px; font-weight: 500;
       text-align: center; font-family: inherit;
-      color: var(--text); cursor: text; padding: 0;
+      color: var(--text); cursor: text; padding: 10px 4px;
+      min-height: 72px;
     }
-    .prio-input::placeholder { color: var(--text3); font-size: 14px; font-weight: 400; }
-    .prio-input.p1 { background: #FCEBEB; color: #A32D2D; }
-    .prio-input.p2 { background: #FAEEDA; color: #854F0B; }
-    .prio-input.p3 { background: #EAF3DE; color: #3B6D11; }
+    .prio-input::placeholder { color: var(--text3); font-size: 15px; font-weight: 400; }
 
     tfoot td {
       border-left: 0.5px solid var(--border);
@@ -294,8 +292,11 @@ async function saveToServer() {
   }
 }
 
-function prioClass(v) {
-  return v === '1' ? 'p1' : v === '2' ? 'p2' : v === '3' ? 'p3' : '';
+function prioClass(v) { return ''; }
+
+function setPrio(ri, ci, val) {
+  data[ri][ci].prio = val.slice(0, 3);
+  scheduleSave();
 }
 
 function render() {
@@ -319,7 +320,7 @@ function render() {
             </button>
           </div>
           <div class="prio-area">
-            <input class="prio-input ${prioClass(cell.prio)}" type="text" maxlength="1"
+            <input class="prio-input" type="text" maxlength="3"
               value="${cell.prio}" placeholder="P"
               aria-label="Priorité"
               oninput="setPrio(${ri},${ci},this.value)"
@@ -348,17 +349,6 @@ function toggle(ri, ci) {
 function edit(ri, ci, val) {
   data[ri][ci].text = val;
   scheduleSave();
-}
-
-function setPrio(ri, ci, val) {
-  const v = val.replace(/[^123]/g, '').slice(0, 1);
-  data[ri][ci].prio = v;
-  scheduleSave();
-  const inputs = document.querySelectorAll(`#tbody tr:nth-child(${ri + 1}) .prio-input`);
-  if (inputs[ci]) {
-    inputs[ci].value = v;
-    inputs[ci].className = 'prio-input ' + prioClass(v);
-  }
 }
 
 function clearCell(ri, ci) {
