@@ -7,180 +7,57 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #ffffff;
-      --bg2: #f7f7f5;
-      --border: rgba(0,0,0,0.12);
-      --text: #1a1a1a;
-      --text2: #666;
-      --text3: #aaa;
-      --radius: 12px;
-      --radius-sm: 8px;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg2);
-      min-height: 100vh;
-      padding: 20px;
-      color: var(--text);
-    }
-
-    .wrap {
-      background: var(--bg);
-      border-radius: var(--radius);
-      border: 0.5px solid var(--border);
-      overflow: hidden;
-      max-width: 100%;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 20px;
-      border-bottom: 0.5px solid var(--border);
-      background: var(--bg2);
-    }
-
+    :root { --bg: #ffffff; --bg2: #f7f7f5; --border: rgba(0,0,0,0.12); --text: #1a1a1a; --text2: #666; --text3: #aaa; --radius: 12px; --radius-sm: 8px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg2); min-height: 100vh; padding: 20px; color: var(--text); }
+    .wrap { background: var(--bg); border-radius: var(--radius); border: 0.5px solid var(--border); overflow: hidden; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 0.5px solid var(--border); background: var(--bg2); }
     .topbar-left { display: flex; align-items: center; gap: 10px; }
     .dot { width: 10px; height: 10px; border-radius: 50%; background: #CD1719; flex-shrink: 0; }
-    .logo { height: 28px; }
-    .topbar-title { font-size: 16px; font-weight: 500; color: var(--text); }
+    .topbar-title { font-size: 16px; font-weight: 500; }
     .topbar-date { font-size: 13px; color: var(--text3); }
-
     .topbar-right { display: flex; align-items: center; gap: 10px; }
-
-    .sync-status {
-      font-size: 12px;
-      color: var(--text3);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .sync-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: #ccc; flex-shrink: 0;
-      transition: background 0.3s;
-    }
+    .sync-status { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 5px; }
+    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; flex-shrink: 0; transition: background 0.3s; }
     .sync-dot.ok { background: #639922; }
     .sync-dot.saving { background: #EF9F27; }
     .sync-dot.error { background: #E24B4A; }
-
-    .reset-btn {
-      font-size: 13px; color: var(--text2);
-      background: none; border: 0.5px solid var(--border);
-      border-radius: var(--radius-sm); padding: 6px 14px;
-      cursor: pointer; display: flex; align-items: center; gap: 5px;
-    }
-    .reset-btn:hover { background: var(--bg2); }
-
+    .reset-btn { font-size: 13px; color: var(--text2); background: none; border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 6px 14px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+    .reset-btn:hover { background: var(--bg); }
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-
-    thead th {
-      padding: 12px 14px;
-      font-size: 13px; font-weight: 500; color: var(--text2);
-      border-left: 0.5px solid var(--border);
-      border-bottom: 0.5px solid var(--border);
-      background: var(--bg2); text-align: left;
-    }
-    thead th:first-child { border-left: none; width: 40px; text-align: center; }
-
+    thead th { padding: 12px 14px; font-size: 13px; font-weight: 500; color: var(--text2); border-left: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); background: var(--bg2); text-align: left; }
+    thead th:first-child { border-left: none; width: 36px; text-align: center; }
     .th-inner { display: flex; align-items: center; gap: 8px; }
-    .avatar {
-      width: 26px; height: 26px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 10px; font-weight: 500; flex-shrink: 0;
-    }
-    .av-c  { background: #E6F1FB; color: #0C447C; }
+    .avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 500; flex-shrink: 0; }
+    .av-c { background: #E6F1FB; color: #0C447C; }
     .av-ca { background: #E1F5EE; color: #085041; }
-    .av-l  { background: #EEEDFE; color: #3C3489; }
-
-    tbody td {
-      border-left: 0.5px solid var(--border);
-      border-bottom: 0.5px solid var(--border);
-      vertical-align: middle; padding: 0;
-    }
-    tbody td:first-child {
-      border-left: none; text-align: center;
-      font-size: 13px; color: var(--text3); width: 40px;
-    }
+    .av-l { background: #EEEDFE; color: #3C3489; }
+    tbody td { border-left: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); vertical-align: middle; padding: 0; }
+    tbody td:first-child { border-left: none; text-align: center; font-size: 13px; color: var(--text3); width: 36px; }
     tbody tr:last-child td { border-bottom: none; }
-
-    .cell-inner { display: flex; align-items: stretch; min-height: 72px; }
-
-    .task-area {
-      display: flex; align-items: flex-start;
-      gap: 10px; padding: 10px 10px 10px 14px;
-      flex: 1; transition: background 0.1s; cursor: text;
-    }
+    .cell-inner { display: flex; align-items: stretch; min-height: 80px; }
+    .task-area { display: flex; align-items: flex-start; gap: 10px; padding: 10px 10px 10px 14px; flex: 1; transition: background 0.1s; }
     .task-area:hover { background: var(--bg2); }
-
-    .task-area input[type=checkbox] {
-      width: 20px; height: 20px; cursor: pointer;
-      accent-color: #004472; flex-shrink: 0; margin-top: 14px;
-    }
-
-    .task-area textarea {
-      flex: 1; font-size: 15px;
-      font-family: inherit; color: var(--text);
-      background: none; border: none; outline: none;
-      resize: none; line-height: 1.6;
-      padding: 10px 0; min-height: 50px; overflow: hidden;
-    }
+    .task-area input[type=checkbox] { width: 24px; height: 24px; cursor: pointer; accent-color: #004472; flex-shrink: 0; margin-top: 14px; }
+    .task-area textarea { flex: 1; font-size: 15px; font-family: inherit; color: var(--text); background: none; border: none; outline: none; resize: none; line-height: 1.6; padding: 10px 0; min-height: 56px; overflow: hidden; }
     .task-area textarea::placeholder { color: var(--text3); }
-    .task-area textarea.done {
-      text-decoration: line-through; color: var(--text3);
-    }
-
-    .del-btn {
-      background: none; border: none; cursor: pointer;
-      color: var(--text3); padding: 2px; border-radius: 4px;
-      opacity: 0; transition: opacity 0.15s;
-      font-size: 15px; margin-top: 12px; flex-shrink: 0;
-    }
+    .task-area textarea.done { text-decoration: line-through; color: var(--text3); }
+    .del-btn { background: none; border: none; cursor: pointer; color: var(--text3); padding: 2px; border-radius: 4px; opacity: 0; transition: opacity 0.15s; font-size: 15px; margin-top: 12px; flex-shrink: 0; }
     .task-area:hover .del-btn { opacity: 1; }
     .del-btn:hover { color: #CD1719; }
+    .prio-area { width: 80px; border-left: 0.5px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; flex-shrink: 0; padding: 8px 4px; transition: background 0.2s; }
+    .prio-canvas { width: 64px; height: 56px; border: 1.5px dashed rgba(0,0,0,0.15); border-radius: 8px; cursor: crosshair; touch-action: none; background: white; display: block; }
+    .prio-canvas.active { border-color: #004472; border-style: solid; }
+    .prio-result { font-size: 24px; font-weight: 500; color: #004472; line-height: 1; min-height: 30px; text-align: center; }
+    .prio-clear { font-size: 10px; color: var(--text3); background: none; border: none; cursor: pointer; padding: 0; line-height: 1; visibility: hidden; }
+    .prio-area:hover .prio-clear { visibility: visible; }
+    .prio-clear:hover { color: #CD1719; }
 
-    .prio-area {
-      width: 64px; border-left: 0.5px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .prio-input {
-      width: 100%; height: 100%; border: none; outline: none;
-      background: none; font-size: 22px; font-weight: 500;
-      text-align: center; font-family: inherit;
-      color: var(--text); cursor: text; padding: 10px 4px;
-      min-height: 72px;
-    }
-    .prio-input::placeholder { color: var(--text3); font-size: 15px; font-weight: 400; }
-
-    tfoot td {
-      border-left: 0.5px solid var(--border);
-      border-top: 0.5px solid var(--border);
-      background: var(--bg2);
-    }
+    tfoot td { border-left: 0.5px solid var(--border); border-top: 0.5px solid var(--border); background: var(--bg2); }
     tfoot td:first-child { border-left: none; text-align: center; }
-    .add-inner {
-      display: flex; align-items: center;
-      gap: 8px; padding: 10px 12px;
-    }
-    .add-inner input {
-      flex: 1; font-size: 14px; background: none;
-      border: none; outline: none; font-family: inherit;
-      color: var(--text); padding: 4px 0;
-    }
+    .add-inner { display: flex; align-items: center; gap: 8px; padding: 10px 12px; }
+    .add-inner input { flex: 1; font-size: 14px; background: none; border: none; outline: none; font-family: inherit; color: var(--text); padding: 4px 0; }
     .add-inner input::placeholder { color: var(--text3); }
-
-    .loading-overlay {
-      position: fixed; inset: 0;
-      background: rgba(255,255,255,0.85);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px; color: var(--text2);
-      z-index: 100;
-    }
+    .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--text2); z-index: 100; }
   </style>
 </head>
 <body>
@@ -230,6 +107,15 @@
 const COLS = 3;
 let data = [];
 let saveTimer = null;
+let hwrRecognizer = null;
+
+async function initHWR() {
+  if ('createHandwritingRecognizer' in navigator) {
+    try {
+      hwrRecognizer = await navigator.createHandwritingRecognizer({ languages: ['fr', 'en'] });
+    } catch(e) {}
+  }
+}
 
 function defaultData() {
   return Array.from({ length: 10 }, () =>
@@ -237,11 +123,9 @@ function defaultData() {
   );
 }
 
-function setSyncStatus(state) {
-  const dot = document.getElementById('sync-dot');
-  const label = document.getElementById('sync-label');
-  dot.className = 'sync-dot ' + state;
-  label.textContent = state === 'ok' ? 'Synchronisé' : state === 'saving' ? 'Enregistrement…' : 'Erreur sync';
+function setSyncStatus(s) {
+  document.getElementById('sync-dot').className = 'sync-dot ' + s;
+  document.getElementById('sync-label').textContent = s === 'ok' ? 'Synchronisé' : s === 'saving' ? 'Enregistrement…' : 'Erreur sync';
 }
 
 async function loadFromServer() {
@@ -250,10 +134,7 @@ async function loadFromServer() {
     if (!r.ok) throw new Error();
     data = await r.json();
     setSyncStatus('ok');
-  } catch (e) {
-    data = defaultData();
-    setSyncStatus('error');
-  }
+  } catch(e) { data = defaultData(); setSyncStatus('error'); }
   document.getElementById('loader').style.display = 'none';
   render();
   setInterval(pollServer, 5000);
@@ -263,97 +144,114 @@ async function pollServer() {
   try {
     const r = await fetch('/api/tasks');
     if (!r.ok) return;
-    const fresh = await r.json();
-    data = fresh;
-    render();
-    setSyncStatus('ok');
-  } catch (e) {
-    setSyncStatus('error');
-  }
+    data = await r.json();
+    render(); setSyncStatus('ok');
+  } catch(e) { setSyncStatus('error'); }
 }
 
 function scheduleSave() {
   setSyncStatus('saving');
   if (saveTimer) clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveToServer, 800);
+  saveTimer = setTimeout(async () => {
+    try {
+      const r = await fetch('/api/tasks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      if (!r.ok) throw new Error();
+      setSyncStatus('ok');
+    } catch(e) { setSyncStatus('error'); }
+  }, 800);
 }
 
-async function saveToServer() {
-  try {
-    const r = await fetch('/api/tasks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+function sortedData() {
+  const numRows = data.length;
+  const result = Array.from({ length: numRows }, () => Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '', rank: -1 })));
+  for (let ci = 0; ci < COLS; ci++) {
+    const col = data.map(row => row[ci]);
+    const withPrio = col.filter(c => c.prio !== '' && c.text !== '');
+    const withoutPrio = col.filter(c => c.prio === '' && c.text !== '');
+    const empty = col.filter(c => c.text === '');
+    const sortedWithPrio = withPrio.sort((a, b) => {
+      const av = parseFloat(a.prio);
+      const bv = parseFloat(b.prio);
+      if (!isNaN(av) && !isNaN(bv)) return av - bv;
+      if (!isNaN(av)) return -1;
+      if (!isNaN(bv)) return 1;
+      return a.prio.localeCompare(b.prio);
     });
-    if (!r.ok) throw new Error();
-    setSyncStatus('ok');
-  } catch (e) {
-    setSyncStatus('error');
+    const sorted = [...sortedWithPrio, ...withoutPrio, ...empty];
+    sorted.forEach((cell, ri) => {
+      result[ri][ci] = { ...cell, rank: cell.prio !== '' ? ri : -1 };
+    });
   }
+  return result;
 }
 
-function prioClass(v) { return ''; }
+function rankColorClass(rank) { return ''; }
 
-function setPrio(ri, ci, val) {
-  data[ri][ci].prio = val.slice(0, 3);
-  scheduleSave();
-}
+function prioColorClass(v) { return ''; }
+
+function esc(s) { return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 
 function render() {
   const tb = document.getElementById('tbody');
-  const scrollTops = {};
-  tb.querySelectorAll('textarea').forEach((ta, i) => { scrollTops[i] = ta.scrollTop; });
   tb.innerHTML = '';
-  data.forEach((row, ri) => {
+  const display = sortedData();
+  display.forEach((row, ri) => {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${ri + 1}</td>` + row.map((cell, ci) => `
-      <td>
+    let cells = `<td>${ri + 1}</td>`;
+    row.forEach((cell, ci) => {
+      cells += `<td>
         <div class="cell-inner">
           <div class="task-area">
-            <input type="checkbox" ${cell.done ? 'checked' : ''} aria-label="Fait" onchange="toggle(${ri},${ci})"/>
+            <input type="checkbox" ${cell.done ? 'checked' : ''} aria-label="Fait" onchange="toggleCell('${esc(cell.text)}',${ci})"/>
             <textarea rows="1" placeholder="—" class="${cell.done ? 'done' : ''}"
-              onblur="edit(${ri},${ci},this.value)"
+              onblur="editCell('${esc(cell.text)}',${ci},this.value)"
               oninput="resize(this)"
             >${cell.text}</textarea>
-            <button class="del-btn" onclick="clearCell(${ri},${ci})" aria-label="Effacer">
+            <button class="del-btn" onclick="clearByText('${esc(cell.text)}',${ci})" aria-label="Effacer">
               <i class="ti ti-x"></i>
             </button>
           </div>
-          <div class="prio-area">
-            <input class="prio-input" type="text" maxlength="3"
-              value="${cell.prio}" placeholder="P"
-              aria-label="Priorité"
-              oninput="setPrio(${ri},${ci},this.value)"
-            />
+          <div class="prio-area ${rankColorClass(cell.rank)}">
+            <canvas class="prio-canvas" width="64" height="56"
+              data-text="${esc(cell.text)}" data-ci="${ci}"></canvas>
+            <div class="prio-result">${cell.prio || ''}</div>
+            <button class="prio-clear" onclick="clearPrio('${esc(cell.text)}',${ci})">effacer</button>
           </div>
         </div>
-      </td>`).join('');
+      </td>`;
+    });
+    tr.innerHTML = cells;
     tb.appendChild(tr);
     row.forEach((_, ci) => {
       const ta = tr.querySelectorAll('textarea')[ci];
       if (ta) setTimeout(() => resize(ta), 0);
     });
   });
+  attachCanvasListeners();
 }
 
-function resize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.max(50, el.scrollHeight) + 'px';
+function resize(el) { el.style.height = 'auto'; el.style.height = Math.max(56, el.scrollHeight) + 'px'; }
+
+function findCell(text, ci) { return data.find(row => row[ci].text === text); }
+
+function toggleCell(text, ci) {
+  const cell = findCell(text, ci);
+  if (cell) { cell.done = !cell.done; scheduleSave(); render(); }
 }
 
-function toggle(ri, ci) {
-  data[ri][ci].done = !data[ri][ci].done;
-  scheduleSave(); render();
+function editCell(oldText, ci, newVal) {
+  const cell = findCell(oldText, ci);
+  if (cell) { cell.text = newVal; scheduleSave(); }
 }
 
-function edit(ri, ci, val) {
-  data[ri][ci].text = val;
-  scheduleSave();
+function clearByText(text, ci) {
+  const idx = data.findIndex(row => row[ci].text === text);
+  if (idx >= 0) { data[idx][ci] = { text: '', done: false, prio: '' }; scheduleSave(); render(); }
 }
 
-function clearCell(ri, ci) {
-  data[ri][ci] = { text: '', done: false, prio: '' };
-  scheduleSave(); render();
+function clearPrio(text, ci) {
+  const cell = findCell(text, ci);
+  if (cell) { cell.prio = ''; scheduleSave(); render(); }
 }
 
 function handleAdd(e, ci) {
@@ -362,13 +260,8 @@ function handleAdd(e, ci) {
   const val = e.target.value.trim();
   if (!val) return;
   const emptyRow = data.findIndex(row => !row[ci].text);
-  if (emptyRow >= 0) {
-    data[emptyRow][ci].text = val;
-  } else {
-    const nr = Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '' }));
-    nr[ci].text = val;
-    data.push(nr);
-  }
+  if (emptyRow >= 0) { data[emptyRow][ci].text = val; }
+  else { const nr = Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '' })); nr[ci].text = val; data.push(nr); }
   e.target.value = '';
   scheduleSave(); render();
 }
@@ -379,10 +272,118 @@ function resetAll() {
   scheduleSave(); render();
 }
 
+function attachCanvasListeners() {
+  document.querySelectorAll('.prio-canvas').forEach(canvas => {
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#004472';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    let drawing = false;
+    let strokes = [];
+    let currentStroke = [];
+    let recTimer = null;
+
+    function pos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const src = (e.touches && e.touches[0]) ? e.touches[0] : e;
+      return { x: src.clientX - rect.left, y: src.clientY - rect.top, t: Date.now() };
+    }
+
+    canvas.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      drawing = true;
+      currentStroke = [];
+      const p = pos(e);
+      currentStroke.push(p);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      canvas.classList.add('active');
+    });
+
+    canvas.addEventListener('pointermove', e => {
+      if (!drawing) return;
+      e.preventDefault();
+      const p = pos(e);
+      currentStroke.push(p);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+    });
+
+    canvas.addEventListener('pointerup', e => {
+      if (!drawing) return;
+      drawing = false;
+      if (currentStroke.length) strokes.push([...currentStroke]);
+      currentStroke = [];
+      if (recTimer) clearTimeout(recTimer);
+      recTimer = setTimeout(() => recognize(canvas, strokes), 700);
+    });
+
+    canvas.addEventListener('pointerleave', e => {
+      if (!drawing) return;
+      drawing = false;
+      if (currentStroke.length) strokes.push([...currentStroke]);
+      currentStroke = [];
+    });
+  });
+}
+
+async function recognize(canvas, strokes) {
+  const text = canvas.dataset.text;
+  const ci = parseInt(canvas.dataset.ci);
+
+  // Tentative API Chrome HWR
+  if (hwrRecognizer) {
+    try {
+      const drawing = hwrRecognizer.startDrawing({ recognitionType: 'text' });
+      strokes.forEach(stroke => {
+        drawing.addStroke(new HandwritingStroke(stroke.map(p => ({ x: p.x, y: p.y, t: p.t }))));
+      });
+      const results = await drawing.getPrediction();
+      if (results && results[0] && results[0].text.trim()) {
+        applyPrio(text, ci, results[0].text.trim());
+        return;
+      }
+    } catch(e) {}
+  }
+
+  // Fallback : analyse géométrique simple
+  const result = geometricRecognize(canvas);
+  if (result) applyPrio(text, ci, result);
+}
+
+function geometricRecognize(canvas) {
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const d = ctx.getImageData(0, 0, w, h).data;
+  let pts = [];
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i+3] > 50) {
+      pts.push({ x: (i/4) % w, y: Math.floor((i/4) / w) });
+    }
+  }
+  if (pts.length < 8) return null;
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  const bw = Math.max(...xs) - Math.min(...xs);
+  const bh = Math.max(...ys) - Math.min(...ys);
+  const ratio = bh / Math.max(1, bw);
+  // 1 = très étroit et haut
+  if (ratio > 2.5) return '1';
+  return null;
+}
+
+function applyPrio(text, ci, value) {
+  const cell = findCell(text, ci);
+  if (!cell) return;
+  cell.prio = value;
+  scheduleSave();
+  render();
+}
+
 document.getElementById('tdate').textContent =
   '— ' + new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
 
-loadFromServer();
+initHWR().then(() => loadFromServer());
 </script>
 </body>
 </html>
