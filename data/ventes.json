@@ -18,7 +18,7 @@
       "achat": "1500",
       "vente": "750",
       "prepa": "0",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "",
