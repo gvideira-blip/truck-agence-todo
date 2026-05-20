@@ -17,7 +17,7 @@
       "marque": "SAMRO",
       "achat": "1500",
       "vente": "750",
-      "prepa": "0",
+      "prepa": "00",
       "facture": true
     },
     {
@@ -26,8 +26,8 @@
       "immat": "GF676FN",
       "marque": "FILIAT",
       "achat": "9900",
-      "vente": "",
-      "prepa": "",
+      "vente": "7000",
+      "prepa": "0",
       "facture": false
     }
   ]
