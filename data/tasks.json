@@ -57,9 +57,9 @@
       "prio": ""
     },
     {
-      "text": "",
+      "text": "Bonjour",
       "done": false,
-      "prio": ""
+      "prio": "1"
     },
     {
       "text": "",
@@ -86,7 +86,7 @@
   ],
   [
     {
-      "text": "",
+      "text": "MOUGIN Patrick",
       "done": false,
       "prio": ""
     },
