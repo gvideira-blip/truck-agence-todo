@@ -1,85 +1,67 @@
-const https = require('https');
+const GH_OWNER = 'gvideira-blip';
+const GH_REPO = 'truck-agence-todo';
+const GH_PATH = 'data/ventes.json';
+const GH_BRANCH = 'main';
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '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';
-const REPO = 'gvideira-blip/truck-agence-todo';
-const FILE_PATH = 'ventes.json';
-
-function githubRequest(method, path, body) {
-  return new Promise((resolve, reject) => {
-    const data = body ? JSON.stringify(body) : null;
-    const options = {
-      hostname: 'api.github.com',
-      path,
-      method,
-      headers: {
-        'Authorization': `token ${GITHUB_TOKEN}`,
-        'User-Agent': 'truck-agence-todo',
-        'Content-Type': 'application/json',
-        ...(data ? { 'Content-Length': Buffer.byteLength(data) } : {})
-      }
-    };
-    const req = https.request(options, res => {
-      let body = '';
-      res.on('data', chunk => body += chunk);
-      res.on('end', () => {
-        try { resolve(JSON.parse(body)); }
-        catch(e) { resolve(body); }
-      });
-    });
-    req.on('error', reject);
-    if (data) req.write(data);
-    req.end();
+async function ghGet() {
+  const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}?ref=${GH_BRANCH}`;
+  const r = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+      'Accept': 'application/vnd.github+json',
+      'User-Agent': 'truck-agence-todo'
+    }
   });
+  if (r.status === 404) return { data: null, sha: null };
+  if (!r.ok) throw new Error(`GitHub GET ${r.status}: ${await r.text()}`);
+  const j = await r.json();
+  const content = Buffer.from(j.content, 'base64').toString('utf8');
+  return { data: JSON.parse(content), sha: j.sha };
 }
 
-module.exports = async (req, res) => {
+async function ghPut(data, sha) {
+  const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`;
+  const body = {
+    message: `update ventes ${new Date().toISOString()}`,
+    content: Buffer.from(JSON.stringify(data, null, 2)).toString('base64'),
+    branch: GH_BRANCH
+  };
+  if (sha) body.sha = sha;
+  const r = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+      'Accept': 'application/vnd.github+json',
+      'User-Agent': 'truck-agence-todo',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error(`GitHub PUT ${r.status}: ${await r.text()}`);
+}
+
+function defaultData() {
+  return { ventes: [] };
+}
+
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
-
-  if (req.method === 'GET') {
-    try {
-      const data = await githubRequest('GET', `/repos/${REPO}/contents/${FILE_PATH}`);
-      if (data.content) {
-        const content = JSON.parse(Buffer.from(data.content, 'base64').toString('utf8'));
-        return res.status(200).json({ ...content, sha: data.sha });
-      }
-      return res.status(200).json({ ventes: [], sha: null });
-    } catch(e) {
-      return res.status(200).json({ ventes: [], sha: null });
+  try {
+    if (req.method === 'GET') {
+      const { data } = await ghGet();
+      return res.status(200).json(data || defaultData());
     }
-  }
-
-  if (req.method === 'POST') {
-    try {
-      const body = await new Promise((resolve, reject) => {
-        let data = '';
-        req.on('data', chunk => data += chunk);
-        req.on('end', () => { try { resolve(JSON.parse(data)); } catch(e) { reject(e); } });
-        req.on('error', reject);
-      });
-
-      // Get current SHA
-      let sha = null;
-      try {
-        const existing = await githubRequest('GET', `/repos/${REPO}/contents/${FILE_PATH}`);
-        sha = existing.sha;
-      } catch(e) {}
-
-      const content = Buffer.from(JSON.stringify({ ventes: body.ventes || [] }, null, 2)).toString('base64');
-      const payload = {
-        message: `update ventes.json`,
-        content,
-        ...(sha ? { sha } : {})
-      };
-
-      await githubRequest('PUT', `/repos/${REPO}/contents/${FILE_PATH}`, payload);
+    if (req.method === 'POST') {
+      const body = req.body;
+      const { sha } = await ghGet();
+      await ghPut(body, sha);
       return res.status(200).json({ ok: true });
-    } catch(e) {
-      return res.status(500).json({ error: e.message });
     }
+    return res.status(405).end();
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
   }
-
-  return res.status(405).json({ error: 'Method not allowed' });
-};
+}
