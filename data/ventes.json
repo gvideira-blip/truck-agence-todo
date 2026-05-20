@@ -79,6 +79,16 @@
       "vente": "52000",
       "prepa": "",
       "facture": false
+    },
+    {
+      "acheteur": "",
+      "vendeur": "",
+      "immat": "",
+      "marque": "",
+      "achat": "",
+      "vente": "",
+      "prepa": "",
+      "facture": false
     }
   ]
 }
