@@ -37,7 +37,7 @@
       "marque": "Billaud",
       "achat": "12300",
       "vente": "15250",
-      "prepa": "",
+      "prepa": "0",
       "facture": false
     }
   ]
