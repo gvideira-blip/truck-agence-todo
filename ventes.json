@@ -1,14 +1,3 @@
 {
-  "ventes": [
-    {
-      "acheteur": "sfvj",
-      "vendeur": "svfbhk",
-      "immat": "vfd",
-      "marque": "fksjh",
-      "achat": "15000",
-      "vente": "18000",
-      "prepa": "1000",
-      "facture": false
-    }
-  ]
+  "ventes": []
 }
