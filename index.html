@@ -4,6 +4,15 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tâches du jour — Truck Agence</title>
+  <script>
+    // Garde d'authentification — redirige vers /login.html si pas connecté
+    (function() {
+      const until = parseInt(localStorage.getItem('ta_auth_until') || '0');
+      if (until <= Date.now()) {
+        window.location.href = '/login.html?next=' + encodeURIComponent(window.location.pathname);
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
