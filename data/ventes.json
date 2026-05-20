@@ -28,6 +28,16 @@
       "achat": "7000",
       "vente": "9900",
       "prepa": "0",
+      "facture": true
+    },
+    {
+      "acheteur": "",
+      "vendeur": "",
+      "immat": "",
+      "marque": "",
+      "achat": "",
+      "vente": "",
+      "prepa": "",
       "facture": false
     }
   ]
