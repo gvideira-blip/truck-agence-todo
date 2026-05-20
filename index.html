@@ -29,6 +29,29 @@
       color: var(--text);
     }
 
+    /* NAV */
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .nav a {
+      font-size: 12px;
+      color: var(--text2);
+      text-decoration: none;
+      padding: 5px 14px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--bg);
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .nav a:hover { border-color: var(--blue); color: var(--blue); }
+    .nav a.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
     .wrap {
       background: var(--bg);
       border-radius: var(--r);
@@ -145,7 +168,6 @@
     .prio-btn:hover { border-color: var(--blue); }
     .prio-btn .placeholder { color: var(--text3); font-size: 13px; font-weight: 400; }
 
-    /* Modal mixte clavier + pavé */
     .modal-bg {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.4);
@@ -216,6 +238,12 @@
 <body>
 
 <div id="loader">Chargement…</div>
+
+<nav class="nav">
+  <a href="/" class="active">✅ Tâches</a>
+  <a href="/ventes.html">📊 Ventes</a>
+  <a href="/tableau-blanc.html">🖊️ Tableau blanc</a>
+</nav>
 
 <div class="wrap">
   <div class="topbar">
@@ -328,37 +356,23 @@ function save() {
   }, 700);
 }
 
-/* TRI : on construit un tableau d'index triés pour chaque colonne */
 function buildSortedIndexes() {
   const maxRows = data.length;
   const result = Array.from({length: maxRows}, () => new Array(COLS));
-
   for (let ci = 0; ci < COLS; ci++) {
-    // Construire la liste {realIndex, cell} pour cette colonne
     const entries = [];
     for (let ri = 0; ri < data.length; ri++) {
       entries.push({ ri: ri, cell: data[ri][ci] });
     }
-
-    // Catégoriser
     const withPrio = entries.filter(e => e.cell.prio !== '' && e.cell.text !== '');
     const noPrio   = entries.filter(e => e.cell.prio === '' && e.cell.text !== '');
     const empty    = entries.filter(e => e.cell.text === '');
-
-    // Trier les avec priorité
-    withPrio.sort((a, b) => {
-      const an = parseFloat(a.cell.prio);
-      const bn = parseFloat(b.cell.prio);
-      return an - bn;
-    });
-
-    // Concaténer et placer
+    withPrio.sort((a, b) => parseFloat(a.cell.prio) - parseFloat(b.cell.prio));
     const ordered = withPrio.concat(noPrio, empty);
     for (let di = 0; di < ordered.length && di < maxRows; di++) {
       result[di][ci] = ordered[di].ri;
     }
   }
-
   return result;
 }
 
@@ -401,7 +415,6 @@ function render() {
 }
 
 function resize(el) { el.style.height='auto'; el.style.height=Math.max(28,el.scrollHeight)+'px'; }
-
 function toggle(ri, ci) { data[ri][ci].done = !data[ri][ci].done; save(); render(); }
 function editText(ri, ci, val) { data[ri][ci].text = val; save(); }
 function clearCell(ri, ci) { data[ri][ci] = { text:'', done:false, prio:'' }; save(); render(); }
@@ -427,7 +440,6 @@ function resetAll() {
   save(); render();
 }
 
-/* Pavé numérique avec clavier en parallèle */
 function openKeypad(ri, ci) {
   kpTarget = { ri, ci };
   const input = document.getElementById('modal-input');
@@ -435,46 +447,31 @@ function openKeypad(ri, ci) {
   document.getElementById('modal-bg').classList.add('open');
   setTimeout(() => input.focus(), 50);
 }
-
-function closeKeypadIfBg(e) {
-  if (e.target.id === 'modal-bg') closeKeypad();
-}
-
-function closeKeypad() {
-  kpTarget = null;
-  document.getElementById('modal-bg').classList.remove('open');
-}
-
+function closeKeypadIfBg(e) { if (e.target.id === 'modal-bg') closeKeypad(); }
+function closeKeypad() { kpTarget = null; document.getElementById('modal-bg').classList.remove('open'); }
 function kpType(val) {
-  // Filtre : que des chiffres
   const clean = val.replace(/[^0-9]/g, '').slice(0, 4);
   document.getElementById('modal-input').value = clean;
 }
-
 function kpKeydown(e) {
   if (e.key === 'Enter') { e.preventDefault(); kpOk(); }
   else if (e.key === 'Escape') { e.preventDefault(); closeKeypad(); }
 }
-
 function kpAdd(digit) {
   const input = document.getElementById('modal-input');
   if (input.value.length >= 4) return;
   input.value = input.value + digit;
 }
-
 function kpDel() {
   const input = document.getElementById('modal-input');
   input.value = input.value.slice(0, -1);
 }
-
 function kpOk() {
   if (!kpTarget) return;
   const { ri, ci } = kpTarget;
   const val = document.getElementById('modal-input').value;
   data[ri][ci].prio = val;
-  save();
-  closeKeypad();
-  render();
+  save(); closeKeypad(); render();
 }
 
 document.getElementById('tdate').textContent =
