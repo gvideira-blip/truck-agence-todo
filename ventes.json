@@ -1,14 +1,3 @@
 {
-  "ventes": [
-    {
-      "acheteur": "",
-      "vendeur": "",
-      "immat": "",
-      "marque": "",
-      "achat": "",
-      "vente": "",
-      "prepa": "",
-      "facture": true
-    }
-  ]
+  "ventes": []
 }
