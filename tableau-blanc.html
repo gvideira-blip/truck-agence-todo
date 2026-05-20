@@ -109,6 +109,7 @@
     color: var(--blue);
   }
   .tool-btn.eraser.active { border-color: var(--red); background: #fef0f0; color: var(--red); }
+  .tool-btn.lasso.active { border-color: var(--green); background: #edf7f1; color: var(--green); }
 
   /* Color swatches */
   .color-btn {
@@ -198,6 +199,7 @@
     background-size: 32px 32px;
   }
   canvas.eraser-mode { cursor: cell; }
+  canvas.lasso-mode { cursor: copy; }
 </style>
 </head>
 <body>
@@ -217,6 +219,9 @@
     </button>
     <button class="tool-btn eraser" id="eraserBtn" onclick="setTool('eraser')" title="Gomme">
       <i class="ti ti-eraser"></i>
+    </button>
+    <button class="tool-btn lasso" id="lassoBtn" onclick="setTool('lasso')" title="Lasso (effacer une zone)">
+      <i class="ti ti-lasso"></i>
     </button>
   </div>
 
@@ -295,7 +300,9 @@ function setTool(t) {
   tool = t;
   document.getElementById('penBtn').classList.toggle('active', t === 'pen');
   document.getElementById('eraserBtn').classList.toggle('active', t === 'eraser');
+  document.getElementById('lassoBtn').classList.toggle('active', t === 'lasso');
   canvas.classList.toggle('eraser-mode', t === 'eraser');
+  canvas.classList.toggle('lasso-mode', t === 'lasso');
 }
 function setColor(c, el) {
   color = c;
@@ -310,6 +317,8 @@ function setWidth(w, el) {
 }
 
 // --- Drawing ---
+let lassoPoints = null;
+
 function getPos(e) {
   const rect = canvas.getBoundingClientRect();
   const t = e.touches ? e.touches[0] : e;
@@ -320,6 +329,12 @@ function startStroke(e) {
   e.preventDefault();
   isDrawing = true;
   const pos = getPos(e);
+
+  if (tool === 'lasso') {
+    lassoPoints = [pos];
+    return;
+  }
+
   currentStroke = {
     color: tool === 'eraser' ? '#ffffff' : color,
     width: tool === 'eraser' ? Math.max(width * 4, 20) : width,
@@ -331,9 +346,18 @@ function startStroke(e) {
 }
 
 function continueStroke(e) {
-  if (!isDrawing || !currentStroke) return;
+  if (!isDrawing) return;
   e.preventDefault();
   const pos = getPos(e);
+
+  if (tool === 'lasso') {
+    lassoPoints.push(pos);
+    redraw();
+    drawLassoOverlay();
+    return;
+  }
+
+  if (!currentStroke) return;
   currentStroke.points.push(pos);
   drawStrokeSegment(currentStroke, currentStroke.points.length - 2);
 }
@@ -341,8 +365,60 @@ function continueStroke(e) {
 function endStroke() {
   if (!isDrawing) return;
   isDrawing = false;
+
+  if (tool === 'lasso' && lassoPoints && lassoPoints.length > 2) {
+    eraseInsideLasso(lassoPoints);
+    lassoPoints = null;
+    redraw();
+    scheduleSave();
+    return;
+  }
+  lassoPoints = null;
+
   currentStroke = null;
   scheduleSave();
+}
+
+function drawLassoOverlay() {
+  if (!lassoPoints || lassoPoints.length < 2) return;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(lassoPoints[0].x, lassoPoints[0].y);
+  for (let i = 1; i < lassoPoints.length; i++) {
+    ctx.lineTo(lassoPoints[i].x, lassoPoints[i].y);
+  }
+  // Ligne pointillée verte
+  ctx.setLineDash([6, 4]);
+  ctx.strokeStyle = '#2d8a4e';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // Remplissage léger vert transparent
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(45, 138, 78, 0.08)';
+  ctx.fill();
+  ctx.restore();
+}
+
+// Point-in-polygon (algo ray casting)
+function pointInPolygon(p, polygon) {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].x, yi = polygon[i].y;
+    const xj = polygon[j].x, yj = polygon[j].y;
+    const intersect = ((yi > p.y) !== (yj > p.y)) &&
+      (p.x < (xj - xi) * (p.y - yi) / (yj - yi + 0.00001) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+// Vire les strokes dont la majorité des points sont dans le lasso
+function eraseInsideLasso(polygon) {
+  strokes = strokes.filter(stroke => {
+    const insideCount = stroke.points.filter(p => pointInPolygon(p, polygon)).length;
+    // On supprime si plus de 50% des points sont dedans
+    return insideCount / stroke.points.length < 0.5;
+  });
 }
 
 // Souris
