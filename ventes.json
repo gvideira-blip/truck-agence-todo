@@ -1,13 +1,13 @@
 {
   "ventes": [
     {
-      "acheteur": "kjf",
-      "vendeur": "llkj",
-      "immat": "ljk",
-      "marque": "ljk",
-      "achat": "15000",
-      "vente": "15000",
-      "prepa": "1000",
+      "acheteur": "",
+      "vendeur": "",
+      "immat": "",
+      "marque": "",
+      "achat": "",
+      "vente": "",
+      "prepa": "",
       "facture": true
     }
   ]
