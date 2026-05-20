@@ -336,11 +336,21 @@ async function load() {
 
 async function poll() {
   if (kpTarget) return;
+  // Ne pas re-render si l'utilisateur est en train de taper
+  if (document.activeElement && (
+    document.activeElement.tagName === 'TEXTAREA' ||
+    document.activeElement.tagName === 'INPUT'
+  )) return;
   try {
     const r = await fetch('/api/tasks');
     if (!r.ok) return;
-    data = await r.json();
-    render(); setSyncStatus('ok');
+    const newData = await r.json();
+    // Ne re-render que si les données ont changé
+    if (JSON.stringify(newData) !== JSON.stringify(data)) {
+      data = newData;
+      render();
+    }
+    setSyncStatus('ok');
   } catch(e) { setSyncStatus('error'); }
 }
 
