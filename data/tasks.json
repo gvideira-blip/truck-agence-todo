@@ -3,7 +3,7 @@
     {
       "text": "Relance FNTR",
       "done": false,
-      "prio": ""
+      "prio": "1"
     },
     {
       "text": "Envoie CASSITRANS ATTAL PL ",
@@ -52,7 +52,7 @@
   ],
   [
     {
-      "text": "Test de la journée, ca fonctionne.",
+      "text": "",
       "done": false,
       "prio": ""
     },
