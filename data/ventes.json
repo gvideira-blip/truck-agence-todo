@@ -38,7 +38,7 @@
       "achat": "12300",
       "vente": "15250",
       "prepa": "0",
-      "facture": false
+      "facture": true
     }
   ]
 }
