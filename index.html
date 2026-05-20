@@ -402,8 +402,10 @@ function render() {
           <div class="task">
             <input type="checkbox" ${cell.done?'checked':''} onchange="toggle(${ri},${ci})"/>
             <textarea rows="1" placeholder="—" class="${cell.done?'done':''}"
+              data-di="${di}" data-ci="${ci}"
               onblur="editText(${ri},${ci},this.value)"
               oninput="resize(this)"
+              onkeydown="handleTab(event, ${di}, ${ci})"
             >${cell.text}</textarea>
             <button class="del" onclick="clearCell(${ri},${ci})" aria-label="Effacer">
               <i class="ti ti-x"></i>
@@ -421,6 +423,29 @@ function render() {
       const ta = tr.querySelectorAll('textarea')[ci];
       if (ta) setTimeout(() => resize(ta), 0);
     }
+  }
+}
+
+function handleTab(e, di, ci) {
+  if (e.key !== 'Tab') return;
+  e.preventDefault();
+  // Sauvegarder la valeur courante avant de bouger
+  const ta = e.target;
+  const ri = buildSortedIndexes()[di][ci];
+  if (ri !== undefined) data[ri][ci].text = ta.value;
+
+  // Trouver la prochaine case dans la même colonne (di+1 ou wrap au début)
+  const allRows = document.querySelectorAll('#tbody tr');
+  const nextDi = e.shiftKey ? di - 1 : di + 1;
+
+  if (nextDi >= 0 && nextDi < allRows.length) {
+    const target = document.querySelector(`textarea[data-di="${nextDi}"][data-ci="${ci}"]`);
+    if (target) { target.focus(); target.select(); return; }
+  }
+  // Si on dépasse le bas → focus sur l'input "Ajouter…" de la même colonne
+  if (!e.shiftKey && nextDi >= allRows.length) {
+    const addInput = document.getElementById('a' + ci);
+    if (addInput) addInput.focus();
   }
 }
 
