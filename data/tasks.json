@@ -58,7 +58,7 @@
     },
     {
       "text": "Faire mandat TRANS TER",
-      "done": false,
+      "done": true,
       "prio": "2"
     },
     {
