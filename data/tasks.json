@@ -1,9 +1,9 @@
 [
   [
     {
-      "text": "Relance FNTR",
+      "text": "",
       "done": false,
-      "prio": "6"
+      "prio": ""
     },
     {
       "text": "Dossier Ecole",
@@ -18,9 +18,9 @@
   ],
   [
     {
-      "text": "Relance Recherche en cours",
+      "text": "",
       "done": false,
-      "prio": "5"
+      "prio": ""
     },
     {
       "text": "Rentrer tous les mandats HUBSPOT",
