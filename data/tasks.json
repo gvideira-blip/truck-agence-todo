@@ -103,9 +103,9 @@
   ],
   [
     {
-      "text": "Envoyer Renault Master à Tony ",
-      "done": true,
-      "prio": "2"
+      "text": "",
+      "done": false,
+      "prio": ""
     },
     {
       "text": "VERDET Arnaud Annonce",
@@ -120,9 +120,9 @@
   ],
   [
     {
-      "text": "Appeler intérêt ACTM Italie ",
-      "done": true,
-      "prio": "3"
+      "text": "",
+      "done": false,
+      "prio": ""
     },
     {
       "text": "Mandat Magot",
