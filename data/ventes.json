@@ -48,7 +48,7 @@
       "achat": "1000",
       "vente": "7000",
       "prepa": "2266",
-      "facture": true
+      "facture": false
     },
     {
       "acheteur": "Transports RAVERAT",
