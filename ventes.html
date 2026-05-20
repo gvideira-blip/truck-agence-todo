@@ -3,122 +3,90 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tableau des Ventes – Truck Agence</title>
+<title>Ventes du mois — Truck Agence</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
+    --bg: #ffffff;
+    --bg2: #f5f5f3;
+    --border: rgba(0,0,0,0.1);
+    --text: #1a1a1a;
+    --text2: #777;
+    --text3: #bbb;
     --blue: #004472;
     --red: #CD1719;
-    --bg: #0d1117;
-    --surface: #161b22;
-    --surface2: #21262d;
-    --border: #30363d;
-    --text: #e6edf3;
-    --muted: #8b949e;
-    --green: #3fb950;
-    --orange: #d29922;
+    --green: #2d8a4e;
+    --green-bg: #edf7f1;
+    --orange: #c47a00;
+    --orange-bg: #fff8eb;
+    --r: 12px;
+    --rs: 8px;
   }
 
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg2);
     min-height: 100vh;
-    padding: 0;
+    padding: 24px;
+    color: var(--text);
   }
 
-  /* HEADER */
-  header {
-    background: var(--blue);
-    padding: 14px 28px;
+  /* NAV */
+  .nav {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 3px solid var(--red);
-  }
-  header h1 {
-    font-size: 1.2rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: #fff;
-  }
-  header .month {
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.7);
-    margin-top: 2px;
-  }
-  .header-right {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-  .nav-links {
-    display: flex;
+    justify-content: center;
     gap: 8px;
+    margin-bottom: 16px;
   }
-  .nav-links a {
-    color: rgba(255,255,255,0.75);
+  .nav a {
+    font-size: 12px;
+    color: var(--text2);
     text-decoration: none;
-    font-size: 0.8rem;
-    padding: 5px 12px;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 6px;
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg);
     transition: all 0.15s;
-  }
-  .nav-links a:hover { background: rgba(255,255,255,0.1); color: #fff; }
-
-  btn-add {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 6px;
-    background: var(--red);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s;
+    gap: 5px;
   }
-
-  /* MAIN */
-  main {
-    padding: 24px 28px;
-  }
+  .nav a:hover { border-color: var(--blue); color: var(--blue); }
+  .nav a.active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
   /* RECAP */
   .recap {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 28px;
+    gap: 12px;
+    margin-bottom: 16px;
   }
   .recap-card {
-    background: var(--surface);
+    background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 20px;
+    border-radius: var(--r);
+    padding: 16px 18px;
   }
   .recap-card .label {
-    font-size: 0.75rem;
-    color: var(--muted);
+    font-size: 11px;
+    color: var(--text3);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   .recap-card .value {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: var(--text);
   }
   .recap-card .value.green { color: var(--green); }
   .recap-card .value.orange { color: var(--orange); }
   .recap-card .sub {
-    font-size: 0.78rem;
-    color: var(--muted);
-    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 4px;
   }
   .progress-bar {
     height: 4px;
@@ -129,448 +97,456 @@
   }
   .progress-fill {
     height: 100%;
-    background: var(--green);
+    background: var(--blue);
     border-radius: 2px;
     transition: width 0.4s;
   }
 
-  /* TOOLBAR */
-  .toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
+  /* WRAP */
+  .wrap {
+    background: var(--bg);
+    border-radius: var(--r);
+    border: 1px solid var(--border);
+    overflow: hidden;
   }
-  .toolbar-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+
+  /* TOPBAR */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
   }
-  .btn-add {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--red);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 9px 18px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s;
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); }
+  .title { font-size: 15px; font-weight: 500; }
+  .month-label { font-size: 13px; color: var(--text3); }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .sync { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 5px; }
+  .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; transition: background 0.3s; }
+  .sync-dot.ok { background: #5a9a2a; }
+  .sync-dot.saving { background: #e0920a; }
+  .sync-dot.error { background: #d03030; }
+
+  .btn {
+    font-size: 12px;
+    background: none; border: 1px solid var(--border);
+    border-radius: var(--rs); padding: 5px 12px;
+    cursor: pointer; display: flex; align-items: center; gap: 4px;
+    color: var(--text2); font-family: inherit;
+    transition: all 0.15s;
   }
-  .btn-add:hover { opacity: 0.85; }
+  .btn:hover { background: var(--bg2); }
+  .btn.primary {
+    background: var(--blue); color: #fff; border-color: var(--blue);
+  }
+  .btn.primary:hover { background: #003560; }
+  .btn.danger:hover { border-color: var(--red); color: var(--red); }
 
   /* TABLE */
-  .table-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    overflow-x: auto;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.82rem;
-    min-width: 1000px;
-  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
   thead th {
-    background: var(--surface2);
-    color: var(--muted);
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    padding: 11px 14px;
-    text-align: left;
+    padding: 9px 12px;
+    font-size: 11px; font-weight: 600; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.4px;
+    border-left: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
+    background: var(--bg2); text-align: left;
     white-space: nowrap;
   }
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
-  }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: rgba(255,255,255,0.03); }
-  tbody tr.facture { opacity: 0.65; }
+  thead th.right { text-align: right; }
+  thead th.center { text-align: center; }
+  thead th:first-child { border-left: none; width: 32px; text-align: center; color: var(--text3); font-weight: 400; }
+
   tbody td {
-    padding: 10px 14px;
-    color: var(--text);
-    vertical-align: middle;
+    border-left: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 0; vertical-align: middle;
   }
-  td input[type="text"], td input[type="number"] {
-    background: transparent;
-    border: none;
-    color: var(--text);
-    font-size: 0.82rem;
-    width: 100%;
-    outline: none;
-    padding: 2px 0;
-    font-family: inherit;
+  tbody td:first-child { border-left: none; text-align: center; font-size: 11px; color: var(--text3); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #fafafa; }
+  tbody tr.is-facture { opacity: 0.6; }
+
+  .cell-input {
+    display: block; width: 100%;
+    background: transparent; border: none; outline: none;
+    font-size: 13px; font-family: inherit; color: var(--text);
+    padding: 10px 12px; line-height: 1.4;
   }
-  td input[type="text"]:focus, td input[type="number"]:focus {
-    border-bottom: 1px solid var(--blue);
-  }
-  td input[type="number"] { text-align: right; }
-  
+  .cell-input::placeholder { color: var(--text3); }
+  .cell-input.right { text-align: right; }
+  .cell-input:focus { background: #f0f6fa; }
+
   .marge-cell {
+    padding: 10px 12px;
     font-weight: 700;
+    text-align: right;
+    white-space: nowrap;
   }
-  .marge-cell.positive { color: var(--green); }
-  .marge-cell.negative { color: var(--red); }
+  .marge-cell.pos { color: var(--green); }
+  .marge-cell.neg { color: var(--red); }
+  .pct-cell {
+    padding: 10px 12px;
+    text-align: right;
+    font-size: 12px;
+    color: var(--text2);
+  }
 
-  /* Checkbox facturé */
-  .facture-check {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
+  /* Facturé */
+  .facture-cell {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; padding: 10px 12px; cursor: pointer;
   }
-  .facture-check input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--green);
-    cursor: pointer;
+  .facture-cell input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--blue);
+    cursor: pointer; flex-shrink: 0;
   }
-  .facture-label {
-    font-size: 0.75rem;
-    font-weight: 600;
+  .facture-badge {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 7px; border-radius: 10px;
   }
-  .facture-label.ok { color: var(--green); }
-  .facture-label.pending { color: var(--orange); }
+  .facture-badge.ok { background: var(--green-bg); color: var(--green); }
+  .facture-badge.pending { background: var(--orange-bg); color: var(--orange); }
 
-  .btn-delete {
-    background: none;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    transition: all 0.15s;
-    line-height: 1;
+  .btn-del {
+    background: none; border: none; cursor: pointer;
+    color: var(--text3); padding: 10px 10px;
+    font-size: 12px; transition: color 0.15s;
+    display: block; width: 100%;
   }
-  .btn-delete:hover { color: var(--red); background: rgba(205,23,25,0.1); }
+  .btn-del:hover { color: var(--red); }
 
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--muted);
+  /* Empty */
+  .empty {
+    text-align: center; padding: 60px 20px;
+    color: var(--text3); font-size: 14px;
+    display: none;
   }
-  .empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
-  .empty-state p { font-size: 0.9rem; }
+  .empty.show { display: block; }
+  .empty-icon { font-size: 2rem; margin-bottom: 10px; }
 
-  .save-indicator {
-    font-size: 0.75rem;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  /* Footer total */
+  tfoot td {
+    border-left: 1px solid var(--border);
+    border-top: 2px solid var(--border);
+    background: var(--bg2);
+    padding: 10px 12px;
+    font-size: 12px; font-weight: 600;
+    color: var(--text2);
   }
-  .save-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--green);
-  }
-  .save-dot.saving { background: var(--orange); animation: pulse 0.8s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  tfoot td:first-child { border-left: none; }
+  tfoot td.right { text-align: right; }
+  tfoot td.marge-total { color: var(--blue); font-size: 14px; text-align: right; }
 
-  .reset-btn {
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.78rem;
-    cursor: pointer;
-    transition: all 0.15s;
+  #loader {
+    position: fixed; inset: 0;
+    background: rgba(255,255,255,0.92);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--text2); z-index: 100;
   }
-  .reset-btn:hover { border-color: var(--red); color: var(--red); }
 
-  @media (max-width: 768px) {
-    main { padding: 16px; }
+  @media (max-width: 900px) {
+    body { padding: 12px; }
     .recap { grid-template-columns: repeat(2, 1fr); }
-    header { padding: 12px 16px; }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <div>
-    <h1>📊 Tableau des Ventes</h1>
-    <div class="month" id="currentMonth"></div>
-  </div>
-  <div class="header-right">
-    <div class="save-indicator">
-      <div class="save-dot" id="saveDot"></div>
-      <span id="saveLabel">Sauvegardé</span>
-    </div>
-    <nav class="nav-links">
-      <a href="/">✅ Todo</a>
-      <a href="/tableau-blanc.html">🖊️ Tableau blanc</a>
-    </nav>
-  </div>
-</header>
+<div id="loader">Chargement…</div>
 
-<main>
-  <!-- RECAP -->
-  <div class="recap">
-    <div class="recap-card">
-      <div class="label">Marge facturée</div>
-      <div class="value green" id="margeFacturee">0 €</div>
-      <div class="sub" id="countFacturee">0 vente(s) facturée(s)</div>
+<nav class="nav">
+  <a href="/">✅ Tâches</a>
+  <a href="/ventes.html" class="active">📊 Ventes</a>
+  <a href="/tableau-blanc.html">🖊️ Tableau blanc</a>
+</nav>
+
+<!-- RECAP -->
+<div class="recap">
+  <div class="recap-card">
+    <div class="label">Marge facturée</div>
+    <div class="value green" id="rFacturee">0 €</div>
+    <div class="sub" id="rCntF">0 vente(s)</div>
+  </div>
+  <div class="recap-card">
+    <div class="label">Potentiel à facturer</div>
+    <div class="value orange" id="rPotentiel">0 €</div>
+    <div class="sub" id="rCntP">0 vente(s)</div>
+  </div>
+  <div class="recap-card">
+    <div class="label">Total mois</div>
+    <div class="value" id="rTotal">0 €</div>
+    <div class="sub" id="rCntT">0 vente(s)</div>
+  </div>
+  <div class="recap-card">
+    <div class="label">Objectif · 50 000 €</div>
+    <div class="value" id="rPct">0%</div>
+    <div class="sub" id="rPctSub">0 € réalisés</div>
+    <div class="progress-bar"><div class="progress-fill" id="rBar" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- TABLE -->
+<div class="wrap">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="dot"></div>
+      <span class="title">Ventes du mois</span>
+      <span class="month-label" id="monthLabel"></span>
     </div>
-    <div class="recap-card">
-      <div class="label">Potentiel à facturer</div>
-      <div class="value orange" id="margePotentiel">0 €</div>
-      <div class="sub" id="countPotentiel">0 vente(s) en cours</div>
-    </div>
-    <div class="recap-card">
-      <div class="label">Total mois</div>
-      <div class="value" id="margeTotal">0 €</div>
-      <div class="sub" id="countTotal">0 vente(s) au total</div>
-    </div>
-    <div class="recap-card">
-      <div class="label">Objectif mensuel · 50 000 €</div>
-      <div class="value" id="pctObjectif">0%</div>
-      <div class="sub" id="labelObjectif">0 € réalisés</div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    <div class="topbar-right">
+      <div class="sync">
+        <div class="sync-dot" id="sdot"></div>
+        <span id="slabel">—</span>
       </div>
+      <button class="btn danger" onclick="confirmReset()">
+        <i class="ti ti-refresh"></i> Remise à zéro
+      </button>
+      <button class="btn primary" onclick="addRow()">
+        <i class="ti ti-plus"></i> Ajouter
+      </button>
     </div>
   </div>
 
-  <!-- TOOLBAR -->
-  <div class="toolbar">
-    <span class="toolbar-title">Ventes du mois</span>
-    <div style="display:flex;gap:10px;align-items:center;">
-      <button class="reset-btn" onclick="confirmReset()">🗑️ Remise à zéro</button>
-      <button class="btn-add" onclick="addRow()">+ Ajouter une vente</button>
-    </div>
+  <div class="empty" id="empty">
+    <div class="empty-icon">📋</div>
+    Aucune vente ce mois-ci.<br>Cliquez sur <strong>+ Ajouter</strong> pour commencer.
   </div>
 
-  <!-- TABLE -->
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Acheteur</th>
-          <th>Vendeur</th>
-          <th>Immat.</th>
-          <th>Marque / Modèle</th>
-          <th style="text-align:right">Achat HT €</th>
-          <th style="text-align:right">Vente HT €</th>
-          <th style="text-align:right">Prépa €</th>
-          <th style="text-align:right">Marge €</th>
-          <th style="text-align:right">%</th>
-          <th style="text-align:center">Facturé</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-    <div class="empty-state" id="emptyState">
-      <div class="icon">📋</div>
-      <p>Aucune vente ce mois-ci.<br>Cliquez sur <strong>+ Ajouter une vente</strong> pour commencer.</p>
-    </div>
-  </div>
-</main>
+  <table id="table" style="display:none">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Acheteur</th>
+        <th>Vendeur</th>
+        <th>Immat.</th>
+        <th>Marque / Modèle</th>
+        <th class="right">Achat HT</th>
+        <th class="right">Vente HT</th>
+        <th class="right">Prépa</th>
+        <th class="right">Marge</th>
+        <th class="right">%</th>
+        <th class="center">Facturé</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+    <tfoot id="tfoot">
+      <tr>
+        <td colspan="8" style="text-align:right">Total</td>
+        <td class="marge-total" id="footMarge">—</td>
+        <td></td><td></td><td></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
 
 <script>
-const GITHUB_TOKEN = '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';
-const REPO = 'gvideira-blip/truck-agence-todo';
-const FILE = 'ventes.json';
 const OBJECTIF = 50000;
-
 let ventes = [];
 let saveTimer = null;
-let currentSha = null;
 
-// --- INIT ---
+function setSyncStatus(s) {
+  document.getElementById('sdot').className = 'sync-dot ' + s;
+  document.getElementById('slabel').textContent = s==='ok'?'Synchronisé':s==='saving'?'Enregistrement…':'Erreur sync';
+}
+
 async function init() {
-  const now = new Date();
-  document.getElementById('currentMonth').textContent =
-    now.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase());
+  document.getElementById('monthLabel').textContent =
+    '— ' + new Date().toLocaleDateString('fr-FR', { month:'long', year:'numeric' });
   await loadData();
+  document.getElementById('loader').style.display = 'none';
   render();
 }
 
-// --- GITHUB LOAD ---
 async function loadData() {
   try {
-    const r = await fetch(`/api/ventes`);
+    const r = await fetch('/api/ventes');
+    if (!r.ok) throw 0;
     const d = await r.json();
     ventes = d.ventes || [];
-    currentSha = d.sha || null;
-  } catch(e) {
-    ventes = [];
-  }
+    setSyncStatus('ok');
+  } catch(e) { ventes = []; setSyncStatus('error'); }
 }
 
-// --- SAVE ---
 function scheduleSave() {
-  setSaving(true);
+  setSyncStatus('saving');
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveData, 1200);
+  saveTimer = setTimeout(async () => {
+    try {
+      await fetch('/api/ventes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ventes })
+      });
+      setSyncStatus('ok');
+    } catch(e) { setSyncStatus('error'); }
+  }, 800);
 }
 
-async function saveData() {
-  try {
-    await fetch('/api/ventes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ventes })
-    });
-    setSaving(false);
-  } catch(e) {
-    setSaving(false);
-  }
+function calcMarge(v) {
+  const a = parseFloat(v.achat)||0;
+  const ve = parseFloat(v.vente)||0;
+  const p = parseFloat(v.prepa)||0;
+  return ve - a - p;
 }
 
-function setSaving(saving) {
-  const dot = document.getElementById('saveDot');
-  const label = document.getElementById('saveLabel');
-  if (saving) {
-    dot.classList.add('saving');
-    label.textContent = 'Sauvegarde...';
-  } else {
-    dot.classList.remove('saving');
-    label.textContent = 'Sauvegardé';
-  }
-}
-
-// --- RENDER ---
 function render() {
   const tbody = document.getElementById('tbody');
-  const empty = document.getElementById('emptyState');
+  const empty = document.getElementById('empty');
+  const table = document.getElementById('table');
+
   tbody.innerHTML = '';
-  empty.style.display = ventes.length ? 'none' : 'block';
+
+  if (!ventes.length) {
+    empty.classList.add('show');
+    table.style.display = 'none';
+    updateRecap();
+    return;
+  }
+  empty.classList.remove('show');
+  table.style.display = 'table';
 
   ventes.forEach((v, i) => {
-    const achat = parseFloat(v.achat) || 0;
-    const vente = parseFloat(v.vente) || 0;
-    const prepa = parseFloat(v.prepa) || 0;
-    const marge = vente - achat - prepa;
-    const pct = vente > 0 ? ((marge / vente) * 100).toFixed(1) : '—';
-    const margeClass = marge >= 0 ? 'positive' : 'negative';
+    const marge = calcMarge(v);
+    const pct = (parseFloat(v.vente)||0) > 0
+      ? ((marge / (parseFloat(v.vente)||1)) * 100).toFixed(1) + '%'
+      : '—';
+    const margeClass = marge >= 0 ? 'pos' : 'neg';
 
     const tr = document.createElement('tr');
-    if (v.facture) tr.classList.add('facture');
+    if (v.facture) tr.classList.add('is-facture');
     tr.innerHTML = `
-      <td style="color:var(--muted);font-size:0.75rem">${i+1}</td>
-      <td><input type="text" value="${esc(v.acheteur||'')}" placeholder="Acheteur" onchange="update(${i},'acheteur',this.value)"></td>
-      <td><input type="text" value="${esc(v.vendeur||'')}" placeholder="Vendeur" onchange="update(${i},'vendeur',this.value)"></td>
-      <td><input type="text" value="${esc(v.immat||'')}" placeholder="AB-123-CD" onchange="update(${i},'immat',this.value)" style="font-family:monospace;letter-spacing:1px"></td>
-      <td><input type="text" value="${esc(v.marque||'')}" placeholder="Volvo FH 460" onchange="update(${i},'marque',this.value)"></td>
-      <td><input type="number" value="${v.achat||''}" placeholder="0" onchange="update(${i},'achat',this.value)" oninput="recomputeRow(this,${i})"></td>
-      <td><input type="number" value="${v.vente||''}" placeholder="0" onchange="update(${i},'vente',this.value)" oninput="recomputeRow(this,${i})"></td>
-      <td><input type="number" value="${v.prepa||''}" placeholder="0" onchange="update(${i},'prepa',this.value)" oninput="recomputeRow(this,${i})"></td>
-      <td class="marge-cell ${margeClass}" id="marge-${i}">${formatEur(marge)}</td>
-      <td style="color:var(--muted);text-align:right;font-size:0.78rem" id="pct-${i}">${pct !== '—' ? pct+'%' : '—'}</td>
-      <td style="text-align:center">
-        <label class="facture-check">
-          <input type="checkbox" ${v.facture?'checked':''} onchange="toggleFacture(${i},this.checked)">
-          <span class="facture-label ${v.facture?'ok':'pending'}">${v.facture?'OK':'En att.'}</span>
+      <td>${i+1}</td>
+      <td><input class="cell-input" type="text" value="${esc(v.acheteur||'')}" placeholder="Acheteur" data-i="${i}" data-f="acheteur"></td>
+      <td><input class="cell-input" type="text" value="${esc(v.vendeur||'')}" placeholder="Vendeur" data-i="${i}" data-f="vendeur"></td>
+      <td><input class="cell-input" type="text" value="${esc(v.immat||'')}" placeholder="AB-123-CD" data-i="${i}" data-f="immat" style="font-family:monospace;letter-spacing:1px"></td>
+      <td><input class="cell-input" type="text" value="${esc(v.marque||'')}" placeholder="Volvo FH 460" data-i="${i}" data-f="marque"></td>
+      <td><input class="cell-input right" type="number" value="${v.achat||''}" placeholder="0" data-i="${i}" data-f="achat"></td>
+      <td><input class="cell-input right" type="number" value="${v.vente||''}" placeholder="0" data-i="${i}" data-f="vente"></td>
+      <td><input class="cell-input right" type="number" value="${v.prepa||''}" placeholder="0" data-i="${i}" data-f="prepa"></td>
+      <td class="marge-cell ${margeClass}" id="m-${i}">${fmt(marge)}</td>
+      <td class="pct-cell" id="p-${i}">${pct}</td>
+      <td>
+        <label class="facture-cell">
+          <input type="checkbox" ${v.facture?'checked':''} data-i="${i}" data-action="facture">
+          <span class="facture-badge ${v.facture?'ok':'pending'}">${v.facture?'OK':'En att.'}</span>
         </label>
       </td>
-      <td><button class="btn-delete" onclick="deleteRow(${i})" title="Supprimer">✕</button></td>
+      <td><button class="btn-del" data-i="${i}" data-action="del" title="Supprimer"><i class="ti ti-x"></i></button></td>
     `;
     tbody.appendChild(tr);
   });
 
   updateRecap();
+  updateFooter();
 }
 
-function recomputeRow(input, i) {
-  // live update marge cell without full re-render
-  const row = input.closest('tr');
-  const inputs = row.querySelectorAll('input[type="number"]');
-  const achat = parseFloat(inputs[0].value) || 0;
-  const vente = parseFloat(inputs[1].value) || 0;
-  const prepa = parseFloat(inputs[2].value) || 0;
-  const marge = vente - achat - prepa;
-  const pct = vente > 0 ? ((marge/vente)*100).toFixed(1) : '—';
-  const margeCell = document.getElementById(`marge-${i}`);
-  const pctCell = document.getElementById(`pct-${i}`);
-  margeCell.textContent = formatEur(marge);
-  margeCell.className = `marge-cell ${marge >= 0 ? 'positive' : 'negative'}`;
-  pctCell.textContent = pct !== '—' ? pct+'%' : '—';
+// Délégation d'événements
+document.getElementById('tbody').addEventListener('change', e => {
+  const el = e.target;
+  const i = parseInt(el.dataset.i);
+  if (isNaN(i)) return;
+  if (el.dataset.action === 'facture') {
+    ventes[i].facture = el.checked;
+    render();
+    scheduleSave();
+  } else if (el.dataset.f) {
+    ventes[i][el.dataset.f] = el.value;
+    // Recalcul live marge
+    const marge = calcMarge(ventes[i]);
+    const pct = (parseFloat(ventes[i].vente)||0) > 0
+      ? ((marge/(parseFloat(ventes[i].vente)||1))*100).toFixed(1)+'%' : '—';
+    const mc = document.getElementById('m-'+i);
+    const pc = document.getElementById('p-'+i);
+    if (mc) { mc.textContent = fmt(marge); mc.className = 'marge-cell '+(marge>=0?'pos':'neg'); }
+    if (pc) pc.textContent = pct;
+    updateRecap();
+    updateFooter();
+    scheduleSave();
+  }
+});
+
+document.getElementById('tbody').addEventListener('input', e => {
+  const el = e.target;
+  const i = parseInt(el.dataset.i);
+  if (isNaN(i) || !el.dataset.f) return;
+  ventes[i][el.dataset.f] = el.value;
+  const marge = calcMarge(ventes[i]);
+  const pct = (parseFloat(ventes[i].vente)||0) > 0
+    ? ((marge/(parseFloat(ventes[i].vente)||1))*100).toFixed(1)+'%' : '—';
+  const mc = document.getElementById('m-'+i);
+  const pc = document.getElementById('p-'+i);
+  if (mc) { mc.textContent = fmt(marge); mc.className = 'marge-cell '+(marge>=0?'pos':'neg'); }
+  if (pc) pc.textContent = pct;
   updateRecap();
-}
+  updateFooter();
+  scheduleSave();
+});
+
+document.getElementById('tbody').addEventListener('click', e => {
+  const btn = e.target.closest('[data-action="del"]');
+  if (btn) {
+    const i = parseInt(btn.dataset.i);
+    ventes.splice(i, 1);
+    render();
+    scheduleSave();
+  }
+});
 
 function updateRecap() {
-  let facturee = 0, potentiel = 0, cntF = 0, cntP = 0;
-  ventes.forEach((v, i) => {
-    const achat = parseFloat(v.achat)||0;
-    const vente = parseFloat(v.vente)||0;
-    const prepa = parseFloat(v.prepa)||0;
-    const marge = vente - achat - prepa;
-    if (v.facture) { facturee += marge; cntF++; }
-    else { potentiel += marge; cntP++; }
+  let mF=0, mP=0, cF=0, cP=0;
+  ventes.forEach(v => {
+    const m = calcMarge(v);
+    if (v.facture) { mF += m; cF++; } else { mP += m; cP++; }
   });
-  const total = facturee + potentiel;
-  const pct = Math.min(Math.round((total / OBJECTIF) * 100), 100);
+  const total = mF + mP;
+  const pct = Math.min(Math.round((total/OBJECTIF)*100), 100);
 
-  document.getElementById('margeFacturee').textContent = formatEur(facturee);
-  document.getElementById('margePotentiel').textContent = formatEur(potentiel);
-  document.getElementById('margeTotal').textContent = formatEur(total);
-  document.getElementById('countFacturee').textContent = `${cntF} vente(s) facturée(s)`;
-  document.getElementById('countPotentiel').textContent = `${cntP} vente(s) en cours`;
-  document.getElementById('countTotal').textContent = `${cntF+cntP} vente(s) au total`;
-  document.getElementById('pctObjectif').textContent = `${pct}%`;
-  document.getElementById('labelObjectif').textContent = `${formatEur(total)} réalisés`;
-  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('rFacturee').textContent = fmt(mF);
+  document.getElementById('rPotentiel').textContent = fmt(mP);
+  document.getElementById('rTotal').textContent = fmt(total);
+  document.getElementById('rCntF').textContent = cF + ' vente(s) facturée(s)';
+  document.getElementById('rCntP').textContent = cP + ' vente(s) en cours';
+  document.getElementById('rCntT').textContent = (cF+cP) + ' vente(s) au total';
+  document.getElementById('rPct').textContent = pct + '%';
+  document.getElementById('rPctSub').textContent = fmt(total) + ' réalisés';
+  document.getElementById('rBar').style.width = pct + '%';
 }
 
-// --- ACTIONS ---
+function updateFooter() {
+  const total = ventes.reduce((s, v) => s + calcMarge(v), 0);
+  document.getElementById('footMarge').textContent = fmt(total);
+}
+
 function addRow() {
   ventes.push({ acheteur:'', vendeur:'', immat:'', marque:'', achat:'', vente:'', prepa:'', facture:false });
   render();
-  // focus first input of last row
-  const rows = document.querySelectorAll('#tbody tr');
-  if (rows.length) rows[rows.length-1].querySelector('input').focus();
-  scheduleSave();
-}
-
-function update(i, field, value) {
-  ventes[i][field] = value;
-  scheduleSave();
-}
-
-function toggleFacture(i, checked) {
-  ventes[i].facture = checked;
-  render();
-  scheduleSave();
-}
-
-function deleteRow(i) {
-  ventes.splice(i, 1);
-  render();
+  // focus première cellule de la dernière ligne
+  setTimeout(() => {
+    const rows = document.querySelectorAll('#tbody tr');
+    if (rows.length) rows[rows.length-1].querySelector('.cell-input').focus();
+  }, 50);
   scheduleSave();
 }
 
 function confirmReset() {
-  if (confirm('Remettre à zéro toutes les ventes du mois ? Cette action est irréversible.')) {
-    ventes = [];
-    render();
-    scheduleSave();
-  }
+  if (!confirm('Remettre à zéro toutes les ventes du mois ?')) return;
+  ventes = [];
+  render();
+  scheduleSave();
 }
 
-// --- UTILS ---
-function formatEur(n) {
-  return new Intl.NumberFormat('fr-FR', { style:'currency', currency:'EUR', minimumFractionDigits:0, maximumFractionDigits:0 }).format(n);
+function fmt(n) {
+  return new Intl.NumberFormat('fr-FR', {
+    style:'currency', currency:'EUR',
+    minimumFractionDigits:0, maximumFractionDigits:0
+  }).format(n);
 }
-function esc(s) {
-  return s.replace(/"/g,'&quot;').replace(/</g,'&lt;');
-}
+function esc(s) { return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 
 init();
 </script>
