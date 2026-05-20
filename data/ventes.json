@@ -89,16 +89,6 @@
       "vente": "87500",
       "prepa": "",
       "facture": false
-    },
-    {
-      "acheteur": "",
-      "vendeur": "",
-      "immat": "",
-      "marque": "",
-      "achat": "",
-      "vente": "",
-      "prepa": "",
-      "facture": false
     }
   ]
 }
