@@ -8,7 +8,7 @@
       "achat": "",
       "vente": "",
       "prepa": "",
-      "facture": false
+      "facture": true
     }
   ]
 }
