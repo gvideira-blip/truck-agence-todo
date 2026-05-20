@@ -3,7 +3,7 @@
     {
       "text": "Relance FNTR",
       "done": false,
-      "prio": "1"
+      "prio": ""
     },
     {
       "text": "Envoie CASSITRANS ATTAL PL ",
@@ -20,7 +20,7 @@
     {
       "text": "Relance Recherche en cours",
       "done": false,
-      "prio": ""
+      "prio": "2"
     },
     {
       "text": "Rentrer tous les mandats",
