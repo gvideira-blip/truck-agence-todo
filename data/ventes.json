@@ -45,7 +45,7 @@
       "vendeur": "Cassitrans",
       "immat": "EA202SY",
       "marque": "Magyar Citerne",
-      "achat": "",
+      "achat": "1000",
       "vente": "",
       "prepa": "",
       "facture": false
@@ -55,7 +55,7 @@
       "vendeur": "Cassitrans",
       "immat": "EG398XW",
       "marque": "Maisonneuve Citerne",
-      "achat": "",
+      "achat": "7000",
       "vente": "",
       "prepa": "",
       "facture": false
@@ -65,7 +65,7 @@
       "vendeur": "Eole Nettoyage",
       "immat": "DN059AV",
       "marque": "Scania / Brock",
-      "achat": "",
+      "achat": "210",
       "vente": "",
       "prepa": "",
       "facture": false
