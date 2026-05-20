@@ -98,7 +98,7 @@
       "achat": "5000",
       "vente": "7000",
       "prepa": "",
-      "facture": false
+      "facture": true
     }
   ]
 }
