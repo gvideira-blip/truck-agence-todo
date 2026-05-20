@@ -15,9 +15,9 @@
       "vendeur": "Garage Berthelemot",
       "immat": "CC486NG",
       "marque": "SAMRO",
-      "achat": "750",
-      "vente": "",
-      "prepa": "",
+      "achat": "1500",
+      "vente": "750",
+      "prepa": "350",
       "facture": false
     },
     {
