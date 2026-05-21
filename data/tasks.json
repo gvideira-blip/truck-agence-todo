@@ -212,7 +212,7 @@
     {
       "text": "Attente Photos TDBN + contrôles + Changer annonce",
       "done": false,
-      "prio": ""
+      "prio": "20"
     },
     {
       "text": "",
