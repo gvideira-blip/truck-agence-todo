@@ -78,7 +78,7 @@
       "achat": "46000",
       "vente": "52000",
       "prepa": "",
-      "facture": true
+      "facture": false
     },
     {
       "acheteur": "Michon Construction",
