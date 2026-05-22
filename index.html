@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tâches du jour — Truck Agence</title>
   <script>
-    // Garde d'authentification — redirige vers /login.html si pas connecté
     (function() {
       const until = parseInt(localStorage.getItem('ta_auth_until') || '0');
       if (until <= Date.now()) {
@@ -40,38 +39,25 @@
 
     /* NAV */
     .nav {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 16px;
+      display: flex; justify-content: center; gap: 8px; margin-bottom: 16px;
     }
     .nav a {
-      font-size: 12px;
-      color: var(--text2);
-      text-decoration: none;
-      padding: 5px 14px;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      background: var(--bg);
-      transition: all 0.15s;
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      font-size: 12px; color: var(--text2); text-decoration: none;
+      padding: 5px 14px; border: 1px solid var(--border); border-radius: 20px;
+      background: var(--bg); transition: all 0.15s;
+      display: flex; align-items: center; gap: 5px;
     }
     .nav a:hover { border-color: var(--blue); color: var(--blue); }
     .nav a.active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
     .wrap {
-      background: var(--bg);
-      border-radius: var(--r);
-      border: 1px solid var(--border);
-      overflow: hidden;
+      background: var(--bg); border-radius: var(--r);
+      border: 1px solid var(--border); overflow: hidden;
     }
 
     .topbar {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 18px;
-      background: var(--bg2);
+      padding: 14px 18px; background: var(--bg2);
       border-bottom: 1px solid var(--border);
     }
     .topbar-left { display: flex; align-items: center; gap: 10px; }
@@ -81,9 +67,9 @@
     .topbar-right { display: flex; align-items: center; gap: 12px; }
     .sync { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 5px; }
     .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; transition: background 0.3s; }
-    .sync-dot.ok { background: #5a9a2a; }
+    .sync-dot.ok     { background: #5a9a2a; }
     .sync-dot.saving { background: #e0920a; }
-    .sync-dot.error { background: #d03030; }
+    .sync-dot.error  { background: #d03030; }
     .btn-reset {
       font-size: 12px; color: var(--text2);
       background: none; border: 1px solid var(--border);
@@ -95,13 +81,14 @@
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 
     thead th {
-      padding: 9px 14px;
-      font-size: 13px; font-weight: 500; color: var(--text2);
-      border-left: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
+      padding: 9px 14px; font-size: 13px; font-weight: 500; color: var(--text2);
+      border-left: 1px solid var(--border); border-bottom: 1px solid var(--border);
       background: var(--bg2); text-align: left;
     }
-    thead th:first-child { border-left: none; width: 36px; text-align: center; color: var(--text3); font-weight: 400; }
+    thead th:first-child {
+      border-left: none; width: 36px; text-align: center;
+      color: var(--text3); font-weight: 400;
+    }
 
     .th-inner { display: flex; align-items: center; gap: 7px; }
     .avatar {
@@ -114,25 +101,25 @@
     .av-l  { background: #eae8fc; color: #3a338a; }
 
     tbody td {
-      border-left: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
+      border-left: 1px solid var(--border); border-bottom: 1px solid var(--border);
       padding: 0; vertical-align: middle;
     }
-    tbody td:first-child { border-left: none; text-align: center; font-size: 12px; color: var(--text3); width: 36px; }
+    tbody td:first-child {
+      border-left: none; text-align: center;
+      font-size: 12px; color: var(--text3); width: 36px;
+    }
     tbody tr:last-child td { border-bottom: none; }
 
     .cell { display: flex; align-items: center; min-height: 48px; }
 
     .task {
       flex: 1; display: flex; align-items: center;
-      gap: 8px; padding: 4px 8px 4px 12px;
-      transition: background 0.1s;
+      gap: 8px; padding: 4px 8px 4px 12px; transition: background 0.1s;
     }
     .task:hover { background: var(--bg2); }
 
     .task input[type=checkbox] {
-      width: 20px; height: 20px;
-      accent-color: var(--blue);
+      width: 20px; height: 20px; accent-color: var(--blue);
       flex-shrink: 0; cursor: pointer;
     }
 
@@ -159,16 +146,12 @@
       width: 52px; flex-shrink: 0;
       border-left: 1px solid var(--border);
       display: flex; align-items: center; justify-content: center;
-      padding: 4px;
-      align-self: stretch;
+      padding: 4px; align-self: stretch;
     }
     .prio-btn {
-      width: 100%; height: 40px;
-      background: white;
-      border: 1.5px dashed var(--border);
-      border-radius: 6px;
-      font-size: 18px; font-weight: 500;
-      color: var(--blue);
+      width: 100%; height: 40px; background: white;
+      border: 1.5px dashed var(--border); border-radius: 6px;
+      font-size: 18px; font-weight: 500; color: var(--blue);
       cursor: pointer; font-family: inherit;
       display: flex; align-items: center; justify-content: center;
       transition: border-color 0.15s, background 0.1s;
@@ -177,41 +160,32 @@
     .prio-btn:hover { border-color: var(--blue); }
     .prio-btn .placeholder { color: var(--text3); font-size: 13px; font-weight: 400; }
 
+    /* ── Modal priorité ── */
     .modal-bg {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.4);
-      display: none; align-items: center; justify-content: center;
-      z-index: 200;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      display: none; align-items: center; justify-content: center; z-index: 200;
     }
     .modal-bg.open { display: flex; }
     .modal {
-      background: white; border-radius: 16px;
-      padding: 24px; min-width: 280px;
+      background: white; border-radius: 16px; padding: 24px; min-width: 280px;
       box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     }
     .modal-title { font-size: 14px; color: var(--text2); text-align: center; margin-bottom: 12px; }
     .modal-input {
-      width: 100%; height: 64px;
-      background: var(--bg2); border: 2px solid var(--blue);
-      border-radius: 10px; margin-bottom: 16px;
+      width: 100%; height: 64px; background: var(--bg2);
+      border: 2px solid var(--blue); border-radius: 10px; margin-bottom: 16px;
       text-align: center; outline: none;
-      font-size: 28px; font-weight: 500; color: var(--blue);
-      font-family: inherit;
+      font-size: 28px; font-weight: 500; color: var(--blue); font-family: inherit;
     }
     .modal-input::placeholder { color: var(--text3); font-size: 16px; font-weight: 400; }
     .keypad {
-      display: grid;
-      grid-template-columns: repeat(3, 64px);
-      gap: 8px;
-      justify-content: center;
+      display: grid; grid-template-columns: repeat(3, 64px);
+      gap: 8px; justify-content: center;
     }
     .key {
-      height: 52px; font-size: 20px; font-weight: 500;
-      background: white;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      cursor: pointer; font-family: inherit;
-      color: var(--text);
+      height: 52px; font-size: 20px; font-weight: 500; background: white;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      cursor: pointer; font-family: inherit; color: var(--text);
       transition: background 0.1s, transform 0.05s;
     }
     .key:hover { background: var(--bg2); }
@@ -222,9 +196,16 @@
     .key.del-key { color: var(--red); }
     .modal-hint { font-size: 11px; color: var(--text3); text-align: center; margin-top: 10px; }
 
+    /* ── Info de renumbering ── */
+    .modal-renumber-info {
+      font-size: 11px; color: var(--blue); text-align: center;
+      margin-top: 6px; padding: 4px 8px; background: #f0f6fa;
+      border-radius: 6px; display: none;
+    }
+    .modal-renumber-info.show { display: block; }
+
     tfoot td {
-      border-left: 1px solid var(--border);
-      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border); border-top: 1px solid var(--border);
       background: var(--bg2); padding: 0;
     }
     tfoot td:first-child { border-left: none; text-align: center; color: var(--text3); }
@@ -237,8 +218,7 @@
     .add-cell input::placeholder { color: var(--text3); }
 
     #loader {
-      position: fixed; inset: 0;
-      background: rgba(255,255,255,0.92);
+      position: fixed; inset: 0; background: rgba(255,255,255,0.92);
       display: flex; align-items: center; justify-content: center;
       font-size: 14px; color: var(--text2); z-index: 100;
     }
@@ -293,6 +273,7 @@
   </table>
 </div>
 
+<!-- Modal priorité -->
 <div class="modal-bg" id="modal-bg" onclick="closeKeypadIfBg(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">Priorité</div>
@@ -300,6 +281,7 @@
       placeholder="—" maxlength="4"
       oninput="kpType(this.value)"
       onkeydown="kpKeydown(event)" />
+    <div class="modal-renumber-info" id="renumberInfo"></div>
     <div class="keypad">
       <button class="key" onclick="kpAdd('1')">1</button>
       <button class="key" onclick="kpAdd('2')">2</button>
@@ -322,15 +304,22 @@
 const COLS = 3;
 let data = [];
 let saveTimer = null;
-let kpTarget = null;
+let kpTarget = null; // { ri, ci }
 
-function blank() { return Array.from({length:10}, () => Array.from({length:COLS}, () => ({text:'',done:false,prio:''}))); }
+// ─── Utilitaires ─────────────────────────────────────────────
+function blank() {
+  return Array.from({ length: 10 }, () =>
+    Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '' }))
+  );
+}
 
 function setSyncStatus(s) {
   document.getElementById('sdot').className = 'sync-dot ' + s;
-  document.getElementById('slabel').textContent = s==='ok'?'Synchronisé':s==='saving'?'Enregistrement…':'Erreur sync';
+  document.getElementById('slabel').textContent =
+    s === 'ok' ? 'Synchronisé' : s === 'saving' ? 'Enregistrement…' : 'Erreur sync';
 }
 
+// ─── Chargement & poll ───────────────────────────────────────
 async function load() {
   try {
     const r = await fetch('/api/tasks');
@@ -345,7 +334,6 @@ async function load() {
 
 async function poll() {
   if (kpTarget) return;
-  // Ne pas re-render si l'utilisateur est en train de taper
   if (document.activeElement && (
     document.activeElement.tagName === 'TEXTAREA' ||
     document.activeElement.tagName === 'INPUT'
@@ -354,7 +342,6 @@ async function poll() {
     const r = await fetch('/api/tasks');
     if (!r.ok) return;
     const newData = await r.json();
-    // Ne re-render que si les données ont changé
     if (JSON.stringify(newData) !== JSON.stringify(data)) {
       data = newData;
       render();
@@ -363,31 +350,69 @@ async function poll() {
   } catch(e) { setSyncStatus('error'); }
 }
 
+// ─── Save ────────────────────────────────────────────────────
 function save() {
   setSyncStatus('saving');
-  if (saveTimer) clearTimeout(saveTimer);
+  clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     try {
-      const r = await fetch('/api/tasks', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+      const r = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
       if (!r.ok) throw 0;
       setSyncStatus('ok');
     } catch(e) { setSyncStatus('error'); }
   }, 700);
 }
 
+// ─── Renumbering des priorités ───────────────────────────────
+/**
+ * Après qu'une priorité est modifiée dans une colonne, on renumérote
+ * toutes les tâches ayant une priorité dans cette colonne
+ * en gardant leur ordre relatif mais en compactant les numéros : 1, 2, 3…
+ *
+ * Exemple : si les priorités existantes sont [3, 1, 5, 2],
+ * l'ordre visuel (trié) serait [1, 2, 3, 5] → on renumérote en [1, 2, 3, 4].
+ *
+ * @param {number} ci - Index de la colonne à renumeroter
+ */
+function renumberPriorities(ci) {
+  // Récupérer toutes les cellules de cette colonne qui ont une priorité
+  const cells = [];
+  for (let ri = 0; ri < data.length; ri++) {
+    const cell = data[ri][ci];
+    if (cell.prio !== '' && cell.text !== '') {
+      cells.push({ ri, prio: parseFloat(cell.prio) });
+    }
+  }
+
+  if (cells.length === 0) return; // Rien à renuméroter
+
+  // Trier par priorité actuelle
+  cells.sort((a, b) => a.prio - b.prio);
+
+  // Réassigner 1, 2, 3… dans l'ordre
+  cells.forEach((c, idx) => {
+    data[c.ri][ci].prio = String(idx + 1);
+  });
+}
+
+// ─── Tri & rendu ─────────────────────────────────────────────
 function buildSortedIndexes() {
   const maxRows = data.length;
-  const result = Array.from({length: maxRows}, () => new Array(COLS));
+  const result  = Array.from({ length: maxRows }, () => new Array(COLS));
   for (let ci = 0; ci < COLS; ci++) {
     const entries = [];
     for (let ri = 0; ri < data.length; ri++) {
-      entries.push({ ri: ri, cell: data[ri][ci] });
+      entries.push({ ri, cell: data[ri][ci] });
     }
     const withPrio = entries.filter(e => e.cell.prio !== '' && e.cell.text !== '');
     const noPrio   = entries.filter(e => e.cell.prio === '' && e.cell.text !== '');
     const empty    = entries.filter(e => e.cell.text === '');
     withPrio.sort((a, b) => parseFloat(a.cell.prio) - parseFloat(b.cell.prio));
-    const ordered = withPrio.concat(noPrio, empty);
+    const ordered = [...withPrio, ...noPrio, ...empty];
     for (let di = 0; di < ordered.length && di < maxRows; di++) {
       result[di][ci] = ordered[di].ri;
     }
@@ -396,21 +421,23 @@ function buildSortedIndexes() {
 }
 
 function render() {
-  const tb = document.getElementById('tbody');
+  const tb  = document.getElementById('tbody');
   tb.innerHTML = '';
   const idx = buildSortedIndexes();
   for (let di = 0; di < idx.length; di++) {
-    const tr = document.createElement('tr');
-    let html = `<td>${di + 1}</td>`;
+    const tr  = document.createElement('tr');
+    let html  = `<td>${di + 1}</td>`;
     for (let ci = 0; ci < COLS; ci++) {
-      const ri = idx[di][ci];
+      const ri   = idx[di][ci];
       const cell = data[ri][ci];
-      const prioDisplay = cell.prio ? cell.prio : '<span class="placeholder">P</span>';
+      const prioDisplay = cell.prio
+        ? cell.prio
+        : '<span class="placeholder">P</span>';
       html += `<td>
         <div class="cell">
           <div class="task">
-            <input type="checkbox" ${cell.done?'checked':''} onchange="toggle(${ri},${ci})"/>
-            <textarea rows="1" placeholder="—" class="${cell.done?'done':''}"
+            <input type="checkbox" ${cell.done ? 'checked' : ''} onchange="toggle(${ri},${ci})"/>
+            <textarea rows="1" placeholder="—" class="${cell.done ? 'done' : ''}"
               data-di="${di}" data-ci="${ci}"
               onblur="editText(${ri},${ci},this.value)"
               oninput="resize(this)"
@@ -421,7 +448,8 @@ function render() {
             </button>
           </div>
           <div class="prio">
-            <button class="prio-btn ${cell.prio?'filled':''}" onclick="openKeypad(${ri},${ci})">${prioDisplay}</button>
+            <button class="prio-btn ${cell.prio ? 'filled' : ''}"
+              onclick="openKeypad(${ri},${ci})">${prioDisplay}</button>
           </div>
         </div>
       </td>`;
@@ -435,33 +463,34 @@ function render() {
   }
 }
 
+// ─── Interactions ────────────────────────────────────────────
 function handleTab(e, di, ci) {
   if (e.key !== 'Tab') return;
   e.preventDefault();
-  // Sauvegarder la valeur courante avant de bouger
-  const ta = e.target;
-  const ri = buildSortedIndexes()[di][ci];
+  const ta  = e.target;
+  const ri  = buildSortedIndexes()[di][ci];
   if (ri !== undefined) data[ri][ci].text = ta.value;
-
-  // Trouver la prochaine case dans la même colonne (di+1 ou wrap au début)
   const allRows = document.querySelectorAll('#tbody tr');
-  const nextDi = e.shiftKey ? di - 1 : di + 1;
-
+  const nextDi  = e.shiftKey ? di - 1 : di + 1;
   if (nextDi >= 0 && nextDi < allRows.length) {
     const target = document.querySelector(`textarea[data-di="${nextDi}"][data-ci="${ci}"]`);
     if (target) { target.focus(); target.select(); return; }
   }
-  // Si on dépasse le bas → focus sur l'input "Ajouter…" de la même colonne
   if (!e.shiftKey && nextDi >= allRows.length) {
     const addInput = document.getElementById('a' + ci);
     if (addInput) addInput.focus();
   }
 }
 
-function resize(el) { el.style.height='auto'; el.style.height=Math.max(28,el.scrollHeight)+'px'; }
+function resize(el) { el.style.height = 'auto'; el.style.height = Math.max(28, el.scrollHeight) + 'px'; }
 function toggle(ri, ci) { data[ri][ci].done = !data[ri][ci].done; save(); render(); }
 function editText(ri, ci, val) { data[ri][ci].text = val; save(); }
-function clearCell(ri, ci) { data[ri][ci] = { text:'', done:false, prio:'' }; save(); render(); }
+function clearCell(ri, ci) {
+  data[ri][ci] = { text: '', done: false, prio: '' };
+  // Renumeroter la colonne après suppression de priorité
+  renumberPriorities(ci);
+  save(); render();
+}
 
 function addTask(e, ci) {
   if (e.key !== 'Enter') return;
@@ -471,8 +500,9 @@ function addTask(e, ci) {
   const emptyRi = data.findIndex(row => !row[ci].text);
   if (emptyRi >= 0) { data[emptyRi][ci].text = val; }
   else {
-    const nr = Array.from({length:COLS}, () => ({text:'',done:false,prio:''}));
-    nr[ci].text = val; data.push(nr);
+    const nr = Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '' }));
+    nr[ci].text = val;
+    data.push(nr);
   }
   e.target.value = '';
   save(); render();
@@ -480,19 +510,36 @@ function addTask(e, ci) {
 
 function resetAll() {
   if (!confirm('Remettre à zéro toutes les cases ?')) return;
-  data = data.map(row => row.map(c => ({...c, done:false, prio:''})));
+  data = data.map(row => row.map(c => ({ ...c, done: false, prio: '' })));
   save(); render();
 }
 
+// ─── Keypad modal ────────────────────────────────────────────
 function openKeypad(ri, ci) {
   kpTarget = { ri, ci };
   const input = document.getElementById('modal-input');
   input.value = data[ri][ci].prio || '';
+  // Calculer le prochain numéro disponible pour cette colonne
+  const usedPrios = data
+    .filter((row, r) => r !== ri && row[ci].prio !== '' && row[ci].text !== '')
+    .map(row => parseInt(row[ci].prio))
+    .filter(n => !isNaN(n));
+  const nextAvail = usedPrios.length > 0 ? Math.max(...usedPrios) + 1 : 1;
+  const info = document.getElementById('renumberInfo');
+  const existingCount = data.filter((row, r) => row[ci].prio !== '' && row[ci].text !== '').length;
+  if (existingCount > 0) {
+    info.textContent = `${existingCount} priorité(s) existante(s) — seront renumérotées automatiquement`;
+    info.classList.add('show');
+  } else {
+    info.classList.remove('show');
+  }
   document.getElementById('modal-bg').classList.add('open');
   setTimeout(() => input.focus(), 50);
 }
+
 function closeKeypadIfBg(e) { if (e.target.id === 'modal-bg') closeKeypad(); }
 function closeKeypad() { kpTarget = null; document.getElementById('modal-bg').classList.remove('open'); }
+
 function kpType(val) {
   const clean = val.replace(/[^0-9]/g, '').slice(0, 4);
   document.getElementById('modal-input').value = clean;
@@ -510,16 +557,31 @@ function kpDel() {
   const input = document.getElementById('modal-input');
   input.value = input.value.slice(0, -1);
 }
+
 function kpOk() {
   if (!kpTarget) return;
   const { ri, ci } = kpTarget;
   const val = document.getElementById('modal-input').value;
+
+  // Appliquer la nouvelle valeur
   data[ri][ci].prio = val;
-  save(); closeKeypad(); render();
+
+  // ── Renumbering automatique ──────────────────────────────
+  // Si une valeur a été saisie, on renumérote toute la colonne
+  // pour garantir une séquence 1, 2, 3… sans trous ni doublons.
+  if (val !== '') {
+    renumberPriorities(ci);
+  }
+  // ─────────────────────────────────────────────────────────
+
+  save();
+  closeKeypad();
+  render();
 }
 
+// ─── Date ────────────────────────────────────────────────────
 document.getElementById('tdate').textContent =
-  '— ' + new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+  '— ' + new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
 
 load();
 </script>
