@@ -98,7 +98,7 @@
       "achat": "5000",
       "vente": "7000",
       "prepa": "",
-      "facture": true
+      "facture": false
     }
   ],
   "objectif": 45000
