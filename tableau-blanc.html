@@ -253,6 +253,28 @@ let width = 4;
 let saveTimer  = null;
 let lastSavedHash = '';
 
+// ═══════════════════════════════════════════════════════════
+// SYSTÈME DE COORDONNÉES "MONDE" (normalisées)
+// ───────────────────────────────────────────────────────────
+// Tous les traits sont stockés en coordonnées d'un monde virtuel
+// de largeur fixe WORLD_W. À l'affichage, ce monde est mis à
+// l'échelle pour tenir dans la largeur de l'écran courant.
+// Résultat : tout le monde voit le dessin entier, juste à une
+// taille différente selon l'appareil.
+//
+// scale = (largeur réelle du canvas en CSS px) / WORLD_W
+//   - écran > convertir monde → écran : valeur * scale
+//   - écran > convertir écran → monde : valeur / scale
+// ═══════════════════════════════════════════════════════════
+const WORLD_W = 1400;          // Largeur de référence du monde
+let   worldScale = 1;          // Facteur d'échelle courant
+let   cssW = 0, cssH = 0;      // Dimensions CSS du canvas (px logiques)
+
+// Convertit une distance/coordonnée du monde vers l'écran
+function w2s(v) { return v * worldScale; }
+// Convertit une distance/coordonnée de l'écran vers le monde
+function s2w(v) { return v / worldScale; }
+
 function fitCanvas() {
   const wrap = canvas.parentElement;
   // Forcer un reflow avant de lire les dimensions (fix iOS Safari)
@@ -265,9 +287,17 @@ function fitCanvas() {
   // Fallback si getBoundingClientRect retourne 0 (iOS avant layout)
   const w = rect.width  || wrap.offsetWidth  || window.innerWidth;
   const h = rect.height || wrap.offsetHeight || (window.innerHeight - wrap.getBoundingClientRect().top - 20);
+
+  cssW = w;
+  cssH = h;
   canvas.width  = w * dpr;
   canvas.height = h * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  // ── Calcul du facteur d'échelle monde → écran ──
+  // Le monde fait WORLD_W de large ; on l'adapte à la largeur réelle.
+  worldScale = cssW / WORLD_W;
+
   redraw();
 }
 
@@ -311,7 +341,11 @@ let lassoPoints = null;
 function getPos(e) {
   const rect = canvas.getBoundingClientRect();
   const t = e.touches ? e.touches[0] : e;
-  return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+  // Position en pixels écran (relatifs au canvas)
+  const sx = t.clientX - rect.left;
+  const sy = t.clientY - rect.top;
+  // Conversion écran → monde : on STOCKE toujours en coordonnées monde
+  return { x: s2w(sx), y: s2w(sy) };
 }
 
 function startStroke(e) {
@@ -355,10 +389,12 @@ function endStroke() {
 
 function drawLassoOverlay() {
   if (!lassoPoints || lassoPoints.length < 2) return;
+  // lassoPoints est en coordonnées MONDE → conversion écran
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(lassoPoints[0].x, lassoPoints[0].y);
-  for (let i = 1; i < lassoPoints.length; i++) ctx.lineTo(lassoPoints[i].x, lassoPoints[i].y);
+  ctx.moveTo(w2s(lassoPoints[0].x), w2s(lassoPoints[0].y));
+  for (let i = 1; i < lassoPoints.length; i++)
+    ctx.lineTo(w2s(lassoPoints[i].x), w2s(lassoPoints[i].y));
   ctx.setLineDash([6, 4]);
   ctx.strokeStyle = '#2d8a4e'; ctx.lineWidth = 2; ctx.stroke();
   ctx.closePath(); ctx.fillStyle = 'rgba(45,138,78,0.08)'; ctx.fill();
@@ -394,16 +430,19 @@ canvas.addEventListener('touchend',    endStroke);
 canvas.addEventListener('touchcancel', endStroke);
 
 function drawStrokeSegment(stroke, fromIdx) {
+  // Les points sont en coordonnées MONDE → on convertit en écran (w2s)
   if (stroke.points.length < 2) {
     ctx.beginPath(); ctx.fillStyle = stroke.color;
-    ctx.arc(stroke.points[0].x, stroke.points[0].y, stroke.width / 2, 0, Math.PI * 2);
+    ctx.arc(w2s(stroke.points[0].x), w2s(stroke.points[0].y),
+            w2s(stroke.width) / 2, 0, Math.PI * 2);
     ctx.fill(); return;
   }
   ctx.beginPath();
-  ctx.strokeStyle = stroke.color; ctx.lineWidth = stroke.width;
+  ctx.strokeStyle = stroke.color;
+  ctx.lineWidth = w2s(stroke.width);
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  ctx.moveTo(stroke.points[fromIdx].x, stroke.points[fromIdx].y);
-  ctx.lineTo(stroke.points[fromIdx + 1].x, stroke.points[fromIdx + 1].y);
+  ctx.moveTo(w2s(stroke.points[fromIdx].x),     w2s(stroke.points[fromIdx].y));
+  ctx.lineTo(w2s(stroke.points[fromIdx + 1].x), w2s(stroke.points[fromIdx + 1].y));
   ctx.stroke();
 }
 
@@ -411,17 +450,20 @@ function redraw() {
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   for (const stroke of strokes) {
+    // Points stockés en MONDE → conversion écran via w2s()
     if (stroke.points.length < 2) {
       ctx.beginPath(); ctx.fillStyle = stroke.color;
-      ctx.arc(stroke.points[0].x, stroke.points[0].y, stroke.width / 2, 0, Math.PI * 2);
+      ctx.arc(w2s(stroke.points[0].x), w2s(stroke.points[0].y),
+              w2s(stroke.width) / 2, 0, Math.PI * 2);
       ctx.fill();
     } else {
       ctx.beginPath();
-      ctx.strokeStyle = stroke.color; ctx.lineWidth = stroke.width;
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth = w2s(stroke.width);
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-      ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+      ctx.moveTo(w2s(stroke.points[0].x), w2s(stroke.points[0].y));
       for (let i = 1; i < stroke.points.length; i++)
-        ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+        ctx.lineTo(w2s(stroke.points[i].x), w2s(stroke.points[i].y));
       ctx.stroke();
     }
   }
