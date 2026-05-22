@@ -135,38 +135,46 @@
   /* ═══════════════════════════════════════════
      RESPONSIVE MOBILE
      ═══════════════════════════════════════════ */
-  @media (max-width: 768px) {
-    body { padding: 8px; }
+  /* ═══════════════════════════════════════════
+     RESPONSIVE MOBILE — tableau blanc
+     ═══════════════════════════════════════════ */
 
-    /* NAV compact */
+  /* Portrait ET paysage : toolbar sur une seule ligne compacte */
+  @media (max-width: 900px) {
+    body { padding: 8px; }
     .nav { gap: 5px; margin-bottom: 8px; }
     .nav a { font-size: 11px; padding: 5px 10px; gap: 3px; }
 
-    /* TOOLBAR : wrap en 2 lignes naturelles */
-    .toolbar { padding: 6px 10px; gap: 8px; margin-bottom: 8px; border-radius: 10px; }
-    .tool-group { gap: 5px; padding-right: 10px; }
-    .tool-group .lbl { display: none; } /* Masquer les labels texte pour gagner de la place */
+    .toolbar {
+      padding: 6px 10px;
+      gap: 6px;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      flex-wrap: nowrap; /* Force une seule ligne */
+      overflow-x: auto;  /* Scroll si vraiment trop petit */
+      -webkit-overflow-scrolling: touch;
+    }
+    .tool-group { gap: 4px; padding-right: 8px; flex-shrink: 0; }
+    .tool-group .lbl { display: none; } /* Labels masqués */
 
-    /* Boutons outils et couleurs légèrement plus petits */
-    .tool-btn  { width: 40px; height: 40px; font-size: 18px; } /* Plus grand pour les doigts */
-    .color-btn { width: 32px; height: 32px; }
-    .width-btn { width: 40px; height: 40px; }
+    .tool-btn  { width: 38px; height: 38px; font-size: 17px; flex-shrink: 0; }
+    .color-btn { width: 28px; height: 28px; flex-shrink: 0; }
+    .width-btn { width: 38px; height: 38px; flex-shrink: 0; }
+
+    /* Sync : point seul, texte masqué */
+    .sync span#slabel { display: none; }
 
     /* Bouton effacer : icône seule */
     .btn-clear .btn-text { display: none; }
-    .btn-clear { padding: 8px 10px; }
+    .btn-clear { padding: 8px 10px; flex-shrink: 0; }
 
-    /* Le sync texte : masqué, on garde juste le dot */
-    .sync span { display: none; }
-
-    /* Le canvas prend tout l'espace restant — déjà géré par flex:1 */
+    .right { margin-left: auto; flex-shrink: 0; }
   }
 
+  /* Portrait uniquement : nav emoji-only */
   @media (max-width: 480px) {
     .nav a span { display: none; }
     .nav a { padding: 7px 11px; }
-    /* Sur très petit écran, toolbar sur 2 lignes bien espacées */
-    .toolbar { gap: 6px; }
   }
 </style>
 </head>
@@ -247,14 +255,30 @@ let lastSavedHash = '';
 
 function fitCanvas() {
   const wrap = canvas.parentElement;
+  // Forcer un reflow avant de lire les dimensions (fix iOS Safari)
+  wrap.style.display = 'none';
+  // eslint-disable-next-line no-unused-expressions
+  wrap.offsetHeight; // lecture forcée
+  wrap.style.display = '';
   const rect = wrap.getBoundingClientRect();
   const dpr  = window.devicePixelRatio || 1;
-  canvas.width  = rect.width  * dpr;
-  canvas.height = rect.height * dpr;
+  // Fallback si getBoundingClientRect retourne 0 (iOS avant layout)
+  const w = rect.width  || wrap.offsetWidth  || window.innerWidth;
+  const h = rect.height || wrap.offsetHeight || (window.innerHeight - wrap.getBoundingClientRect().top - 20);
+  canvas.width  = w * dpr;
+  canvas.height = h * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   redraw();
 }
-window.addEventListener('resize', fitCanvas);
+
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  // Debounce + double rAF pour iOS orientation change
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    requestAnimationFrame(() => requestAnimationFrame(fitCanvas));
+  }, 100);
+});
 
 function setSyncStatus(s) {
   document.getElementById('sdot').className = 'sync-dot ' + s;
@@ -450,9 +474,13 @@ function confirmClear() {
   strokes = []; redraw(); scheduleSave();
 }
 
-fitCanvas();
-loadData();
-setInterval(poll, 5000);
+// Double rAF au démarrage : garantit que le layout iOS est stabilisé
+// avant de calculer les dimensions du canvas
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  fitCanvas();
+  loadData();
+  setInterval(poll, 5000);
+}));
 </script>
 </body>
 </html>
