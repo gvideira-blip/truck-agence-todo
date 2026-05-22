@@ -362,6 +362,13 @@ let data = [];
 let saveTimer = null;
 let kpTarget = null; // { ri, ci }
 
+// ─── Verrou anti-écrasement ──────────────────────────────────
+// pendingSave passe à true dès qu'une modif locale est faite et
+// ne repasse à false QUE lorsque le serveur a confirmé la
+// sauvegarde. Tant qu'il est true, le poll NE DOIT PAS écraser
+// les données locales (sinon les modifs en rafale "reviennent").
+let pendingSave = false;
+
 // ─── Utilitaires ─────────────────────────────────────────────
 function blank() {
   return Array.from({ length: 10 }, () =>
@@ -390,6 +397,10 @@ async function load() {
 
 async function poll() {
   if (kpTarget) return;
+  // ── Verrou : ne JAMAIS écraser des modifs locales non confirmées ──
+  // Si une sauvegarde est en attente ou en cours, le serveur n'a pas
+  // encore notre dernière version → on saute ce poll.
+  if (pendingSave) return;
   if (document.activeElement && (
     document.activeElement.tagName === 'TEXTAREA' ||
     document.activeElement.tagName === 'INPUT'
@@ -398,6 +409,9 @@ async function poll() {
     const r = await fetch('/api/tasks');
     if (!r.ok) return;
     const newData = await r.json();
+    // Re-vérification du verrou APRÈS le fetch : l'utilisateur a pu
+    // modifier quelque chose pendant que la requête était en vol.
+    if (pendingSave) return;
     if (JSON.stringify(newData) !== JSON.stringify(data)) {
       data = newData;
       render();
@@ -409,17 +423,33 @@ async function poll() {
 // ─── Save ────────────────────────────────────────────────────
 function save() {
   setSyncStatus('saving');
+  // Lève le verrou immédiatement : à partir d'ici, le poll laisse
+  // les données locales tranquilles jusqu'à confirmation serveur.
+  pendingSave = true;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
+    // On capture l'état envoyé pour savoir, à la réponse, si
+    // l'utilisateur a encore modifié quelque chose entre-temps.
+    const snapshot = JSON.stringify(data);
     try {
       const r = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: snapshot
       });
       if (!r.ok) throw 0;
+      // Le verrou ne se libère que si AUCUNE nouvelle modif n'a eu
+      // lieu pendant l'envoi. Sinon un autre save() est déjà
+      // programmé et gardera le verrou actif.
+      if (JSON.stringify(data) === snapshot) {
+        pendingSave = false;
+      }
       setSyncStatus('ok');
-    } catch(e) { setSyncStatus('error'); }
+    } catch(e) {
+      // En cas d'échec réseau, on garde le verrou : les données
+      // locales restent prioritaires, un prochain save() retentera.
+      setSyncStatus('error');
+    }
   }, 700);
 }
 
