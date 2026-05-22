@@ -101,7 +101,7 @@
   /* WRAP */
   .wrap {
     background: var(--bg); border-radius: var(--r);
-    border: 1px solid var(--border); overflow: hidden;
+    border: 1px solid var(--border);
   }
   .topbar {
     display: flex; align-items: center; justify-content: space-between;
@@ -240,80 +240,53 @@
   }
 
   /* ═══════════════════════════════════════════
-     RESPONSIVE MOBILE — Option B : scroll horizontal
-     Le desktop n'est PAS modifié au-dessus de 768px.
+     RESPONSIVE — scroll horizontal actif partout
      ═══════════════════════════════════════════ */
+
+  /* Scroll wrapper toujours actif — desktop et mobile */
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background:
+      linear-gradient(to right, white 20%, rgba(255,255,255,0)),
+      linear-gradient(to right, rgba(255,255,255,0), white 80%) 100% 0,
+      radial-gradient(farthest-side at 0% 50%, rgba(0,0,0,0.07), transparent),
+      radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,0.07), transparent) 100% 0;
+    background-repeat: no-repeat;
+    background-size: 40px 100%, 40px 100%, 12px 100%, 12px 100%;
+    background-attachment: local, local, scroll, scroll;
+  }
+
+  /* Largeur min : force le scroll si besoin */
+  #table { min-width: 820px; }
+
   @media (max-width: 768px) {
-
     body { padding: 10px; }
-
-    /* NAV — plus compact */
     .nav { gap: 5px; margin-bottom: 12px; }
     .nav a { font-size: 11px; padding: 5px 10px; gap: 3px; }
-
-    /* RECAP — 2 colonnes sur tablette, 1 sur petit mobile */
     .recap { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
     .recap-card { padding: 12px 14px; }
     .recap-card .value { font-size: 1.15rem; }
-
-    /* Indicateurs secondaires : 2 colonnes */
-    .recap[style*="grid-template-columns: repeat(4"] {
-      grid-template-columns: repeat(2, 1fr) !important;
-    }
-
-    /* TOPBAR — empile titre et boutons sur deux lignes */
+    .recap[style*="repeat(4"] { grid-template-columns: repeat(2, 1fr) !important; }
     .topbar { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
     .topbar-left { flex: 1; min-width: 0; }
     .topbar-right { width: 100%; justify-content: flex-end; }
-    .month-label { display: none; } /* trop long sur mobile */
-
-    /* Masquer le texte du bouton reset sur très petit écran */
-    .btn.danger .btn-label { display: none; }
-
-    /* WRAP — retire le overflow:hidden pour laisser le tableau scroller */
-    .wrap { overflow: visible; border-radius: var(--r); }
-
-    /* Conteneur scrollable autour du tableau */
-    .table-scroll {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      border-radius: 0 0 var(--r) var(--r);
-      /* Indicateur visuel de scroll */
-      background:
-        linear-gradient(to right, white 20%, rgba(255,255,255,0)),
-        linear-gradient(to right, rgba(255,255,255,0), white 80%) 100% 0,
-        radial-gradient(farthest-side at 0 50%, rgba(0,0,0,0.08), transparent),
-        radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,0.08), transparent) 100% 0;
-      background-repeat: no-repeat;
-      background-size: 40px 100%, 40px 100%, 12px 100%, 12px 100%;
-      background-attachment: local, local, scroll, scroll;
-    }
-
-    /* Le tableau lui-même : largeur minimale fixe pour forcer le scroll */
-    #table {
-      min-width: 780px; /* assez pour voir toutes les colonnes */
-      font-size: 12px;
-    }
-
-    /* Cellules légèrement plus compactes sur mobile */
+    .month-label { display: none; }
+    #table { font-size: 12px; }
     .cell-input { padding: 8px 8px; font-size: 12px; }
     thead th { padding: 7px 8px; }
     .marge-cell { padding: 8px 8px; font-size: 12px; }
-    .pct-cell   { padding: 8px 8px; font-size: 11px; }
+    .pct-cell { padding: 8px 8px; font-size: 11px; }
     .facture-cell { padding: 8px 8px; gap: 4px; }
     .facture-badge { font-size: 10px; padding: 2px 5px; }
     .btn-del { padding: 8px 6px; }
-
-    /* Objectif input */
     .objectif-input { font-size: 1.15rem; width: 100px; }
   }
 
   @media (max-width: 480px) {
     .recap { grid-template-columns: 1fr; }
-    .recap[style*="grid-template-columns: repeat(4"] {
-      grid-template-columns: repeat(2, 1fr) !important;
-    }
-    .nav a span { display: none; } /* Garde juste l'emoji */
+    .recap[style*="repeat(4"] { grid-template-columns: repeat(2, 1fr) !important; }
+    .nav a span { display: none; }
     .nav a { padding: 6px 10px; }
   }
 </style>
