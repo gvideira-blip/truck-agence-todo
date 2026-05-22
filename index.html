@@ -222,6 +222,50 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 14px; color: var(--text2); z-index: 100;
     }
+
+    /* RESPONSIVE MOBILE — Option B : scroll horizontal */
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+      .nav { gap: 5px; margin-bottom: 12px; }
+      .nav a { font-size: 11px; padding: 5px 10px; gap: 3px; }
+      .topbar { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+      .topbar-left { flex: 1; }
+      .topbar-right { width: 100%; justify-content: flex-end; }
+      .date { display: none; }
+      .wrap { overflow: visible; }
+      .table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 0 0 var(--r) var(--r);
+        background:
+          linear-gradient(to right, white 20%, rgba(255,255,255,0)),
+          linear-gradient(to right, rgba(255,255,255,0), white 80%) 100% 0,
+          radial-gradient(farthest-side at 0 50%, rgba(0,0,0,0.08), transparent),
+          radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,0.08), transparent) 100% 0;
+        background-repeat: no-repeat;
+        background-size: 40px 100%, 40px 100%, 12px 100%, 12px 100%;
+        background-attachment: local, local, scroll, scroll;
+      }
+      table { min-width: 680px; font-size: 12px; }
+      thead th { padding: 7px 8px; font-size: 10px; }
+      thead th:first-child { width: 28px; }
+      .cell { min-height: 42px; }
+      .task { padding: 3px 6px 3px 8px; gap: 6px; }
+      .task textarea { font-size: 13px; }
+      .task input[type=checkbox] { width: 18px; height: 18px; }
+      .prio { width: 44px; }
+      .prio-btn { height: 34px; font-size: 15px; }
+      .add-cell { padding: 6px 8px; }
+      .add-cell input { font-size: 13px; }
+      .modal-bg { align-items: flex-end; }
+      .modal { border-radius: 16px 16px 0 0; width: 100%; padding: 20px 16px 32px; }
+      .keypad { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .key { height: 52px; }
+    }
+    @media (max-width: 480px) {
+      .nav a span { display: none; }
+      .nav a { padding: 6px 10px; }
+    }
   </style>
 </head>
 <body>
@@ -252,25 +296,27 @@
     </div>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th><div class="th-inner"><div class="avatar av-c">Ch</div>Chloé</div></th>
-        <th><div class="th-inner"><div class="avatar av-ca">Ca</div>Camille</div></th>
-        <th><div class="th-inner"><div class="avatar av-l">Li</div>Lila</div></th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-    <tfoot>
-      <tr>
-        <td><i class="ti ti-plus" style="font-size:13px;"></i></td>
-        <td><div class="add-cell"><input id="a0" placeholder="Ajouter…" onkeydown="addTask(event,0)"/></div></td>
-        <td><div class="add-cell"><input id="a1" placeholder="Ajouter…" onkeydown="addTask(event,1)"/></div></td>
-        <td><div class="add-cell"><input id="a2" placeholder="Ajouter…" onkeydown="addTask(event,2)"/></div></td>
-      </tr>
-    </tfoot>
-  </table>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th><div class="th-inner"><div class="avatar av-c">Ch</div>Chloé</div></th>
+          <th><div class="th-inner"><div class="avatar av-ca">Ca</div>Camille</div></th>
+          <th><div class="th-inner"><div class="avatar av-l">Li</div>Lila</div></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+      <tfoot>
+        <tr>
+          <td><i class="ti ti-plus" style="font-size:13px;"></i></td>
+          <td><div class="add-cell"><input id="a0" placeholder="Ajouter…" onkeydown="addTask(event,0)"/></div></td>
+          <td><div class="add-cell"><input id="a1" placeholder="Ajouter…" onkeydown="addTask(event,1)"/></div></td>
+          <td><div class="add-cell"><input id="a2" placeholder="Ajouter…" onkeydown="addTask(event,2)"/></div></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 </div>
 
 <!-- Modal priorité -->
