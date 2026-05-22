@@ -58,82 +58,80 @@ function defaultData() {
 }
 
 /**
- * Merge optimiste : fusionne les modifications entrantes avec l'état actuel sur GitHub.
+ * Merge "suppression prioritaire".
  *
- * Stratégie cellule par cellule :
- * - Si la cellule entrante a du contenu et que la cellule distante est vide → on prend l'entrante
- * - Si la cellule entrante est vide et que la cellule distante a du contenu → on garde la distante
- * - Si les deux ont du contenu et sont différentes → on garde les DEUX (la distante en premier,
- *   l'entrante ajoutée à la ligne suivante disponible)
- * - Si identiques → rien à faire
+ * Le client fait autorité sur les lignes qu'il connaît (position par
+ * position) : ce qu'il envoie est appliqué tel quel, suppressions
+ * comprises. Effacer une case côté client = la case reste effacée.
  *
- * Pour prio et done : on prend la valeur la plus récente (entrante) si le texte correspond,
- * sinon on garde la valeur distante.
+ * Le seul apport du merge : si une autre personne a AJOUTÉ des lignes
+ * au-delà de ce que le client connaît, ces lignes sont conservées.
+ *
+ * Ce choix privilégie une suppression fiable. Le risque résiduel
+ * (deux personnes éditant la même case à la même seconde) est
+ * négligeable ici : chaque apprentie a sa propre colonne.
  */
 function mergeData(incoming, remote) {
-  // Normalise les dimensions : prend le max de lignes
   const COLS = 3;
-  const maxRows = Math.max(incoming.length, remote.length, 10);
 
-  // Étend les tableaux si nécessaire
-  while (incoming.length < maxRows) incoming.push(Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '' })));
-  while (remote.length < maxRows) remote.push(Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '' })));
+  // ── Principe (suppression prioritaire) ──────────────────────
+  // Le CLIENT fait autorité sur les lignes qu'il connaît, position
+  // par position. Effacer une case = la case reste effacée.
+  //
+  // Le merge ne sert qu'à UN seul cas réel de concurrence :
+  // une autre personne a AJOUTÉ une ligne plus bas que tout ce que
+  // le client connaît. Dans ce cas seulement, on récupère du distant.
+  //
+  // Concrètement :
+  //  - Pour toutes les lignes 0..incoming.length-1  → on prend INCOMING
+  //    (y compris les cases vides : c'est une suppression volontaire)
+  //  - Pour les lignes au-delà (remote plus long)   → on ajoute le
+  //    contenu distant non vide que le client n'a pas vu
+  // ────────────────────────────────────────────────────────────
 
-  const merged = remote.map(row => row.map(cell => ({ ...cell })));
+  // 1. Base = ce que le client envoie (sa vérité, suppressions incluses)
+  const merged = incoming.map(row => {
+    // Sécurité : normaliser chaque ligne sur COLS colonnes
+    const safe = [];
+    for (let ci = 0; ci < COLS; ci++) {
+      const c = row && row[ci] ? row[ci] : { text: '', done: false, prio: '' };
+      safe.push({
+        text: c.text || '',
+        done: !!c.done,
+        prio: c.prio || ''
+      });
+    }
+    return safe;
+  });
 
-  for (let ci = 0; ci < COLS; ci++) {
-    // Construire un index des textes distants pour déduplication
-    const remoteTexts = new Set(
-      remote.map(row => (row[ci]?.text || '').trim().toLowerCase()).filter(Boolean)
-    );
-
-    for (let ri = 0; ri < incoming.length; ri++) {
-      const inc = incoming[ri]?.[ci];
-      const rem = remote[ri]?.[ci];
-      if (!inc) continue;
-
-      const incText = (inc.text || '').trim();
-      const remText = (rem?.text || '').trim();
-
-      if (!incText) continue; // Cellule entrante vide → on garde l'état distant tel quel
-
-      if (!remText) {
-        // Case distante vide → on applique directement la valeur entrante
-        merged[ri][ci] = { ...inc };
-      } else if (incText.toLowerCase() === remText.toLowerCase()) {
-        // Même texte → on met à jour prio et done avec la valeur entrante (plus récente)
-        merged[ri][ci] = { ...rem, done: inc.done, prio: inc.prio };
-      } else {
-        // Conflit de contenu : le texte entrant n'est pas encore dans le distant → on l'ajoute
-        if (!remoteTexts.has(incText.toLowerCase())) {
-          // Chercher la première ligne vide dans cette colonne
-          let inserted = false;
-          for (let r2 = 0; r2 < merged.length; r2++) {
-            if (!(merged[r2][ci]?.text || '').trim()) {
-              merged[r2][ci] = { ...inc };
-              remoteTexts.add(incText.toLowerCase());
-              inserted = true;
-              break;
-            }
-          }
-          if (!inserted) {
-            // Plus de place → étendre le tableau
-            const newRow = Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '' }));
-            newRow[ci] = { ...inc };
-            merged.push(newRow);
-            remoteTexts.add(incText.toLowerCase());
-          }
-        } else {
-          // Le texte entrant existe déjà côté distant → mettre à jour done/prio sur la bonne ligne
-          for (let r2 = 0; r2 < merged.length; r2++) {
-            if ((merged[r2][ci]?.text || '').trim().toLowerCase() === incText.toLowerCase()) {
-              merged[r2][ci] = { ...merged[r2][ci], done: inc.done, prio: inc.prio };
-              break;
-            }
-          }
+  // 2. Récupérer UNIQUEMENT les lignes distantes que le client
+  //    ne connaît pas (index >= incoming.length) et qui ont du contenu.
+  //    C'est le seul cas où une autre personne a ajouté quelque chose
+  //    sans que le client en ait connaissance.
+  if (remote.length > incoming.length) {
+    for (let ri = incoming.length; ri < remote.length; ri++) {
+      const remoteRow = remote[ri];
+      if (!remoteRow) continue;
+      // La ligne distante a-t-elle au moins une case remplie ?
+      const hasContent = remoteRow.some(c => (c?.text || '').trim() !== '');
+      if (hasContent) {
+        const safe = [];
+        for (let ci = 0; ci < COLS; ci++) {
+          const c = remoteRow[ci] || { text: '', done: false, prio: '' };
+          safe.push({
+            text: c.text || '',
+            done: !!c.done,
+            prio: c.prio || ''
+          });
         }
+        merged.push(safe);
       }
     }
+  }
+
+  // 3. Garantir un minimum de 10 lignes (cohérent avec blank())
+  while (merged.length < 10) {
+    merged.push(Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '' })));
   }
 
   return merged;
