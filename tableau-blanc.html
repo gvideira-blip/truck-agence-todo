@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Tableau blanc — Truck Agence</title>
 <script>
-  // Garde d'authentification
   (function() {
     const until = parseInt(localStorage.getItem('ta_auth_until') || '0');
     if (until <= Date.now()) {
@@ -40,21 +39,13 @@
 
   /* NAV */
   .nav {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 10px;
-    flex-shrink: 0;
+    display: flex; justify-content: center; gap: 8px;
+    margin-bottom: 10px; flex-shrink: 0;
   }
   .nav a {
-    font-size: 12px;
-    color: var(--text2);
-    text-decoration: none;
-    padding: 5px 14px;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    background: var(--bg);
-    transition: all 0.15s;
+    font-size: 12px; color: var(--text2); text-decoration: none;
+    padding: 5px 14px; border: 1px solid var(--border); border-radius: 20px;
+    background: var(--bg); transition: all 0.15s;
     display: flex; align-items: center; gap: 5px;
   }
   .nav a:hover { border-color: var(--blue); color: var(--blue); }
@@ -62,152 +53,129 @@
 
   /* TOOLBAR */
   .toolbar {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 8px 12px;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-shrink: 0;
-    flex-wrap: wrap;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 8px 12px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 14px;
+    flex-shrink: 0; flex-wrap: wrap;
   }
   .tool-group {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding-right: 14px;
-    border-right: 1px solid var(--border);
+    display: flex; align-items: center; gap: 6px;
+    padding-right: 14px; border-right: 1px solid var(--border);
   }
   .tool-group:last-child { border-right: none; padding-right: 0; }
   .tool-group .lbl {
-    font-size: 10px;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-right: 4px;
+    font-size: 10px; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px;
   }
 
   .tool-btn {
-    width: 36px; height: 36px;
-    border: 1.5px solid var(--border);
-    background: white;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.1s;
-    color: var(--text2);
-    font-size: 16px;
+    width: 36px; height: 36px; border: 1.5px solid var(--border);
+    background: white; border-radius: 8px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.1s; color: var(--text2); font-size: 16px;
   }
   .tool-btn:hover { background: var(--bg2); }
-  .tool-btn.active {
-    border-color: var(--blue);
-    background: #f0f6fa;
-    color: var(--blue);
-  }
+  .tool-btn.active { border-color: var(--blue); background: #f0f6fa; color: var(--blue); }
   .tool-btn.eraser.active { border-color: var(--red); background: #fef0f0; color: var(--red); }
-  .tool-btn.lasso.active { border-color: var(--green); background: #edf7f1; color: var(--green); }
+  .tool-btn.lasso.active  { border-color: var(--green); background: #edf7f1; color: var(--green); }
 
-  /* Color swatches */
   .color-btn {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    border: 2px solid white;
-    box-shadow: 0 0 0 1.5px var(--border);
-    cursor: pointer;
-    transition: transform 0.1s;
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 2px solid white; box-shadow: 0 0 0 1.5px var(--border);
+    cursor: pointer; transition: transform 0.1s;
   }
   .color-btn:hover { transform: scale(1.1); }
   .color-btn.active { box-shadow: 0 0 0 2.5px var(--text); transform: scale(1.1); }
-  .c-black { background: #1a1a1a; }
-  .c-blue { background: #004472; }
-  .c-red { background: #CD1719; }
-  .c-green { background: #2d8a4e; }
+  .c-black  { background: #1a1a1a; }
+  .c-blue   { background: #004472; }
+  .c-red    { background: #CD1719; }
+  .c-green  { background: #2d8a4e; }
   .c-orange { background: #e87900; }
 
-  /* Width buttons */
   .width-btn {
-    width: 36px; height: 36px;
-    border: 1.5px solid var(--border);
-    background: white;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.1s;
+    width: 36px; height: 36px; border: 1.5px solid var(--border);
+    background: white; border-radius: 8px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all 0.1s;
   }
   .width-btn:hover { background: var(--bg2); }
   .width-btn.active { border-color: var(--blue); background: #f0f6fa; }
   .width-dot { background: var(--text); border-radius: 50%; }
 
-  .right {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .sync {
-    font-size: 12px;
-    color: var(--text3);
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
+  .right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .sync { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 5px; }
   .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; transition: background 0.3s; }
-  .sync-dot.ok { background: #5a9a2a; }
+  .sync-dot.ok     { background: #5a9a2a; }
   .sync-dot.saving { background: #e0920a; }
-  .sync-dot.error { background: #d03030; }
+  .sync-dot.error  { background: #d03030; }
 
   .btn-clear {
-    font-size: 12px;
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 7px 14px;
-    cursor: pointer;
-    color: var(--text2);
-    font-family: inherit;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: all 0.15s;
+    font-size: 12px; background: none; border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 14px; cursor: pointer;
+    color: var(--text2); font-family: inherit;
+    display: flex; align-items: center; gap: 5px; transition: all 0.15s;
   }
   .btn-clear:hover { border-color: var(--red); color: var(--red); }
 
   /* CANVAS */
   .canvas-wrap {
-    flex: 1;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
+    flex: 1; background: white; border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; position: relative;
   }
   canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-    cursor: crosshair;
-    background: white;
+    display: block; width: 100%; height: 100%;
+    cursor: crosshair; background: white;
     background-image:
       linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
     background-size: 32px 32px;
   }
   canvas.eraser-mode { cursor: cell; }
-  canvas.lasso-mode { cursor: copy; }
+  canvas.lasso-mode  { cursor: copy; }
+
+  /* ═══════════════════════════════════════════
+     RESPONSIVE MOBILE
+     ═══════════════════════════════════════════ */
+  @media (max-width: 768px) {
+    body { padding: 8px; }
+
+    /* NAV compact */
+    .nav { gap: 5px; margin-bottom: 8px; }
+    .nav a { font-size: 11px; padding: 5px 10px; gap: 3px; }
+
+    /* TOOLBAR : wrap en 2 lignes naturelles */
+    .toolbar { padding: 6px 10px; gap: 8px; margin-bottom: 8px; border-radius: 10px; }
+    .tool-group { gap: 5px; padding-right: 10px; }
+    .tool-group .lbl { display: none; } /* Masquer les labels texte pour gagner de la place */
+
+    /* Boutons outils et couleurs légèrement plus petits */
+    .tool-btn  { width: 40px; height: 40px; font-size: 18px; } /* Plus grand pour les doigts */
+    .color-btn { width: 32px; height: 32px; }
+    .width-btn { width: 40px; height: 40px; }
+
+    /* Bouton effacer : icône seule */
+    .btn-clear .btn-text { display: none; }
+    .btn-clear { padding: 8px 10px; }
+
+    /* Le sync texte : masqué, on garde juste le dot */
+    .sync span { display: none; }
+
+    /* Le canvas prend tout l'espace restant — déjà géré par flex:1 */
+  }
+
+  @media (max-width: 480px) {
+    .nav a span { display: none; }
+    .nav a { padding: 7px 11px; }
+    /* Sur très petit écran, toolbar sur 2 lignes bien espacées */
+    .toolbar { gap: 6px; }
+  }
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <a href="/">✅ Tâches</a>
-  <a href="/ventes.html">📊 Ventes</a>
-  <a href="/tableau-blanc.html" class="active">🖊️ Tableau blanc</a>
+  <a href="/">✅ <span>Tâches</span></a>
+  <a href="/ventes.html">📊 <span>Ventes</span></a>
+  <a href="/tableau-blanc.html" class="active">🖊️ <span>Tableau blanc</span></a>
 </nav>
 
 <div class="toolbar">
@@ -229,10 +197,10 @@
   <div class="tool-group" id="colorGroup">
     <span class="lbl">Couleur</span>
     <div class="color-btn c-black active" onclick="setColor('#1a1a1a', this)"></div>
-    <div class="color-btn c-blue" onclick="setColor('#004472', this)"></div>
-    <div class="color-btn c-red" onclick="setColor('#CD1719', this)"></div>
-    <div class="color-btn c-green" onclick="setColor('#2d8a4e', this)"></div>
-    <div class="color-btn c-orange" onclick="setColor('#e87900', this)"></div>
+    <div class="color-btn c-blue"         onclick="setColor('#004472', this)"></div>
+    <div class="color-btn c-red"          onclick="setColor('#CD1719', this)"></div>
+    <div class="color-btn c-green"        onclick="setColor('#2d8a4e', this)"></div>
+    <div class="color-btn c-orange"       onclick="setColor('#e87900', this)"></div>
   </div>
 
   <!-- Épaisseur -->
@@ -255,7 +223,7 @@
       <span id="slabel">—</span>
     </div>
     <button class="btn-clear" onclick="confirmClear()">
-      <i class="ti ti-trash"></i> Tout effacer
+      <i class="ti ti-trash"></i> <span class="btn-text">Tout effacer</span>
     </button>
   </div>
 </div>
@@ -266,24 +234,22 @@
 
 <script>
 const canvas = document.getElementById('board');
-const ctx = canvas.getContext('2d');
+const ctx    = canvas.getContext('2d');
 
-let strokes = [];         // tableau de strokes : [{color, width, tool, points: [{x,y}]}]
+let strokes       = [];
 let currentStroke = null;
-let isDrawing = false;
-let tool = 'pen';
+let isDrawing     = false;
+let tool  = 'pen';
 let color = '#1a1a1a';
 let width = 4;
-let saveTimer = null;
-let pollTimer = null;
+let saveTimer  = null;
 let lastSavedHash = '';
 
-// Adapter canvas à la taille du wrap (avec gestion DPI)
 function fitCanvas() {
   const wrap = canvas.parentElement;
   const rect = wrap.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = rect.width * dpr;
+  const dpr  = window.devicePixelRatio || 1;
+  canvas.width  = rect.width  * dpr;
   canvas.height = rect.height * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   redraw();
@@ -292,17 +258,17 @@ window.addEventListener('resize', fitCanvas);
 
 function setSyncStatus(s) {
   document.getElementById('sdot').className = 'sync-dot ' + s;
-  document.getElementById('slabel').textContent = s==='ok'?'Synchronisé':s==='saving'?'Enregistrement…':'Erreur sync';
+  document.getElementById('slabel').textContent =
+    s === 'ok' ? 'Synchronisé' : s === 'saving' ? 'Enregistrement…' : 'Erreur sync';
 }
 
-// --- Outils ---
 function setTool(t) {
   tool = t;
   document.getElementById('penBtn').classList.toggle('active', t === 'pen');
   document.getElementById('eraserBtn').classList.toggle('active', t === 'eraser');
   document.getElementById('lassoBtn').classList.toggle('active', t === 'lasso');
   canvas.classList.toggle('eraser-mode', t === 'eraser');
-  canvas.classList.toggle('lasso-mode', t === 'lasso');
+  canvas.classList.toggle('lasso-mode',  t === 'lasso');
 }
 function setColor(c, el) {
   color = c;
@@ -316,7 +282,6 @@ function setWidth(w, el) {
   if (el) el.classList.add('active');
 }
 
-// --- Drawing ---
 let lassoPoints = null;
 
 function getPos(e) {
@@ -329,17 +294,11 @@ function startStroke(e) {
   e.preventDefault();
   isDrawing = true;
   const pos = getPos(e);
-
-  if (tool === 'lasso') {
-    lassoPoints = [pos];
-    return;
-  }
-
+  if (tool === 'lasso') { lassoPoints = [pos]; return; }
   currentStroke = {
     color: tool === 'eraser' ? '#ffffff' : color,
     width: tool === 'eraser' ? Math.max(width * 4, 20) : width,
-    tool: tool,
-    points: [pos]
+    tool, points: [pos]
   };
   strokes.push(currentStroke);
   drawStrokeSegment(currentStroke, 0);
@@ -349,14 +308,10 @@ function continueStroke(e) {
   if (!isDrawing) return;
   e.preventDefault();
   const pos = getPos(e);
-
   if (tool === 'lasso') {
     lassoPoints.push(pos);
-    redraw();
-    drawLassoOverlay();
-    return;
+    redraw(); drawLassoOverlay(); return;
   }
-
   if (!currentStroke) return;
   currentStroke.points.push(pos);
   drawStrokeSegment(currentStroke, currentStroke.points.length - 2);
@@ -365,16 +320,11 @@ function continueStroke(e) {
 function endStroke() {
   if (!isDrawing) return;
   isDrawing = false;
-
   if (tool === 'lasso' && lassoPoints && lassoPoints.length > 2) {
     eraseInsideLasso(lassoPoints);
-    lassoPoints = null;
-    redraw();
-    scheduleSave();
-    return;
+    lassoPoints = null; redraw(); scheduleSave(); return;
   }
   lassoPoints = null;
-
   currentStroke = null;
   scheduleSave();
 }
@@ -384,22 +334,13 @@ function drawLassoOverlay() {
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(lassoPoints[0].x, lassoPoints[0].y);
-  for (let i = 1; i < lassoPoints.length; i++) {
-    ctx.lineTo(lassoPoints[i].x, lassoPoints[i].y);
-  }
-  // Ligne pointillée verte
+  for (let i = 1; i < lassoPoints.length; i++) ctx.lineTo(lassoPoints[i].x, lassoPoints[i].y);
   ctx.setLineDash([6, 4]);
-  ctx.strokeStyle = '#2d8a4e';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  // Remplissage léger vert transparent
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(45, 138, 78, 0.08)';
-  ctx.fill();
+  ctx.strokeStyle = '#2d8a4e'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.closePath(); ctx.fillStyle = 'rgba(45,138,78,0.08)'; ctx.fill();
   ctx.restore();
 }
 
-// Point-in-polygon (algo ray casting)
 function pointInPolygon(p, polygon) {
   let inside = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -412,44 +353,33 @@ function pointInPolygon(p, polygon) {
   return inside;
 }
 
-// Vire les strokes dont la majorité des points sont dans le lasso
 function eraseInsideLasso(polygon) {
   strokes = strokes.filter(stroke => {
     const insideCount = stroke.points.filter(p => pointInPolygon(p, polygon)).length;
-    // On supprime si plus de 50% des points sont dedans
     return insideCount / stroke.points.length < 0.5;
   });
 }
 
-// Souris
-canvas.addEventListener('mousedown', startStroke);
-canvas.addEventListener('mousemove', continueStroke);
-canvas.addEventListener('mouseup', endStroke);
+canvas.addEventListener('mousedown',  startStroke);
+canvas.addEventListener('mousemove',  continueStroke);
+canvas.addEventListener('mouseup',    endStroke);
 canvas.addEventListener('mouseleave', endStroke);
-// Tactile / stylet
-canvas.addEventListener('touchstart', startStroke, { passive: false });
-canvas.addEventListener('touchmove', continueStroke, { passive: false });
-canvas.addEventListener('touchend', endStroke);
+canvas.addEventListener('touchstart',  startStroke,    { passive: false });
+canvas.addEventListener('touchmove',   continueStroke, { passive: false });
+canvas.addEventListener('touchend',    endStroke);
 canvas.addEventListener('touchcancel', endStroke);
 
 function drawStrokeSegment(stroke, fromIdx) {
   if (stroke.points.length < 2) {
-    // simple point
-    ctx.beginPath();
-    ctx.fillStyle = stroke.color;
+    ctx.beginPath(); ctx.fillStyle = stroke.color;
     ctx.arc(stroke.points[0].x, stroke.points[0].y, stroke.width / 2, 0, Math.PI * 2);
-    ctx.fill();
-    return;
+    ctx.fill(); return;
   }
   ctx.beginPath();
-  ctx.strokeStyle = stroke.color;
-  ctx.lineWidth = stroke.width;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  const p1 = stroke.points[fromIdx];
-  const p2 = stroke.points[fromIdx + 1];
-  ctx.moveTo(p1.x, p1.y);
-  ctx.lineTo(p2.x, p2.y);
+  ctx.strokeStyle = stroke.color; ctx.lineWidth = stroke.width;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.moveTo(stroke.points[fromIdx].x, stroke.points[fromIdx].y);
+  ctx.lineTo(stroke.points[fromIdx + 1].x, stroke.points[fromIdx + 1].y);
   ctx.stroke();
 }
 
@@ -458,26 +388,21 @@ function redraw() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   for (const stroke of strokes) {
     if (stroke.points.length < 2) {
-      ctx.beginPath();
-      ctx.fillStyle = stroke.color;
+      ctx.beginPath(); ctx.fillStyle = stroke.color;
       ctx.arc(stroke.points[0].x, stroke.points[0].y, stroke.width / 2, 0, Math.PI * 2);
       ctx.fill();
     } else {
       ctx.beginPath();
-      ctx.strokeStyle = stroke.color;
-      ctx.lineWidth = stroke.width;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
+      ctx.strokeStyle = stroke.color; ctx.lineWidth = stroke.width;
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-      for (let i = 1; i < stroke.points.length; i++) {
+      for (let i = 1; i < stroke.points.length; i++)
         ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
-      }
       ctx.stroke();
     }
   }
 }
 
-// --- Persistance ---
 async function loadData() {
   try {
     const r = await fetch('/api/board');
@@ -485,12 +410,8 @@ async function loadData() {
     const d = await r.json();
     strokes = d.strokes || [];
     lastSavedHash = JSON.stringify(strokes);
-    setSyncStatus('ok');
-    redraw();
-  } catch(e) {
-    strokes = [];
-    setSyncStatus('error');
-  }
+    setSyncStatus('ok'); redraw();
+  } catch(e) { strokes = []; setSyncStatus('error'); }
 }
 
 function scheduleSave() {
@@ -505,8 +426,7 @@ function scheduleSave() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ strokes })
       });
-      lastSavedHash = hash;
-      setSyncStatus('ok');
+      lastSavedHash = hash; setSyncStatus('ok');
     } catch(e) { setSyncStatus('error'); }
   }, 1500);
 }
@@ -519,9 +439,7 @@ async function poll() {
     const d = await r.json();
     const newHash = JSON.stringify(d.strokes || []);
     if (newHash !== lastSavedHash) {
-      strokes = d.strokes || [];
-      lastSavedHash = newHash;
-      redraw();
+      strokes = d.strokes || []; lastSavedHash = newHash; redraw();
     }
     setSyncStatus('ok');
   } catch(e) { setSyncStatus('error'); }
@@ -529,15 +447,12 @@ async function poll() {
 
 function confirmClear() {
   if (!confirm('Effacer complètement le tableau ?')) return;
-  strokes = [];
-  redraw();
-  scheduleSave();
+  strokes = []; redraw(); scheduleSave();
 }
 
-// Init
 fitCanvas();
 loadData();
-pollTimer = setInterval(poll, 5000);
+setInterval(poll, 5000);
 </script>
 </body>
 </html>
