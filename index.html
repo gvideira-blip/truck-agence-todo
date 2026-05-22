@@ -52,8 +52,9 @@
 
     .wrap {
       background: var(--bg); border-radius: var(--r);
-      border: 1px solid var(--border); overflow: hidden;
+      border: 1px solid var(--border);
     }
+    /* Pas de overflow:hidden ici — le table-scroll en a besoin */
 
     .topbar {
       display: flex; align-items: center; justify-content: space-between;
@@ -78,7 +79,7 @@
     }
     .btn-reset:hover { background: var(--bg2); }
 
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    table { width: 100%; border-collapse: collapse; table-layout: auto; }
 
     thead th {
       padding: 9px 14px; font-size: 13px; font-weight: 500; color: var(--text2);
@@ -223,7 +224,29 @@
       font-size: 14px; color: var(--text2); z-index: 100;
     }
 
-    /* RESPONSIVE MOBILE — Option B : scroll horizontal */
+    /* ═══════════════════════════════════════════
+       RESPONSIVE MOBILE — Option B : scroll horizontal
+       Actif sur TOUTES tailles pour garantir le scroll.
+       ═══════════════════════════════════════════ */
+
+    /* Le scroll wrapper est toujours actif */
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      /* Ombres de bord : signal visuel de scroll */
+      background:
+        linear-gradient(to right, white 20%, rgba(255,255,255,0)),
+        linear-gradient(to right, rgba(255,255,255,0), white 80%) 100% 0,
+        radial-gradient(farthest-side at 0% 50%, rgba(0,0,0,0.07), transparent),
+        radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,0.07), transparent) 100% 0;
+      background-repeat: no-repeat;
+      background-size: 40px 100%, 40px 100%, 12px 100%, 12px 100%;
+      background-attachment: local, local, scroll, scroll;
+    }
+
+    /* Largeur minimale du tableau : force le scroll si l'écran est trop petit */
+    table { min-width: 560px; }
+
     @media (max-width: 768px) {
       body { padding: 10px; }
       .nav { gap: 5px; margin-bottom: 12px; }
@@ -232,35 +255,22 @@
       .topbar-left { flex: 1; }
       .topbar-right { width: 100%; justify-content: flex-end; }
       .date { display: none; }
-      .wrap { overflow: visible; }
-      .table-scroll {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        border-radius: 0 0 var(--r) var(--r);
-        background:
-          linear-gradient(to right, white 20%, rgba(255,255,255,0)),
-          linear-gradient(to right, rgba(255,255,255,0), white 80%) 100% 0,
-          radial-gradient(farthest-side at 0 50%, rgba(0,0,0,0.08), transparent),
-          radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,0.08), transparent) 100% 0;
-        background-repeat: no-repeat;
-        background-size: 40px 100%, 40px 100%, 12px 100%, 12px 100%;
-        background-attachment: local, local, scroll, scroll;
-      }
-      table { min-width: 680px; font-size: 12px; }
+      table { font-size: 12px; }
       thead th { padding: 7px 8px; font-size: 10px; }
       thead th:first-child { width: 28px; }
-      .cell { min-height: 42px; }
-      .task { padding: 3px 6px 3px 8px; gap: 6px; }
+      .cell { min-height: 44px; }
+      .task { padding: 4px 6px 4px 8px; gap: 6px; }
       .task textarea { font-size: 13px; }
       .task input[type=checkbox] { width: 18px; height: 18px; }
-      .prio { width: 44px; }
-      .prio-btn { height: 34px; font-size: 15px; }
+      .prio { width: 46px; }
+      .prio-btn { height: 36px; font-size: 16px; }
       .add-cell { padding: 6px 8px; }
       .add-cell input { font-size: 13px; }
+      /* Modal : monte depuis le bas sur mobile */
       .modal-bg { align-items: flex-end; }
-      .modal { border-radius: 16px 16px 0 0; width: 100%; padding: 20px 16px 32px; }
+      .modal { border-radius: 16px 16px 0 0; width: 100%; padding: 20px 16px 36px; }
       .keypad { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-      .key { height: 52px; }
+      .key { height: 56px; }
     }
     @media (max-width: 480px) {
       .nav a span { display: none; }
