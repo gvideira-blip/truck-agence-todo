@@ -68,7 +68,7 @@
       "achat": "51000",
       "vente": "60000",
       "prepa": "",
-      "facture": true
+      "facture": false
     },
     {
       "acheteur": "Willemy",
