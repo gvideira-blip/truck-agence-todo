@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ventes du mois — Truck Agence</title>
 <script>
-  // Garde d'authentification
   (function() {
     const until = parseInt(localStorage.getItem('ta_auth_until') || '0');
     if (until <= Date.now()) {
@@ -44,215 +43,198 @@
 
   /* NAV */
   .nav {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 16px;
+    display: flex; justify-content: center; gap: 8px; margin-bottom: 16px;
   }
   .nav a {
-    font-size: 12px;
-    color: var(--text2);
-    text-decoration: none;
-    padding: 5px 14px;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    background: var(--bg);
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+    font-size: 12px; color: var(--text2); text-decoration: none;
+    padding: 5px 14px; border: 1px solid var(--border); border-radius: 20px;
+    background: var(--bg); transition: all 0.15s;
+    display: flex; align-items: center; gap: 5px;
   }
   .nav a:hover { border-color: var(--blue); color: var(--blue); }
   .nav a.active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
-  /* RECAP */
+  /* RECAP — 6 cartes sur 2 rangées */
   .recap {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
     margin-bottom: 16px;
   }
   .recap-card {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    padding: 16px 18px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 16px 18px;
   }
   .recap-card .label {
-    font-size: 11px;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
+    font-size: 11px; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
   }
   .recap-card .value {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--text);
+    font-size: 1.4rem; font-weight: 700; color: var(--text);
   }
-  .recap-card .value.green { color: var(--green); }
+  .recap-card .value.green  { color: var(--green); }
   .recap-card .value.orange { color: var(--orange); }
-  .recap-card .sub {
-    font-size: 11px;
-    color: var(--text3);
-    margin-top: 4px;
-  }
+  .recap-card .value.blue   { color: var(--blue); }
+  .recap-card .sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
   .progress-bar {
-    height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    margin-top: 10px;
-    overflow: hidden;
+    height: 4px; background: var(--border); border-radius: 2px;
+    margin-top: 10px; overflow: hidden;
   }
   .progress-fill {
-    height: 100%;
-    background: var(--blue);
-    border-radius: 2px;
-    transition: width 0.4s;
+    height: 100%; border-radius: 2px; transition: width 0.4s;
   }
+  .progress-fill.green  { background: var(--green); }
+  .progress-fill.blue   { background: var(--blue); }
+
+  /* Objectif éditeur inline */
+  .objectif-wrap { display: flex; align-items: center; gap: 6px; }
+  .objectif-input {
+    font-size: 1.4rem; font-weight: 700; color: var(--blue);
+    background: none; border: none; outline: none;
+    font-family: inherit; width: 120px;
+    border-bottom: 1.5px dashed var(--border);
+    cursor: text; padding: 0;
+  }
+  .objectif-input:focus { border-bottom-color: var(--blue); }
+  .objectif-hint { font-size: 10px; color: var(--text3); }
 
   /* WRAP */
   .wrap {
-    background: var(--bg);
-    border-radius: var(--r);
-    border: 1px solid var(--border);
-    overflow: hidden;
+    background: var(--bg); border-radius: var(--r);
+    border: 1px solid var(--border); overflow: hidden;
   }
-
-  /* TOPBAR */
   .topbar {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 18px;
-    background: var(--bg2);
+    padding: 14px 18px; background: var(--bg2);
     border-bottom: 1px solid var(--border);
   }
-  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-left  { display: flex; align-items: center; gap: 10px; }
   .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); }
   .title { font-size: 15px; font-weight: 500; }
   .month-label { font-size: 13px; color: var(--text3); }
   .topbar-right { display: flex; align-items: center; gap: 10px; }
   .sync { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 5px; }
   .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; transition: background 0.3s; }
-  .sync-dot.ok { background: #5a9a2a; }
-  .sync-dot.saving { background: #e0920a; }
-  .sync-dot.error { background: #d03030; }
+  .sync-dot.ok      { background: #5a9a2a; }
+  .sync-dot.saving  { background: #e0920a; }
+  .sync-dot.error   { background: #d03030; }
 
   .btn {
-    font-size: 12px;
-    background: none; border: 1px solid var(--border);
+    font-size: 12px; background: none; border: 1px solid var(--border);
     border-radius: var(--rs); padding: 5px 12px;
     cursor: pointer; display: flex; align-items: center; gap: 4px;
-    color: var(--text2); font-family: inherit;
-    transition: all 0.15s;
+    color: var(--text2); font-family: inherit; transition: all 0.15s;
   }
   .btn:hover { background: var(--bg2); }
-  .btn.primary {
-    background: var(--blue); color: #fff; border-color: var(--blue);
-  }
+  .btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
   .btn.primary:hover { background: #003560; }
   .btn.danger:hover { border-color: var(--red); color: var(--red); }
 
   /* TABLE */
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-
   thead th {
-    padding: 9px 12px;
-    font-size: 11px; font-weight: 600; color: var(--text2);
+    padding: 9px 12px; font-size: 11px; font-weight: 600; color: var(--text2);
     text-transform: uppercase; letter-spacing: 0.4px;
-    border-left: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    background: var(--bg2); text-align: left;
-    white-space: nowrap;
+    border-left: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    background: var(--bg2); text-align: left; white-space: nowrap;
   }
-  thead th.right { text-align: right; }
+  thead th.right  { text-align: right; }
   thead th.center { text-align: center; }
-  thead th:first-child { border-left: none; width: 32px; text-align: center; color: var(--text3); font-weight: 400; }
+  thead th:first-child {
+    border-left: none; width: 32px; text-align: center;
+    color: var(--text3); font-weight: 400;
+  }
 
   tbody td {
     border-left: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
     padding: 0; vertical-align: middle;
   }
-  tbody td:first-child { border-left: none; text-align: center; font-size: 11px; color: var(--text3); }
+  tbody td:first-child { border-left: none; text-align: center; font-size: 11px; }
   tbody tr:last-child td { border-bottom: none; }
   tbody tr:hover { background: #fafafa; }
-  tbody tr.is-facture { opacity: 0.6; }
+
+  /* ── Couleurs par statut ── */
+  /* Ligne facturée : texte vert */
+  tbody tr.is-facture .cell-input,
+  tbody tr.is-facture .marge-cell,
+  tbody tr.is-facture .pct-cell,
+  tbody tr.is-facture td:first-child {
+    color: var(--green) !important;
+  }
+  tbody tr.is-facture .facture-badge { background: var(--green-bg); color: var(--green); }
+
+  /* Ligne non facturée : texte orange */
+  tbody tr.is-pending .cell-input,
+  tbody tr.is-pending .marge-cell,
+  tbody tr.is-pending .pct-cell,
+  tbody tr.is-pending td:first-child {
+    color: var(--orange) !important;
+  }
+  tbody tr.is-pending .facture-badge { background: var(--orange-bg); color: var(--orange); }
+
+  /* Séparateur visuel entre facturé et en attente */
+  tbody tr.separator-row td {
+    border-bottom: 2px solid var(--border);
+    padding: 0;
+    height: 0;
+  }
 
   .cell-input {
-    display: block; width: 100%;
-    background: transparent; border: none; outline: none;
-    font-size: 13px; font-family: inherit; color: var(--text);
-    padding: 10px 12px; line-height: 1.4;
+    display: block; width: 100%; background: transparent;
+    border: none; outline: none; font-size: 13px;
+    font-family: inherit; padding: 10px 12px; line-height: 1.4;
+    /* Majuscules sur tous les champs texte */
+    text-transform: uppercase;
   }
-  .cell-input::placeholder { color: var(--text3); }
+  .cell-input[type="number"] { text-transform: none; } /* Pas de majuscules sur les nombres */
+  .cell-input::placeholder { color: var(--text3); text-transform: none; }
   .cell-input.right { text-align: right; }
   .cell-input:focus { background: #f0f6fa; }
 
   .marge-cell {
-    padding: 10px 12px;
-    font-weight: 700;
-    text-align: right;
-    white-space: nowrap;
+    padding: 10px 12px; font-weight: 700;
+    text-align: right; white-space: nowrap;
   }
   .marge-cell.pos { color: var(--green); }
   .marge-cell.neg { color: var(--red); }
-  .pct-cell {
-    padding: 10px 12px;
-    text-align: right;
-    font-size: 12px;
-    color: var(--text2);
-  }
+  .pct-cell { padding: 10px 12px; text-align: right; font-size: 12px; color: var(--text2); }
 
-  /* Facturé */
   .facture-cell {
     display: flex; align-items: center; justify-content: center;
     gap: 6px; padding: 10px 12px; cursor: pointer;
   }
   .facture-cell input[type="checkbox"] {
-    width: 16px; height: 16px;
-    accent-color: var(--blue);
-    cursor: pointer; flex-shrink: 0;
+    width: 16px; height: 16px; accent-color: var(--blue); cursor: pointer; flex-shrink: 0;
   }
   .facture-badge {
-    font-size: 11px; font-weight: 600;
-    padding: 2px 7px; border-radius: 10px;
+    font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 10px;
   }
-  .facture-badge.ok { background: var(--green-bg); color: var(--green); }
+  .facture-badge.ok      { background: var(--green-bg); color: var(--green); }
   .facture-badge.pending { background: var(--orange-bg); color: var(--orange); }
 
   .btn-del {
     background: none; border: none; cursor: pointer;
-    color: var(--text3); padding: 10px 10px;
-    font-size: 12px; transition: color 0.15s;
-    display: block; width: 100%;
+    color: var(--text3); padding: 10px 10px; font-size: 12px;
+    transition: color 0.15s; display: block; width: 100%;
   }
   .btn-del:hover { color: var(--red); }
 
-  /* Empty */
-  .empty {
-    text-align: center; padding: 60px 20px;
-    color: var(--text3); font-size: 14px;
-    display: none;
-  }
+  .empty { text-align: center; padding: 60px 20px; color: var(--text3); font-size: 14px; display: none; }
   .empty.show { display: block; }
   .empty-icon { font-size: 2rem; margin-bottom: 10px; }
 
-  /* Footer total */
   tfoot td {
-    border-left: 1px solid var(--border);
-    border-top: 2px solid var(--border);
-    background: var(--bg2);
-    padding: 10px 12px;
-    font-size: 12px; font-weight: 600;
-    color: var(--text2);
+    border-left: 1px solid var(--border); border-top: 2px solid var(--border);
+    background: var(--bg2); padding: 10px 12px;
+    font-size: 12px; font-weight: 600; color: var(--text2);
   }
   tfoot td:first-child { border-left: none; }
   tfoot td.right { text-align: right; }
   tfoot td.marge-total { color: var(--blue); font-size: 14px; text-align: right; }
 
   #loader {
-    position: fixed; inset: 0;
-    background: rgba(255,255,255,0.92);
+    position: fixed; inset: 0; background: rgba(255,255,255,0.92);
     display: flex; align-items: center; justify-content: center;
     font-size: 14px; color: var(--text2); z-index: 100;
   }
@@ -260,6 +242,9 @@
   @media (max-width: 900px) {
     body { padding: 12px; }
     .recap { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .recap { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -273,28 +258,72 @@
   <a href="/tableau-blanc.html">🖊️ Tableau blanc</a>
 </nav>
 
-<!-- RECAP -->
+<!-- RECAP : 2 rangées × 3 colonnes -->
 <div class="recap">
+  <!-- Rangée 1 : marges -->
   <div class="recap-card">
     <div class="label">Marge facturée</div>
     <div class="value green" id="rFacturee">0 €</div>
-    <div class="sub" id="rCntF">0 vente(s)</div>
+    <div class="sub" id="rCntF">0 véhicule(s)</div>
   </div>
   <div class="recap-card">
     <div class="label">Potentiel à facturer</div>
     <div class="value orange" id="rPotentiel">0 €</div>
-    <div class="sub" id="rCntP">0 vente(s)</div>
+    <div class="sub" id="rCntP">0 véhicule(s)</div>
   </div>
   <div class="recap-card">
     <div class="label">Total mois</div>
     <div class="value" id="rTotal">0 €</div>
-    <div class="sub" id="rCntT">0 vente(s)</div>
+    <div class="sub" id="rCntT">0 véhicule(s) au total</div>
+  </div>
+
+  <!-- Rangée 2 : objectifs & moyennes -->
+  <div class="recap-card">
+    <div class="label">Objectif (éditable)</div>
+    <div class="objectif-wrap">
+      <input class="objectif-input" id="objectifInput" type="text"
+        inputmode="numeric" value="50 000 €"
+        onblur="onObjectifBlur(this)"
+        onkeydown="if(event.key==='Enter')this.blur()"
+        title="Cliquez pour modifier l'objectif"/>
+    </div>
+    <div class="sub" id="rObjSub">Modifiez en cliquant sur la valeur</div>
   </div>
   <div class="recap-card">
-    <div class="label">Objectif · 50 000 €</div>
-    <div class="value" id="rPct">0%</div>
-    <div class="sub" id="rPctSub">0 € réalisés</div>
-    <div class="progress-bar"><div class="progress-fill" id="rBar" style="width:0%"></div></div>
+    <div class="label">% Objectif — ventes réalisées</div>
+    <div class="value blue" id="rPctVente">0%</div>
+    <div class="sub" id="rPctVenteSub">0 € sur objectif</div>
+    <div class="progress-bar"><div class="progress-fill blue" id="rBarVente" style="width:0%"></div></div>
+  </div>
+  <div class="recap-card">
+    <div class="label">% Objectif — facturé</div>
+    <div class="value green" id="rPctFacture">0%</div>
+    <div class="sub" id="rPctFactureSub">0 € facturés</div>
+    <div class="progress-bar"><div class="progress-fill green" id="rBarFacture" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- Indicateurs secondaires -->
+<div class="recap" style="margin-bottom:16px; grid-template-columns: repeat(4,1fr);">
+  <div class="recap-card">
+    <div class="label">Véhicules vendus</div>
+    <div class="value" id="iCntVendu">0</div>
+    <div class="sub" id="iMoyVendu">Marge moy. — €</div>
+  </div>
+  <div class="recap-card">
+    <div class="label">Véhicules facturés</div>
+    <div class="value green" id="iCntFacture">0</div>
+    <div class="sub" id="iMoyFacture">Marge moy. — €</div>
+  </div>
+  <div class="recap-card">
+    <div class="label">Marge moy. / vendu</div>
+    <div class="value" id="iMoyVenduVal">— €</div>
+    <div class="sub">Tous véhicules</div>
+  </div>
+  <div class="recap-card">
+    <div class="label">Marge moy. / facturé</div>
+    <div class="value green" id="iMoyFactureVal">— €</div>
+    <div class="sub">Facturés uniquement</div>
   </div>
 </div>
 
@@ -354,18 +383,22 @@
 </div>
 
 <script>
-const OBJECTIF = 50000;
-let ventes = [];
+// ─── État global ─────────────────────────────────────────────
+let ventes  = [];
+let objectif = 50000;
 let saveTimer = null;
 
+// ─── Sync status ─────────────────────────────────────────────
 function setSyncStatus(s) {
   document.getElementById('sdot').className = 'sync-dot ' + s;
-  document.getElementById('slabel').textContent = s==='ok'?'Synchronisé':s==='saving'?'Enregistrement…':'Erreur sync';
+  document.getElementById('slabel').textContent =
+    s === 'ok' ? 'Synchronisé' : s === 'saving' ? 'Enregistrement…' : 'Erreur sync';
 }
 
+// ─── Init ─────────────────────────────────────────────────────
 async function init() {
   document.getElementById('monthLabel').textContent =
-    '— ' + new Date().toLocaleDateString('fr-FR', { month:'long', year:'numeric' });
+    '— ' + new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
   await loadData();
   document.getElementById('loader').style.display = 'none';
   render();
@@ -376,11 +409,32 @@ async function loadData() {
     const r = await fetch('/api/ventes');
     if (!r.ok) throw 0;
     const d = await r.json();
-    ventes = d.ventes || [];
+    ventes   = d.ventes   || [];
+    objectif = d.objectif || 50000;
     setSyncStatus('ok');
+    syncObjectifInput();
   } catch(e) { ventes = []; setSyncStatus('error'); }
 }
 
+// ─── Objectif éditable ───────────────────────────────────────
+function syncObjectifInput() {
+  document.getElementById('objectifInput').value = fmtCurrency(objectif);
+}
+
+function onObjectifBlur(el) {
+  // Nettoie la saisie : retire tout sauf chiffres
+  const raw = el.value.replace(/[^0-9]/g, '');
+  const val = parseInt(raw, 10);
+  if (!isNaN(val) && val > 0) {
+    objectif = val;
+    updateRecap();
+    scheduleSave();
+  }
+  // Reformater l'affichage
+  el.value = fmtCurrency(objectif);
+}
+
+// ─── Save ────────────────────────────────────────────────────
 function scheduleSave() {
   setSyncStatus('saving');
   clearTimeout(saveTimer);
@@ -389,26 +443,40 @@ function scheduleSave() {
       await fetch('/api/ventes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ventes })
+        body: JSON.stringify({ ventes, objectif })
       });
       setSyncStatus('ok');
     } catch(e) { setSyncStatus('error'); }
   }, 800);
 }
 
+// ─── Calculs ─────────────────────────────────────────────────
 function calcMarge(v) {
-  const a = parseFloat(v.achat)||0;
-  const ve = parseFloat(v.vente)||0;
-  const p = parseFloat(v.prepa)||0;
+  const a  = parseFloat(v.achat) || 0;
+  const ve = parseFloat(v.vente) || 0;
+  const p  = parseFloat(v.prepa) || 0;
   return ve - a - p;
 }
 
+// ─── Tri : facturés en haut (dans l'ordre de cochage = ordre factureOrder),
+//          puis non facturés (dans l'ordre d'insertion = index dans ventes[])
+function sortedVentes() {
+  const factures   = ventes.filter(v => v.facture);
+  const enAttente  = ventes.filter(v => !v.facture);
+  return [...factures, ...enAttente];
+}
+
+// ─── Render ──────────────────────────────────────────────────
 function render() {
   const tbody = document.getElementById('tbody');
   const empty = document.getElementById('empty');
   const table = document.getElementById('table');
 
   tbody.innerHTML = '';
+
+  const nonEmpty = ventes.filter(v =>
+    v.acheteur || v.vendeur || v.immat || v.marque || v.achat || v.vente || v.prepa || v.facture
+  );
 
   if (!ventes.length) {
     empty.classList.add('show');
@@ -419,33 +487,68 @@ function render() {
   empty.classList.remove('show');
   table.style.display = 'table';
 
-  ventes.forEach((v, i) => {
-    const marge = calcMarge(v);
-    const pct = (parseFloat(v.vente)||0) > 0
-      ? ((marge / (parseFloat(v.vente)||1)) * 100).toFixed(1) + '%'
+  const sorted = sortedVentes();
+  let lastFacture = null; // Pour tracer la ligne séparatrice
+
+  sorted.forEach((v, displayIdx) => {
+    // Indice réel dans ventes[] (pour les callbacks)
+    const realIdx = ventes.indexOf(v);
+    const marge   = calcMarge(v);
+    const pct = (parseFloat(v.vente) || 0) > 0
+      ? ((marge / (parseFloat(v.vente) || 1)) * 100).toFixed(1) + '%'
       : '—';
     const margeClass = marge >= 0 ? 'pos' : 'neg';
 
+    // Séparateur entre groupe facturé et groupe en attente
+    if (lastFacture === true && !v.facture) {
+      const sep = document.createElement('tr');
+      sep.className = 'separator-row';
+      sep.innerHTML = '<td colspan="12"></td>';
+      tbody.appendChild(sep);
+    }
+    lastFacture = v.facture;
+
+    const rowClass = v.facture ? 'is-facture' : 'is-pending';
+
     const tr = document.createElement('tr');
-    if (v.facture) tr.classList.add('is-facture');
+    tr.className = rowClass;
     tr.innerHTML = `
-      <td>${i+1}</td>
-      <td><input class="cell-input" type="text" value="${esc(v.acheteur||'')}" placeholder="Acheteur" data-i="${i}" data-f="acheteur"></td>
-      <td><input class="cell-input" type="text" value="${esc(v.vendeur||'')}" placeholder="Vendeur" data-i="${i}" data-f="vendeur"></td>
-      <td><input class="cell-input" type="text" value="${esc(v.immat||'')}" placeholder="AB-123-CD" data-i="${i}" data-f="immat" style="font-family:monospace;letter-spacing:1px"></td>
-      <td><input class="cell-input" type="text" value="${esc(v.marque||'')}" placeholder="Volvo FH 460" data-i="${i}" data-f="marque"></td>
-      <td><input class="cell-input right" type="number" value="${v.achat||''}" placeholder="0" data-i="${i}" data-f="achat"></td>
-      <td><input class="cell-input right" type="number" value="${v.vente||''}" placeholder="0" data-i="${i}" data-f="vente"></td>
-      <td><input class="cell-input right" type="number" value="${v.prepa||''}" placeholder="0" data-i="${i}" data-f="prepa"></td>
-      <td class="marge-cell ${margeClass}" id="m-${i}">${fmt(marge)}</td>
-      <td class="pct-cell" id="p-${i}">${pct}</td>
+      <td>${displayIdx + 1}</td>
+      <td><input class="cell-input" type="text"
+        value="${esc(v.acheteur || '')}" placeholder="ACHETEUR"
+        data-i="${realIdx}" data-f="acheteur"></td>
+      <td><input class="cell-input" type="text"
+        value="${esc(v.vendeur || '')}" placeholder="VENDEUR"
+        data-i="${realIdx}" data-f="vendeur"></td>
+      <td><input class="cell-input" type="text"
+        value="${esc(v.immat || '')}" placeholder="AB-123-CD"
+        data-i="${realIdx}" data-f="immat"
+        style="font-family:monospace;letter-spacing:1px"></td>
+      <td><input class="cell-input" type="text"
+        value="${esc(v.marque || '')}" placeholder="VOLVO FH 460"
+        data-i="${realIdx}" data-f="marque"></td>
+      <td><input class="cell-input right" type="number"
+        value="${v.achat || ''}" placeholder="0"
+        data-i="${realIdx}" data-f="achat"></td>
+      <td><input class="cell-input right" type="number"
+        value="${v.vente || ''}" placeholder="0"
+        data-i="${realIdx}" data-f="vente"></td>
+      <td><input class="cell-input right" type="number"
+        value="${v.prepa || ''}" placeholder="0"
+        data-i="${realIdx}" data-f="prepa"></td>
+      <td class="marge-cell ${margeClass}" id="m-${realIdx}">${fmtCurrency(marge)}</td>
+      <td class="pct-cell" id="p-${realIdx}">${pct}</td>
       <td>
         <label class="facture-cell">
-          <input type="checkbox" ${v.facture?'checked':''} data-i="${i}" data-action="facture">
-          <span class="facture-badge ${v.facture?'ok':'pending'}">${v.facture?'OK':'En att.'}</span>
+          <input type="checkbox" ${v.facture ? 'checked' : ''}
+            data-i="${realIdx}" data-action="facture">
+          <span class="facture-badge ${v.facture ? 'ok' : 'pending'}">
+            ${v.facture ? 'OK' : 'En att.'}
+          </span>
         </label>
       </td>
-      <td><button class="btn-del" data-i="${i}" data-action="del" title="Supprimer"><i class="ti ti-x"></i></button></td>
+      <td><button class="btn-del" data-i="${realIdx}" data-action="del" title="Supprimer">
+        <i class="ti ti-x"></i></button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -454,45 +557,37 @@ function render() {
   updateFooter();
 }
 
-// Délégation d'événements
+// ─── Événements délégués ─────────────────────────────────────
 document.getElementById('tbody').addEventListener('change', e => {
   const el = e.target;
-  const i = parseInt(el.dataset.i);
+  const i  = parseInt(el.dataset.i);
   if (isNaN(i)) return;
+
   if (el.dataset.action === 'facture') {
     ventes[i].facture = el.checked;
+    // Pas de render complet ici pour éviter de perdre le focus ;
+    // on déplace la ligne visuellement au prochain render
     render();
     scheduleSave();
   } else if (el.dataset.f) {
-    ventes[i][el.dataset.f] = el.value;
-    // Recalcul live marge
-    const marge = calcMarge(ventes[i]);
-    const pct = (parseFloat(ventes[i].vente)||0) > 0
-      ? ((marge/(parseFloat(ventes[i].vente)||1))*100).toFixed(1)+'%' : '—';
-    const mc = document.getElementById('m-'+i);
-    const pc = document.getElementById('p-'+i);
-    if (mc) { mc.textContent = fmt(marge); mc.className = 'marge-cell '+(marge>=0?'pos':'neg'); }
-    if (pc) pc.textContent = pct;
-    updateRecap();
-    updateFooter();
+    let val = el.value;
+    // Majuscules sur les champs texte (pas les nombres)
+    if (el.type !== 'number') val = val.toUpperCase();
+    ventes[i][el.dataset.f] = val;
+    refreshRow(i);
     scheduleSave();
   }
 });
 
 document.getElementById('tbody').addEventListener('input', e => {
   const el = e.target;
-  const i = parseInt(el.dataset.i);
+  const i  = parseInt(el.dataset.i);
   if (isNaN(i) || !el.dataset.f) return;
-  ventes[i][el.dataset.f] = el.value;
-  const marge = calcMarge(ventes[i]);
-  const pct = (parseFloat(ventes[i].vente)||0) > 0
-    ? ((marge/(parseFloat(ventes[i].vente)||1))*100).toFixed(1)+'%' : '—';
-  const mc = document.getElementById('m-'+i);
-  const pc = document.getElementById('p-'+i);
-  if (mc) { mc.textContent = fmt(marge); mc.className = 'marge-cell '+(marge>=0?'pos':'neg'); }
-  if (pc) pc.textContent = pct;
-  updateRecap();
-  updateFooter();
+
+  let val = el.value;
+  if (el.type !== 'number') val = val.toUpperCase();
+  ventes[i][el.dataset.f] = val;
+  refreshRow(i);
   scheduleSave();
 });
 
@@ -506,38 +601,78 @@ document.getElementById('tbody').addEventListener('click', e => {
   }
 });
 
+// Mise à jour légère d'une ligne (marge + pct) sans re-render complet
+function refreshRow(i) {
+  const marge = calcMarge(ventes[i]);
+  const pct = (parseFloat(ventes[i].vente) || 0) > 0
+    ? ((marge / (parseFloat(ventes[i].vente) || 1)) * 100).toFixed(1) + '%'
+    : '—';
+  const mc = document.getElementById('m-' + i);
+  const pc = document.getElementById('p-' + i);
+  if (mc) { mc.textContent = fmtCurrency(marge); mc.className = 'marge-cell ' + (marge >= 0 ? 'pos' : 'neg'); }
+  if (pc) pc.textContent = pct;
+  updateRecap();
+  updateFooter();
+}
+
+// ─── Recap ───────────────────────────────────────────────────
 function updateRecap() {
-  let mF=0, mP=0, cF=0, cP=0;
+  let mF = 0, mP = 0, cF = 0, cP = 0;
   ventes.forEach(v => {
     const m = calcMarge(v);
-    if (v.facture) { mF += m; cF++; } else { mP += m; cP++; }
+    if (v.facture) { mF += m; cF++; }
+    else           { mP += m; cP++; }
   });
-  const total = mF + mP;
-  const pct = Math.min(Math.round((total/OBJECTIF)*100), 100);
+  const cTotal = cF + cP;
+  const mTotal = mF + mP;
 
-  document.getElementById('rFacturee').textContent = fmt(mF);
-  document.getElementById('rPotentiel').textContent = fmt(mP);
-  document.getElementById('rTotal').textContent = fmt(total);
-  document.getElementById('rCntF').textContent = cF + ' vente(s) facturée(s)';
-  document.getElementById('rCntP').textContent = cP + ' vente(s) en cours';
-  document.getElementById('rCntT').textContent = (cF+cP) + ' vente(s) au total';
-  document.getElementById('rPct').textContent = pct + '%';
-  document.getElementById('rPctSub').textContent = fmt(total) + ' réalisés';
-  document.getElementById('rBar').style.width = pct + '%';
+  // Pourcentages (plafonnés à 100 pour la barre, pas pour le texte)
+  const pctVente   = objectif > 0 ? (mTotal / objectif * 100) : 0;
+  const pctFacture = objectif > 0 ? (mF     / objectif * 100) : 0;
+
+  document.getElementById('rFacturee').textContent     = fmtCurrency(mF);
+  document.getElementById('rPotentiel').textContent    = fmtCurrency(mP);
+  document.getElementById('rTotal').textContent        = fmtCurrency(mTotal);
+  document.getElementById('rCntF').textContent         = cF + ' véhicule(s) facturé(s)';
+  document.getElementById('rCntP').textContent         = cP + ' véhicule(s) en cours';
+  document.getElementById('rCntT').textContent         = cTotal + ' véhicule(s) au total';
+
+  document.getElementById('rPctVente').textContent     = Math.round(pctVente) + '%';
+  document.getElementById('rPctVenteSub').textContent  = fmtCurrency(mTotal) + ' sur objectif';
+  document.getElementById('rBarVente').style.width     = Math.min(pctVente, 100) + '%';
+
+  document.getElementById('rPctFacture').textContent   = Math.round(pctFacture) + '%';
+  document.getElementById('rPctFactureSub').textContent = fmtCurrency(mF) + ' facturés';
+  document.getElementById('rBarFacture').style.width   = Math.min(pctFacture, 100) + '%';
+
+  // Indicateurs véhicules & moyennes
+  const moyVendu   = cTotal > 0 ? mTotal / cTotal : null;
+  const moyFacture = cF     > 0 ? mF     / cF     : null;
+
+  document.getElementById('iCntVendu').textContent     = cTotal;
+  document.getElementById('iCntFacture').textContent   = cF;
+  document.getElementById('iMoyVendu').textContent     =
+    'Marge moy. ' + (moyVendu   !== null ? fmtCurrency(moyVendu)   : '—');
+  document.getElementById('iMoyFacture').textContent   =
+    'Marge moy. ' + (moyFacture !== null ? fmtCurrency(moyFacture) : '—');
+  document.getElementById('iMoyVenduVal').textContent  =
+    moyVendu   !== null ? fmtCurrency(moyVendu)   : '—';
+  document.getElementById('iMoyFactureVal').textContent =
+    moyFacture !== null ? fmtCurrency(moyFacture) : '—';
 }
 
 function updateFooter() {
   const total = ventes.reduce((s, v) => s + calcMarge(v), 0);
-  document.getElementById('footMarge').textContent = fmt(total);
+  document.getElementById('footMarge').textContent = fmtCurrency(total);
 }
 
+// ─── Actions ─────────────────────────────────────────────────
 function addRow() {
-  ventes.push({ acheteur:'', vendeur:'', immat:'', marque:'', achat:'', vente:'', prepa:'', facture:false });
+  ventes.push({ acheteur:'', vendeur:'', immat:'', marque:'', achat:'', vente:'', prepa:'', facture: false });
   render();
-  // focus première cellule de la dernière ligne
   setTimeout(() => {
-    const rows = document.querySelectorAll('#tbody tr');
-    if (rows.length) rows[rows.length-1].querySelector('.cell-input').focus();
+    const rows = document.querySelectorAll('#tbody tr:not(.separator-row)');
+    if (rows.length) rows[rows.length - 1].querySelector('.cell-input').focus();
   }, 50);
   scheduleSave();
 }
@@ -549,14 +684,27 @@ function confirmReset() {
   scheduleSave();
 }
 
-function fmt(n) {
+// ─── Formatage ───────────────────────────────────────────────
+/**
+ * Formate un nombre en monnaie française : 7000 → "7 000 €"
+ * Utilise Intl mais force le symbole € à la fin avec espace insécable.
+ */
+function fmtCurrency(n) {
+  const num = Math.round(n);
+  // Intl.NumberFormat fr-FR produit "7 000 €" avec espace fine insécable avant €
   return new Intl.NumberFormat('fr-FR', {
-    style:'currency', currency:'EUR',
-    minimumFractionDigits:0, maximumFractionDigits:0
-  }).format(n);
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(num);
 }
-function esc(s) { return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 
+function esc(s) {
+  return String(s).replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+// ─── Démarrage ───────────────────────────────────────────────
 init();
 </script>
 </body>
