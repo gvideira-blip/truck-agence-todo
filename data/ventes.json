@@ -58,7 +58,7 @@
       "achat": "7000",
       "vente": "8500",
       "prepa": "335",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "Balayage Service Ile de France",
@@ -68,7 +68,7 @@
       "achat": "51000",
       "vente": "60000",
       "prepa": "",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "Willemy",
@@ -78,7 +78,7 @@
       "achat": "46000",
       "vente": "52000",
       "prepa": "",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "Michon Construction",
@@ -88,7 +88,7 @@
       "achat": "79500",
       "vente": "87500",
       "prepa": "",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "DIDION Clément ",
