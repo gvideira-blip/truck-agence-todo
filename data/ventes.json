@@ -88,7 +88,7 @@
       "achat": "79500",
       "vente": "87500",
       "prepa": "",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "DIDION Clément ",
