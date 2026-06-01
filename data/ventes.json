@@ -109,6 +109,16 @@
       "vente": "",
       "prepa": "",
       "facture": false
+    },
+    {
+      "acheteur": "",
+      "vendeur": "SG BOIS",
+      "immat": "",
+      "marque": "SCANIA GRUMIER",
+      "achat": "",
+      "vente": "",
+      "prepa": "",
+      "facture": false
     }
   ],
   "objectif": 70000
