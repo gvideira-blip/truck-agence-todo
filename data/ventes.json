@@ -42,12 +42,12 @@
     },
     {
       "acheteur": "",
-      "vendeur": "RICHE ART DE VIVRE",
-      "immat": "EQ448EY",
-      "marque": "IVECO PORTEUR",
-      "achat": "15000",
-      "vente": "18000",
-      "prepa": "0",
+      "vendeur": "",
+      "immat": "",
+      "marque": "",
+      "achat": "",
+      "vente": "",
+      "prepa": "",
       "facture": false
     }
   ],
