@@ -1,16 +1,6 @@
 {
   "ventes": [
     {
-      "acheteur": "Cassitrans",
-      "vendeur": "Garage Berthelemot",
-      "immat": "CC486NG",
-      "marque": "SAMRO",
-      "achat": "1500",
-      "vente": "750",
-      "prepa": "0",
-      "facture": true
-    },
-    {
       "acheteur": "Gaec de la Combale",
       "vendeur": "RGTP",
       "immat": "GF676FN",
