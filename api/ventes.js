@@ -51,70 +51,6 @@ function defaultData() {
   return { ventes: [], objectif: 50000 };
 }
 
-/**
- * Merge optimiste pour les ventes.
- * Clé d'identité : immat (si remplie) ou acheteur+marque.
- * - Ligne présente dans les deux → on prend la version entrante (plus récente)
- * - Ligne présente uniquement dans l'entrante → on l'ajoute
- * - Ligne présente uniquement dans le distant → on la garde (ajoutée par un autre utilisateur)
- */
-function getKey(v) {
-  const immat = (v.immat || '').trim().toUpperCase();
-  if (immat) return 'immat:' + immat;
-  const combo = ((v.acheteur || '') + '|' + (v.marque || '')).trim().toUpperCase();
-  if (combo !== '|') return 'combo:' + combo;
-  return null; // Ligne vide, pas de clé
-}
-
-function mergeVentes(incoming, remote) {
-  const incomingVentes = incoming.ventes || [];
-  const remoteVentes   = remote.ventes   || [];
-
-  // Index des ventes distantes par clé
-  const remoteMap = new Map();
-  remoteVentes.forEach((v, i) => {
-    const k = getKey(v);
-    if (k) remoteMap.set(k, { vente: v, idx: i });
-  });
-
-  // Index des ventes entrantes par clé
-  const incomingMap = new Map();
-  incomingVentes.forEach(v => {
-    const k = getKey(v);
-    if (k) incomingMap.set(k, v);
-  });
-
-  const merged = [];
-
-  // 1. Parcourir les ventes distantes dans leur ordre
-  for (const rv of remoteVentes) {
-    const k = getKey(rv);
-    if (k && incomingMap.has(k)) {
-      // Ligne connue des deux → on prend la version entrante (opérateur plus récent)
-      merged.push({ ...incomingMap.get(k) });
-    } else {
-      // Ligne uniquement distante (ajoutée par un autre) → on la garde
-      merged.push({ ...rv });
-    }
-  }
-
-  // 2. Ajouter les lignes entrantes qui n'existent pas dans le distant
-  for (const iv of incomingVentes) {
-    const k = getKey(iv);
-    if (!k) continue; // Ligne vide, on saute
-    if (!remoteMap.has(k)) {
-      merged.push({ ...iv });
-    }
-  }
-
-  // objectif : prendre la valeur entrante si elle a changé
-  const objectif = incoming.objectif !== undefined
-    ? incoming.objectif
-    : (remote.objectif || 50000);
-
-  return { ventes: merged, objectif };
-}
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -128,20 +64,24 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const incoming = req.body;
+      const incoming = req.body || {};
 
+      // L'état du client fait foi — suppressions incluses.
+      // On écrit exactement ce qu'il envoie, sans merge :
+      // c'est le merge qui ressuscitait les ventes supprimées.
+      const payload = {
+        ventes:   Array.isArray(incoming.ventes) ? incoming.ventes : [],
+        objectif: incoming.objectif !== undefined ? incoming.objectif : 50000
+      };
+
+      // Verrou optimiste : on récupère le SHA courant juste avant d'écrire.
+      // Si le fichier a changé entre-temps (409), on relit le SHA et on retente.
+      // Dernier qui écrit gagne (comme la page Tâches).
       for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-        const { data: remote, sha } = await ghGet();
-        const base = remote || defaultData();
-
-        const merged = mergeVentes(
-          JSON.parse(JSON.stringify(incoming)),
-          JSON.parse(JSON.stringify(base))
-        );
-
-        const result = await ghPut(merged, sha);
+        const { sha } = await ghGet();
+        const result = await ghPut(payload, sha);
         if (!result.conflict) {
-          return res.status(200).json({ ok: true, merged: attempt > 0 });
+          return res.status(200).json({ ok: true });
         }
         await new Promise(r => setTimeout(r, 100 * (attempt + 1)));
       }
