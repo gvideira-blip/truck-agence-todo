@@ -1,36 +1,6 @@
 {
   "ventes": [
     {
-      "acheteur": "Gaec de la Combale",
-      "vendeur": "RGTP",
-      "immat": "GF676FN",
-      "marque": "FILIAT",
-      "achat": "7000",
-      "vente": "9900",
-      "prepa": "0",
-      "facture": true
-    },
-    {
-      "acheteur": "Transports Berthaux",
-      "vendeur": "STK Environnement",
-      "immat": "FY902QC",
-      "marque": "Billaud",
-      "achat": "12300",
-      "vente": "15250",
-      "prepa": "0",
-      "facture": true
-    },
-    {
-      "acheteur": "SAS TMB",
-      "vendeur": "Cassitrans",
-      "immat": "EA202SY",
-      "marque": "Magyar Citerne",
-      "achat": "1000",
-      "vente": "7000",
-      "prepa": "2266",
-      "facture": true
-    },
-    {
       "acheteur": "Transports RAVERAT",
       "vendeur": "Cassitrans",
       "immat": "EG398XW",
@@ -59,26 +29,6 @@
       "vente": "52000",
       "prepa": "",
       "facture": false
-    },
-    {
-      "acheteur": "Michon Construction",
-      "vendeur": "MKSTP",
-      "immat": "EP384PP",
-      "marque": "Scania",
-      "achat": "79500",
-      "vente": "87500",
-      "prepa": "",
-      "facture": true
-    },
-    {
-      "acheteur": "DIDION Clément ",
-      "vendeur": "Stock (Patrick Canard)",
-      "immat": "CN780EX",
-      "marque": "Trailor",
-      "achat": "5000",
-      "vente": "7000",
-      "prepa": "",
-      "facture": true
     },
     {
       "acheteur": "",
