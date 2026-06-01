@@ -1,16 +1,6 @@
 {
   "ventes": [
     {
-      "acheteur": "Nick & Maladin",
-      "vendeur": "Alphonse Charpiot",
-      "immat": "FY437SR",
-      "marque": "IVECO",
-      "achat": "14000",
-      "vente": "14750",
-      "prepa": "700",
-      "facture": true
-    },
-    {
       "acheteur": "Cassitrans",
       "vendeur": "Garage Berthelemot",
       "immat": "CC486NG",
