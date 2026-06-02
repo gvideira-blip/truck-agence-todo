@@ -95,9 +95,14 @@ body {
 }
 .item-body { flex: 1; min-width: 0; }
 .item-text {
+  width: 100%;
   font-size: 15px; line-height: 1.45; color: var(--text);
-  word-wrap: break-word; white-space: pre-wrap;
+  font-family: inherit;
+  border: none; outline: none; resize: none; background: none;
+  padding: 0; overflow: hidden;
+  border-radius: 4px;
 }
+.item-text:focus { background: var(--bg2); }
 .item-text.done { text-decoration: line-through; color: var(--text3); }
 .item-meta {
   display: flex; align-items: center; gap: 8px; margin-top: 5px;
@@ -425,7 +430,9 @@ function render() {
     row.innerHTML = `
       <input type="checkbox" ${it.done ? 'checked' : ''} onchange="toggle('${it.id}')"/>
       <div class="item-body">
-        <div class="item-text ${it.done ? 'done' : ''}">${escapeHtml(it.text)}</div>
+        <textarea class="item-text ${it.done ? 'done' : ''}" rows="1"
+                  onblur="editText('${it.id}', this.value)"
+                  oninput="resize(this)">${escapeHtml(it.text)}</textarea>
         <div class="item-meta">${badgeFor(it.author)}<span>${fmtDate(it.ts)}</span></div>
       </div>
       <div class="prio">
@@ -435,6 +442,8 @@ function render() {
         <i class="ti ti-x"></i>
       </button>`;
     list.appendChild(row);
+    const ta = row.querySelector('.item-text');
+    if (ta) setTimeout(() => resize(ta), 0);
   });
 }
 
@@ -457,6 +466,15 @@ function addItem() {
 function toggle(id) {
   const it = data.find(x => x.id === id);
   if (it) { it.done = !it.done; save(); render(); }
+}
+// Modification du texte d'une ligne existante (enregistré à la sortie du champ)
+function editText(id, val) {
+  const it = data.find(x => x.id === id);
+  if (it && it.text !== val) { it.text = val; save(); }
+}
+function resize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.max(24, el.scrollHeight) + 'px';
 }
 function removeItem(id) {
   if (!confirm('Supprimer ce point ?')) return;
