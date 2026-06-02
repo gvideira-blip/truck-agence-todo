@@ -72,6 +72,7 @@ function normalizeItem(it) {
     text:   typeof it.text   === 'string' ? it.text   : '',
     author: typeof it.author === 'string' ? it.author : '',
     done:   !!it.done,
+    prio:   (it.prio == null ? '' : String(it.prio)),
     ts:     typeof it.ts === 'number' ? it.ts : Date.now()
   };
 }
