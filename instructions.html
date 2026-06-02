@@ -216,6 +216,11 @@ let data = [];
 let saveTimer = null;
 let pendingSave = false;
 let hideDone = false;
+// Ids connus lors de la dernière synchro avec le serveur.
+// Sert à la fusion : permet de distinguer "j'ai supprimé" de "jamais vu".
+// IMPORTANT : mis à jour UNIQUEMENT à la lecture du serveur (load/poll),
+// jamais lors d'une modif locale.
+let knownIds = [];
 
 // ─── Statut de synchro ───────────────────────────────────────
 function setSyncStatus(s) {
@@ -231,6 +236,7 @@ async function load() {
     if (!r.ok) throw 0;
     const j = await r.json();
     data = Array.isArray(j) ? j : [];
+    knownIds = data.map(it => it.id);
     setSyncStatus('ok');
   } catch(e) { data = []; setSyncStatus('error'); }
   document.getElementById('loader').style.display = 'none';
@@ -250,8 +256,10 @@ async function poll() {
     if (!r.ok) return;
     const newData = await r.json();
     if (pendingSave) return;
-    if (JSON.stringify(newData) !== JSON.stringify(data)) {
-      data = Array.isArray(newData) ? newData : [];
+    const safeNew = Array.isArray(newData) ? newData : [];
+    knownIds = safeNew.map(it => it.id);
+    if (JSON.stringify(safeNew) !== JSON.stringify(data)) {
+      data = safeNew;
       render();
     }
     setSyncStatus('ok');
@@ -269,7 +277,7 @@ function save() {
       const r = await fetch('/api/instructions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: snapshot
+        body: JSON.stringify({ items: data, knownIds })
       });
       if (!r.ok) throw 0;
       if (JSON.stringify(data) === snapshot) pendingSave = false;
