@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Instructions — Truck Agence</title>
+<title>Point à faire avec Gaëtan — Truck Agence</title>
 <script>
 (function() {
   const until = parseInt(localStorage.getItem('ta_auth_until') || '0');
@@ -110,12 +110,28 @@ body {
 .badge.b-c  { background: #deeefb; color: #0a4a7c; }
 .badge.b-ca { background: #d6f0e6; color: #08503e; }
 .badge.b-l  { background: #eae8fc; color: #3a338a; }
+.badge.b-g  { background: #fdecc8; color: #7a5500; }
 .badge.b-x  { background: #eee; color: #777; }
+
+/* Bouton priorité (repris des tâches) */
+.prio { flex-shrink: 0; display: flex; align-items: center; }
+.prio-btn {
+  width: 46px; height: 38px; background: white;
+  border: 1.5px dashed var(--border); border-radius: 6px;
+  font-size: 17px; font-weight: 500; color: var(--blue);
+  cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.15s, background 0.1s;
+}
+.prio-btn.filled { border-style: solid; border-color: var(--blue); background: #f0f6fa; }
+.prio-btn:hover { border-color: var(--blue); }
+.prio-btn .placeholder { color: var(--text3); font-size: 13px; font-weight: 400; }
+
 .del {
   background: none; border: none; cursor: pointer;
   color: var(--text3); font-size: 15px;
   padding: 4px; border-radius: 4px;
-  opacity: 0; transition: opacity 0.15s; flex-shrink: 0;
+  opacity: 0; transition: opacity 0.15s; flex-shrink: 0; margin-top: 2px;
 }
 .item:hover .del { opacity: 1; }
 .del:hover { color: var(--red); }
@@ -149,6 +165,45 @@ body {
 }
 .add button:hover { background: #003560; }
 
+/* Modal priorité (repris des tâches) */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  display: none; align-items: center; justify-content: center; z-index: 200;
+}
+.modal-bg.open { display: flex; }
+.modal {
+  background: white; border-radius: 16px; padding: 24px; min-width: 280px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+.modal-title { font-size: 14px; color: var(--text2); text-align: center; margin-bottom: 12px; }
+.modal-input {
+  width: 100%; height: 64px; background: var(--bg2);
+  border: 2px solid var(--blue); border-radius: 10px; margin-bottom: 16px;
+  text-align: center; outline: none;
+  font-size: 28px; font-weight: 500; color: var(--blue); font-family: inherit;
+}
+.modal-input::placeholder { color: var(--text3); font-size: 16px; font-weight: 400; }
+.keypad { display: grid; grid-template-columns: repeat(3, 64px); gap: 8px; justify-content: center; }
+.key {
+  height: 52px; font-size: 20px; font-weight: 500; background: white;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  cursor: pointer; font-family: inherit; color: var(--text);
+  transition: background 0.1s, transform 0.05s;
+}
+.key:hover { background: var(--bg2); }
+.key:active { transform: scale(0.95); background: #e0e0de; }
+.key.action { font-size: 13px; color: var(--text2); }
+.key.ok { background: var(--blue); color: white; border-color: var(--blue); font-weight: 500; }
+.key.ok:hover { background: #003560; }
+.key.del-key { color: var(--red); }
+.modal-hint { font-size: 11px; color: var(--text3); text-align: center; margin-top: 10px; }
+.modal-renumber-info {
+  font-size: 11px; color: var(--blue); text-align: center;
+  margin-top: 6px; padding: 4px 8px; background: #f0f6fa;
+  border-radius: 6px; display: none;
+}
+.modal-renumber-info.show { display: block; }
+
 #loader {
   position: fixed; inset: 0; background: rgba(255,255,255,0.92);
   display: flex; align-items: center; justify-content: center;
@@ -162,6 +217,10 @@ body {
   .topbar { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
   .add { flex-wrap: wrap; }
   .add input { width: 100%; flex-basis: 100%; order: -1; }
+  .modal-bg { align-items: flex-end; }
+  .modal { border-radius: 16px 16px 0 0; width: 100%; padding: 20px 16px 36px; }
+  .keypad { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .key { height: 56px; }
 }
 @media (max-width: 480px) {
   .nav a span { display: none; }
@@ -176,14 +235,14 @@ body {
   <a href="/">✅ <span>Tâches</span></a>
   <a href="/ventes.html">📊 <span>Ventes</span></a>
   <a href="/tableau-blanc.html">🖊️ <span>Tableau blanc</span></a>
-  <a href="/instructions.html" class="active">📌 <span>Instructions</span></a>
+  <a href="/instructions.html" class="active">📌 <span>Point Gaëtan</span></a>
 </nav>
 
 <div class="wrap">
   <div class="topbar">
     <div class="topbar-left">
       <div class="dot"></div>
-      <span class="title">Instructions pour le patron</span>
+      <span class="title">Point à faire avec Gaëtan</span>
     </div>
     <div class="topbar-right">
       <div class="sync">
@@ -199,15 +258,43 @@ body {
   <div class="list" id="list"></div>
 
   <div class="add">
-    <select id="author" title="Qui écrit ?">
-      <option value="">Anonyme</option>
+    <select id="author" title="Qui ?">
+      <option value="" disabled selected>Qui ?</option>
+      <option value="Gaëtan">Gaëtan</option>
       <option value="Chloé">Chloé</option>
       <option value="Camille">Camille</option>
       <option value="Lila">Lila</option>
     </select>
-    <input id="newInput" placeholder="Nouvelle instruction… (ex. : commander stylos)"
+    <input id="newInput" placeholder="Nouveau point… (ex. : vérifier texte annonce LGOT)"
            onkeydown="if(event.key==='Enter'){event.preventDefault();addItem();}"/>
     <button onclick="addItem()"><i class="ti ti-plus"></i> Ajouter</button>
+  </div>
+</div>
+
+<!-- Modal priorité -->
+<div class="modal-bg" id="modal-bg" onclick="closeKeypadIfBg(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">Priorité</div>
+    <input class="modal-input" id="modal-input" type="text" inputmode="numeric"
+           placeholder="—" maxlength="4"
+           oninput="kpType(this.value)"
+           onkeydown="kpKeydown(event)" />
+    <div class="modal-renumber-info" id="renumberInfo"></div>
+    <div class="keypad">
+      <button class="key" onclick="kpAdd('1')">1</button>
+      <button class="key" onclick="kpAdd('2')">2</button>
+      <button class="key" onclick="kpAdd('3')">3</button>
+      <button class="key" onclick="kpAdd('4')">4</button>
+      <button class="key" onclick="kpAdd('5')">5</button>
+      <button class="key" onclick="kpAdd('6')">6</button>
+      <button class="key" onclick="kpAdd('7')">7</button>
+      <button class="key" onclick="kpAdd('8')">8</button>
+      <button class="key" onclick="kpAdd('9')">9</button>
+      <button class="key action del-key" onclick="kpDel()">←</button>
+      <button class="key" onclick="kpAdd('0')">0</button>
+      <button class="key action ok" onclick="kpOk()">OK</button>
+    </div>
+    <div class="modal-hint">Tapez au clavier ou utilisez le pavé — Entrée pour valider</div>
   </div>
 </div>
 
@@ -216,6 +303,7 @@ let data = [];
 let saveTimer = null;
 let pendingSave = false;
 let hideDone = false;
+let kpTarget = null; // id de l'item en cours d'édition de priorité
 // Ids connus lors de la dernière synchro avec le serveur.
 // Sert à la fusion : permet de distinguer "j'ai supprimé" de "jamais vu".
 // IMPORTANT : mis à jour UNIQUEMENT à la lecture du serveur (load/poll),
@@ -245,7 +333,7 @@ async function load() {
 }
 
 async function poll() {
-  // Ne pas écraser une modif locale non confirmée
+  if (kpTarget) return; // ne pas perturber pendant la saisie d'une priorité
   if (pendingSave) return;
   if (document.activeElement && (
       document.activeElement.tagName === 'TEXTAREA' ||
@@ -286,12 +374,22 @@ function save() {
   }, 700);
 }
 
+// ─── Renumérotation des priorités (repris des tâches) ────────
+// Après modification d'une priorité, on renumérote toute la liste
+// pour garder une séquence propre 1, 2, 3… sans trous ni doublons.
+function renumberPriorities() {
+  const withPrio = data.filter(it => it.prio !== '' && it.prio != null && it.text !== '');
+  withPrio.sort((a, b) => parseFloat(a.prio) - parseFloat(b.prio));
+  withPrio.forEach((it, idx) => { it.prio = String(idx + 1); });
+}
+
 // ─── Rendu ───────────────────────────────────────────────────
 function badgeFor(author) {
+  if (author === 'Gaëtan')  return '<span class="badge b-g">Gaëtan</span>';
   if (author === 'Chloé')   return '<span class="badge b-c">Chloé</span>';
   if (author === 'Camille') return '<span class="badge b-ca">Camille</span>';
   if (author === 'Lila')    return '<span class="badge b-l">Lila</span>';
-  return '<span class="badge b-x">Anonyme</span>';
+  return '<span class="badge b-x">' + escapeHtml(author || '—') + '</span>';
 }
 function fmtDate(ts) {
   if (!ts) return '';
@@ -304,15 +402,24 @@ function escapeHtml(s) {
   return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// Tri : d'abord les éléments avec priorité (croissant), puis les autres.
+function sortedItems() {
+  const withPrio = data.filter(it => it.prio !== '' && it.prio != null);
+  const noPrio   = data.filter(it => !(it.prio !== '' && it.prio != null));
+  withPrio.sort((a, b) => parseFloat(a.prio) - parseFloat(b.prio));
+  return [...withPrio, ...noPrio];
+}
+
 function render() {
   const list = document.getElementById('list');
   list.innerHTML = '';
-  const visible = data.filter(it => !(hideDone && it.done));
+  const visible = sortedItems().filter(it => !(hideDone && it.done));
   if (visible.length === 0) {
-    list.innerHTML = '<div class="empty">Aucune instruction pour le moment.</div>';
+    list.innerHTML = '<div class="empty">Aucun point pour le moment.</div>';
     return;
   }
   visible.forEach(it => {
+    const prioDisplay = it.prio ? it.prio : '<span class="placeholder">P</span>';
     const row = document.createElement('div');
     row.className = 'item';
     row.innerHTML = `
@@ -320,6 +427,9 @@ function render() {
       <div class="item-body">
         <div class="item-text ${it.done ? 'done' : ''}">${escapeHtml(it.text)}</div>
         <div class="item-meta">${badgeFor(it.author)}<span>${fmtDate(it.ts)}</span></div>
+      </div>
+      <div class="prio">
+        <button class="prio-btn ${it.prio ? 'filled' : ''}" onclick="openKeypad('${it.id}')">${prioDisplay}</button>
       </div>
       <button class="del" onclick="removeItem('${it.id}')" aria-label="Supprimer">
         <i class="ti ti-x"></i>
@@ -333,10 +443,11 @@ function addItem() {
   const input = document.getElementById('newInput');
   const author = document.getElementById('author').value;
   const text = input.value.trim();
+  if (!author) { alert('Choisis d\'abord qui écrit (menu de gauche).'); return; }
   if (!text) return;
   data.push({
     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    text, author, done: false, ts: Date.now()
+    text, author, done: false, prio: '', ts: Date.now()
   });
   input.value = '';
   input.focus();
@@ -348,14 +459,61 @@ function toggle(id) {
   if (it) { it.done = !it.done; save(); render(); }
 }
 function removeItem(id) {
-  if (!confirm('Supprimer cette instruction ?')) return;
+  if (!confirm('Supprimer ce point ?')) return;
   data = data.filter(x => x.id !== id);
+  renumberPriorities();
   save();
   render();
 }
 function toggleHideDone() {
   hideDone = !hideDone;
   document.getElementById('hideBtn').classList.toggle('on', hideDone);
+  render();
+}
+
+// ─── Pavé numérique priorité (repris des tâches) ─────────────
+function openKeypad(id) {
+  kpTarget = id;
+  const it = data.find(x => x.id === id);
+  const input = document.getElementById('modal-input');
+  input.value = (it && it.prio) ? it.prio : '';
+  const existingCount = data.filter(x => x.prio !== '' && x.prio != null && x.text !== '').length;
+  const info = document.getElementById('renumberInfo');
+  if (existingCount > 0) {
+    info.textContent = existingCount + ' priorité(s) existante(s) — seront renumérotées automatiquement';
+    info.classList.add('show');
+  } else {
+    info.classList.remove('show');
+  }
+  document.getElementById('modal-bg').classList.add('open');
+  setTimeout(() => input.focus(), 50);
+}
+function closeKeypadIfBg(e) { if (e.target.id === 'modal-bg') closeKeypad(); }
+function closeKeypad() { kpTarget = null; document.getElementById('modal-bg').classList.remove('open'); }
+function kpType(val) {
+  document.getElementById('modal-input').value = val.replace(/[^0-9]/g, '').slice(0, 4);
+}
+function kpKeydown(e) {
+  if (e.key === 'Enter') { e.preventDefault(); kpOk(); }
+  else if (e.key === 'Escape') { e.preventDefault(); closeKeypad(); }
+}
+function kpAdd(digit) {
+  const input = document.getElementById('modal-input');
+  if (input.value.length >= 4) return;
+  input.value = input.value + digit;
+}
+function kpDel() {
+  const input = document.getElementById('modal-input');
+  input.value = input.value.slice(0, -1);
+}
+function kpOk() {
+  if (!kpTarget) return;
+  const it = data.find(x => x.id === kpTarget);
+  const val = document.getElementById('modal-input').value;
+  if (it) it.prio = val;
+  if (val !== '') renumberPriorities();
+  save();
+  closeKeypad();
   render();
 }
 
