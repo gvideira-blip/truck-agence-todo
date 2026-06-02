@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Instructions — Truck Agence</title>
+<script>
+(function() {
+  const until = parseInt(localStorage.getItem('ta_auth_until') || '0');
+  if (until <= Date.now()) {
+    window.location.href = '/login.html?next=' + encodeURIComponent(window.location.pathname);
+  }
+})();
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #ffffff;
+  --bg2: #f5f5f3;
+  --border: rgba(0,0,0,0.1);
+  --text: #1a1a1a;
+  --text2: #777;
+  --text3: #bbb;
+  --blue: #004472;
+  --red: #CD1719;
+  --r: 12px;
+  --rs: 8px;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg2);
+  min-height: 100vh;
+  padding: 24px;
+  color: var(--text);
+}
+/* NAV (identique aux autres pages) */
+.nav {
+  display: flex; justify-content: center; gap: 8px; margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.nav a {
+  font-size: 12px; color: var(--text2); text-decoration: none;
+  padding: 5px 14px; border: 1px solid var(--border); border-radius: 20px;
+  background: var(--bg); transition: all 0.15s;
+  display: flex; align-items: center; gap: 5px;
+}
+.nav a:hover { border-color: var(--blue); color: var(--blue); }
+.nav a.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+.wrap {
+  background: var(--bg); border-radius: var(--r);
+  border: 1px solid var(--border);
+  max-width: 760px; margin: 0 auto;
+}
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); }
+.title { font-size: 15px; font-weight: 500; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.sync { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 5px; }
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; transition: background 0.3s; }
+.sync-dot.ok { background: #5a9a2a; }
+.sync-dot.saving { background: #e0920a; }
+.sync-dot.error { background: #d03030; }
+.btn-hide {
+  font-size: 12px; color: var(--text2);
+  background: none; border: 1px solid var(--border);
+  border-radius: var(--rs); padding: 5px 12px;
+  cursor: pointer; display: flex; align-items: center; gap: 4px;
+}
+.btn-hide:hover { background: var(--bg2); }
+.btn-hide.on { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+/* LISTE */
+.list { padding: 4px 0; }
+.empty {
+  text-align: center; color: var(--text3); font-size: 14px;
+  padding: 40px 20px;
+}
+.item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+.item:last-child { border-bottom: none; }
+.item:hover { background: var(--bg2); }
+.item input[type=checkbox] {
+  width: 20px; height: 20px; accent-color: var(--blue);
+  flex-shrink: 0; cursor: pointer; margin-top: 2px;
+}
+.item-body { flex: 1; min-width: 0; }
+.item-text {
+  font-size: 15px; line-height: 1.45; color: var(--text);
+  word-wrap: break-word; white-space: pre-wrap;
+}
+.item-text.done { text-decoration: line-through; color: var(--text3); }
+.item-meta {
+  display: flex; align-items: center; gap: 8px; margin-top: 5px;
+  font-size: 11px; color: var(--text3);
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500;
+}
+.badge.b-c  { background: #deeefb; color: #0a4a7c; }
+.badge.b-ca { background: #d6f0e6; color: #08503e; }
+.badge.b-l  { background: #eae8fc; color: #3a338a; }
+.badge.b-x  { background: #eee; color: #777; }
+.del {
+  background: none; border: none; cursor: pointer;
+  color: var(--text3); font-size: 15px;
+  padding: 4px; border-radius: 4px;
+  opacity: 0; transition: opacity 0.15s; flex-shrink: 0;
+}
+.item:hover .del { opacity: 1; }
+.del:hover { color: var(--red); }
+
+/* AJOUT */
+.add {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px; background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--r) var(--r);
+}
+.add select {
+  font-size: 13px; font-family: inherit; color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--rs);
+  padding: 7px 8px; background: var(--bg); cursor: pointer;
+  flex-shrink: 0;
+}
+.add input {
+  flex: 1; font-size: 14px; font-family: inherit;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--rs); padding: 8px 12px;
+  outline: none; color: var(--text);
+}
+.add input:focus { border-color: var(--blue); }
+.add input::placeholder { color: var(--text3); }
+.add button {
+  font-size: 14px; background: var(--blue); color: #fff;
+  border: none; border-radius: var(--rs); padding: 8px 16px;
+  cursor: pointer; font-family: inherit; flex-shrink: 0;
+  display: flex; align-items: center; gap: 5px;
+}
+.add button:hover { background: #003560; }
+
+#loader {
+  position: fixed; inset: 0; background: rgba(255,255,255,0.92);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--text2); z-index: 100;
+}
+
+@media (max-width: 768px) {
+  body { padding: 10px; }
+  .nav { gap: 5px; margin-bottom: 12px; }
+  .nav a { font-size: 11px; padding: 5px 10px; gap: 3px; }
+  .topbar { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+  .add { flex-wrap: wrap; }
+  .add input { width: 100%; flex-basis: 100%; order: -1; }
+}
+@media (max-width: 480px) {
+  .nav a span { display: none; }
+  .nav a { padding: 6px 10px; }
+}
+</style>
+</head>
+<body>
+<div id="loader">Chargement…</div>
+
+<nav class="nav">
+  <a href="/">✅ <span>Tâches</span></a>
+  <a href="/ventes.html">📊 <span>Ventes</span></a>
+  <a href="/tableau-blanc.html">🖊️ <span>Tableau blanc</span></a>
+  <a href="/instructions.html" class="active">📌 <span>Instructions</span></a>
+</nav>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="dot"></div>
+      <span class="title">Instructions pour le patron</span>
+    </div>
+    <div class="topbar-right">
+      <div class="sync">
+        <div class="sync-dot" id="sdot"></div>
+        <span id="slabel">—</span>
+      </div>
+      <button class="btn-hide" id="hideBtn" onclick="toggleHideDone()">
+        <i class="ti ti-eye-off"></i> Masquer traités
+      </button>
+    </div>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <div class="add">
+    <select id="author" title="Qui écrit ?">
+      <option value="">Anonyme</option>
+      <option value="Chloé">Chloé</option>
+      <option value="Camille">Camille</option>
+      <option value="Lila">Lila</option>
+    </select>
+    <input id="newInput" placeholder="Nouvelle instruction… (ex. : commander stylos)"
+           onkeydown="if(event.key==='Enter'){event.preventDefault();addItem();}"/>
+    <button onclick="addItem()"><i class="ti ti-plus"></i> Ajouter</button>
+  </div>
+</div>
+
+<script>
+let data = [];
+let saveTimer = null;
+let pendingSave = false;
+let hideDone = false;
+
+// ─── Statut de synchro ───────────────────────────────────────
+function setSyncStatus(s) {
+  document.getElementById('sdot').className = 'sync-dot ' + s;
+  document.getElementById('slabel').textContent =
+    s === 'ok' ? 'Synchronisé' : s === 'saving' ? 'Enregistrement…' : 'Erreur sync';
+}
+
+// ─── Chargement & poll (même logique que index.html) ─────────
+async function load() {
+  try {
+    const r = await fetch('/api/instructions');
+    if (!r.ok) throw 0;
+    const j = await r.json();
+    data = Array.isArray(j) ? j : [];
+    setSyncStatus('ok');
+  } catch(e) { data = []; setSyncStatus('error'); }
+  document.getElementById('loader').style.display = 'none';
+  render();
+  setInterval(poll, 5000);
+}
+
+async function poll() {
+  // Ne pas écraser une modif locale non confirmée
+  if (pendingSave) return;
+  if (document.activeElement && (
+      document.activeElement.tagName === 'TEXTAREA' ||
+      document.activeElement.tagName === 'INPUT' ||
+      document.activeElement.tagName === 'SELECT')) return;
+  try {
+    const r = await fetch('/api/instructions');
+    if (!r.ok) return;
+    const newData = await r.json();
+    if (pendingSave) return;
+    if (JSON.stringify(newData) !== JSON.stringify(data)) {
+      data = Array.isArray(newData) ? newData : [];
+      render();
+    }
+    setSyncStatus('ok');
+  } catch(e) { setSyncStatus('error'); }
+}
+
+// ─── Sauvegarde (debounce + verrou anti-écrasement) ──────────
+function save() {
+  setSyncStatus('saving');
+  pendingSave = true;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    const snapshot = JSON.stringify(data);
+    try {
+      const r = await fetch('/api/instructions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: snapshot
+      });
+      if (!r.ok) throw 0;
+      if (JSON.stringify(data) === snapshot) pendingSave = false;
+      setSyncStatus('ok');
+    } catch(e) { setSyncStatus('error'); }
+  }, 700);
+}
+
+// ─── Rendu ───────────────────────────────────────────────────
+function badgeFor(author) {
+  if (author === 'Chloé')   return '<span class="badge b-c">Chloé</span>';
+  if (author === 'Camille') return '<span class="badge b-ca">Camille</span>';
+  if (author === 'Lila')    return '<span class="badge b-l">Lila</span>';
+  return '<span class="badge b-x">Anonyme</span>';
+}
+function fmtDate(ts) {
+  if (!ts) return '';
+  try {
+    return new Date(ts).toLocaleDateString('fr-FR',
+      { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  } catch(e) { return ''; }
+}
+function escapeHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function render() {
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  const visible = data.filter(it => !(hideDone && it.done));
+  if (visible.length === 0) {
+    list.innerHTML = '<div class="empty">Aucune instruction pour le moment.</div>';
+    return;
+  }
+  visible.forEach(it => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <input type="checkbox" ${it.done ? 'checked' : ''} onchange="toggle('${it.id}')"/>
+      <div class="item-body">
+        <div class="item-text ${it.done ? 'done' : ''}">${escapeHtml(it.text)}</div>
+        <div class="item-meta">${badgeFor(it.author)}<span>${fmtDate(it.ts)}</span></div>
+      </div>
+      <button class="del" onclick="removeItem('${it.id}')" aria-label="Supprimer">
+        <i class="ti ti-x"></i>
+      </button>`;
+    list.appendChild(row);
+  });
+}
+
+// ─── Interactions ────────────────────────────────────────────
+function addItem() {
+  const input = document.getElementById('newInput');
+  const author = document.getElementById('author').value;
+  const text = input.value.trim();
+  if (!text) return;
+  data.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    text, author, done: false, ts: Date.now()
+  });
+  input.value = '';
+  input.focus();
+  save();
+  render();
+}
+function toggle(id) {
+  const it = data.find(x => x.id === id);
+  if (it) { it.done = !it.done; save(); render(); }
+}
+function removeItem(id) {
+  if (!confirm('Supprimer cette instruction ?')) return;
+  data = data.filter(x => x.id !== id);
+  save();
+  render();
+}
+function toggleHideDone() {
+  hideDone = !hideDone;
+  document.getElementById('hideBtn').classList.toggle('on', hideDone);
+  render();
+}
+
+load();
+</script>
+</body>
+</html>
