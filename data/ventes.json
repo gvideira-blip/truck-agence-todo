@@ -65,8 +65,8 @@
       "vendeur": "STOCK (ATTAL)",
       "immat": "FY125TP",
       "marque": "VOLVO FH500",
-      "achat": "",
-      "vente": "",
+      "achat": "55000",
+      "vente": "62000",
       "prepa": "",
       "facture": false
     }
