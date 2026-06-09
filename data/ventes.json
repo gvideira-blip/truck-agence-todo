@@ -105,8 +105,8 @@
       "vendeur": "ALPPHONSE CHARPIOT",
       "immat": "",
       "marque": "",
-      "achat": "",
-      "vente": "",
+      "achat": "6000",
+      "vente": "9500",
       "prepa": "",
       "facture": false
     }
