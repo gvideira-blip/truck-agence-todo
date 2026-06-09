@@ -78,7 +78,7 @@
       "achat": "4000",
       "vente": "4000",
       "prepa": "335",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "MICHEL MEURIOT",
