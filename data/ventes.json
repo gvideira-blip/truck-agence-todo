@@ -117,7 +117,7 @@
       "marque": "GOURDON",
       "achat": "19000",
       "vente": "22000",
-      "prepa": "",
+      "prepa": "0",
       "facture": false
     }
   ],
