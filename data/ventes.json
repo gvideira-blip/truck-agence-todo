@@ -125,7 +125,7 @@
       "vendeur": "",
       "immat": "",
       "marque": "",
-      "achat": "",
+      "achat": "10",
       "vente": "",
       "prepa": "",
       "facture": false
