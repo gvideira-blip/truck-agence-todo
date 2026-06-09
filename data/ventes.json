@@ -17,7 +17,7 @@
       "marque": "Scania / Brock",
       "achat": "51000",
       "vente": "60000",
-      "prepa": "",
+      "prepa": "0",
       "facture": false
     },
     {
@@ -27,7 +27,7 @@
       "marque": "Renault",
       "achat": "46000",
       "vente": "52000",
-      "prepa": "",
+      "prepa": "0",
       "facture": false
     },
     {
@@ -37,7 +37,7 @@
       "marque": "SCANIA GRUMIER",
       "achat": "0",
       "vente": "2000",
-      "prepa": "",
+      "prepa": "0",
       "facture": false
     },
     {
@@ -47,7 +47,7 @@
       "marque": "IVECO PORTEUR",
       "achat": "15000",
       "vente": "18000",
-      "prepa": "",
+      "prepa": "0",
       "facture": true
     },
     {
@@ -107,7 +107,7 @@
       "marque": "MAN",
       "achat": "6000",
       "vente": "9250",
-      "prepa": "",
+      "prepa": "0",
       "facture": true
     },
     {
