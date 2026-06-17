@@ -68,7 +68,7 @@
       "achat": "55000",
       "vente": "67000",
       "prepa": "5100",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "VAN LUCHENE",
