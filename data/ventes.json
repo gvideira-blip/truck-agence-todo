@@ -128,7 +128,7 @@
       "achat": "10175",
       "vente": "14750",
       "prepa": "600",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "MB GREEN TRANS",
