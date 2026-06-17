@@ -58,7 +58,7 @@
       "achat": "20000",
       "vente": "27900",
       "prepa": "4510",
-      "facture": true
+      "facture": false
     },
     {
       "acheteur": "ROLL ET FRERES",
@@ -68,7 +68,7 @@
       "achat": "55000",
       "vente": "67000",
       "prepa": "5100",
-      "facture": true
+      "facture": false
     },
     {
       "acheteur": "VAN LUCHENE",
