@@ -145,9 +145,9 @@
       "vendeur": "CASSITRANS",
       "immat": "CH360TE",
       "marque": "STAS",
-      "achat": "",
-      "vente": "",
-      "prepa": "",
+      "achat": "1500",
+      "vente": "5500",
+      "prepa": "335",
       "facture": false
     }
   ],
