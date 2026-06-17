@@ -58,7 +58,7 @@
       "achat": "20000",
       "vente": "27900",
       "prepa": "4510",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "ROLL ET FRERES",
