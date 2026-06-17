@@ -18,7 +18,7 @@
       "achat": "51000",
       "vente": "60000",
       "prepa": "0",
-      "facture": true
+      "facture": false
     },
     {
       "acheteur": "Willemy",
@@ -28,7 +28,7 @@
       "achat": "46000",
       "vente": "52000",
       "prepa": "0",
-      "facture": true
+      "facture": false
     },
     {
       "acheteur": "GEP PRESTATIONS",
@@ -38,7 +38,7 @@
       "achat": "0",
       "vente": "2000",
       "prepa": "0",
-      "facture": true
+      "facture": false
     },
     {
       "acheteur": "SOW MAMADOU",
