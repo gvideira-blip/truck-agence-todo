@@ -8,7 +8,7 @@
       "achat": "7000",
       "vente": "8500",
       "prepa": "335",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "Balayage Service Ile de France",
