@@ -28,7 +28,7 @@
       "achat": "46000",
       "vente": "52000",
       "prepa": "0",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "GEP PRESTATIONS",
