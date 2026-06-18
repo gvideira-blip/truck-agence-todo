@@ -165,8 +165,8 @@
       "vendeur": "",
       "immat": "",
       "marque": "",
-      "achat": "3001",
-      "vente": "",
+      "achat": "30000",
+      "vente": "2",
       "prepa": "",
       "facture": false
     }
