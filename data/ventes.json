@@ -88,7 +88,7 @@
       "achat": "15000",
       "vente": "17500",
       "prepa": "0",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "RECUPFER",
@@ -157,7 +157,7 @@
       "marque": "MERCEDES VITO",
       "achat": "11700",
       "vente": "12500",
-      "prepa": "485",
+      "prepa": "484",
       "facture": true
     },
     {
