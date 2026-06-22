@@ -168,7 +168,7 @@
       "achat": "29750",
       "vente": "32000",
       "prepa": "",
-      "facture": true
+      "facture": false
     },
     {
       "acheteur": "LAURENT BACHELIN",
