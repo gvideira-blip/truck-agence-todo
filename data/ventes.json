@@ -158,7 +158,7 @@
       "achat": "11700",
       "vente": "12500",
       "prepa": "730",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "NOTRE DAME - MESSIEURS PATOUX",
