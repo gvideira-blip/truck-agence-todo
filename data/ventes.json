@@ -208,7 +208,7 @@
       "achat": "18500",
       "vente": "21500",
       "prepa": "",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "BPM PRO ETOILE CENTRE",
