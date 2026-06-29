@@ -38,7 +38,7 @@
       "achat": "0",
       "vente": "2000",
       "prepa": "0",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "SOW MAMADOU",
