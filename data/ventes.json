@@ -138,7 +138,7 @@
       "achat": "14500",
       "vente": "30000",
       "prepa": "776",
-      "facture": false
+      "facture": true
     },
     {
       "acheteur": "INTERVAL COOP V",
