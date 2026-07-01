@@ -51,46 +51,6 @@
       "facture": false
     },
     {
-      "acheteur": "MB GREEN TRANS",
-      "vendeur": "TRUCK AGENCE (IMMO)",
-      "immat": "EQ483AV",
-      "marque": "RENAULT T480",
-      "achat": "14500",
-      "vente": "30000",
-      "prepa": "587",
-      "facture": true
-    },
-    {
-      "acheteur": "INTERVAL COOP V",
-      "vendeur": "CASSITRANS",
-      "immat": "CH360TE",
-      "marque": "STAS",
-      "achat": "1500",
-      "vente": "5500",
-      "prepa": "775",
-      "facture": true
-    },
-    {
-      "acheteur": "MATHIEU GALLET",
-      "vendeur": "SOCOVI",
-      "immat": "FL940PH",
-      "marque": "MERCEDES VITO",
-      "achat": "11700",
-      "vente": "12500",
-      "prepa": "484",
-      "facture": true
-    },
-    {
-      "acheteur": "NOTRE DAME - MESSIEURS PATOUX",
-      "vendeur": "RONDEAU MIKAEL",
-      "immat": "GC432WG",
-      "marque": "TISVOL",
-      "achat": "29750",
-      "vente": "32000",
-      "prepa": "",
-      "facture": true
-    },
-    {
       "acheteur": "LAURENT BACHELIN",
       "vendeur": "STMO",
       "immat": "FB714RC",
@@ -109,36 +69,6 @@
       "vente": "24000",
       "prepa": "",
       "facture": false
-    },
-    {
-      "acheteur": "BERRY FABIEN",
-      "vendeur": "ARNAUD VERDET",
-      "immat": "DA301XP",
-      "marque": "RENAULT BRAS",
-      "achat": "10700",
-      "vente": "14000",
-      "prepa": "660",
-      "facture": true
-    },
-    {
-      "acheteur": "ROLL PIERRE",
-      "vendeur": "BENETRUY TP",
-      "immat": "DP973SK",
-      "marque": "BENNE TP",
-      "achat": "18500",
-      "vente": "21500",
-      "prepa": "",
-      "facture": true
-    },
-    {
-      "acheteur": "BPM PRO ETOILE CENTRE",
-      "vendeur": "SVI01",
-      "immat": "FF561XQ",
-      "marque": "MERCEDES 1848",
-      "achat": "31000",
-      "vente": "38000",
-      "prepa": "828",
-      "facture": true
     }
   ],
   "objectif": 70000
