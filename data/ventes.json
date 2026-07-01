@@ -69,6 +69,16 @@
       "vente": "24000",
       "prepa": "",
       "facture": false
+    },
+    {
+      "acheteur": "",
+      "vendeur": "",
+      "immat": "",
+      "marque": "",
+      "achat": "",
+      "vente": "",
+      "prepa": "",
+      "facture": false
     }
   ],
   "objectif": 70000
