@@ -31,26 +31,6 @@
       "facture": false
     },
     {
-      "acheteur": "GEP PRESTATIONS",
-      "vendeur": "SG BOIS",
-      "immat": "AY920YT",
-      "marque": "SCANIA GRUMIER",
-      "achat": "0",
-      "vente": "2000",
-      "prepa": "0",
-      "facture": true
-    },
-    {
-      "acheteur": "SOW MAMADOU",
-      "vendeur": "RICHE ART DE VIVRE",
-      "immat": "EQ448EY",
-      "marque": "IVECO PORTEUR",
-      "achat": "15000",
-      "vente": "18000",
-      "prepa": "0",
-      "facture": true
-    },
-    {
       "acheteur": "GD DEBARDAGE",
       "vendeur": "STOCK (GLI)",
       "immat": "EZ479DB",
@@ -59,66 +39,6 @@
       "vente": "27900",
       "prepa": "4510",
       "facture": false
-    },
-    {
-      "acheteur": "ROLL ET FRERES",
-      "vendeur": "STOCK (ATTAL)",
-      "immat": "FY125TP",
-      "marque": "VOLVO FH500",
-      "achat": "55000",
-      "vente": "68319",
-      "prepa": "7600",
-      "facture": true
-    },
-    {
-      "acheteur": "VAN LUCHENE",
-      "vendeur": "CASSITRANS",
-      "immat": "AR311KL",
-      "marque": "BENALU",
-      "achat": "4000",
-      "vente": "4000",
-      "prepa": "535",
-      "facture": true
-    },
-    {
-      "acheteur": "MICHEL MEURIOT",
-      "vendeur": "EURL DES PERRIERES",
-      "immat": "AY054EL",
-      "marque": "SAMRO",
-      "achat": "15000",
-      "vente": "17500",
-      "prepa": "0",
-      "facture": true
-    },
-    {
-      "acheteur": "RECUPFER",
-      "vendeur": "CASSITRANS",
-      "immat": "CR840NJ",
-      "marque": "GENERAL TRAILOR",
-      "achat": "3000",
-      "vente": "4000",
-      "prepa": "375",
-      "facture": true
-    },
-    {
-      "acheteur": "CRISCARGA TRANSPORTES LDA",
-      "vendeur": "ALPHONSE CHARPIOT",
-      "immat": "EX801JV",
-      "marque": "MAN",
-      "achat": "6000",
-      "vente": "9250",
-      "prepa": "0",
-      "facture": true
-    },
-    {
-      "acheteur": "CALLIER PERE & FILS",
-      "vendeur": "ANDRE PERNET",
-      "immat": "GQ535JA",
-      "marque": "GOURDON",
-      "achat": "19250",
-      "vente": "22000",
-      "prepa": "0",
-      "facture": true
     },
     {
       "acheteur": "TRANSPORTS FREDERIC",
