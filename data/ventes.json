@@ -86,7 +86,7 @@
       "immat": "",
       "marque": "",
       "achat": "",
-      "vente": "",
+      "vente": "1500",
       "prepa": "",
       "facture": false
     },
@@ -96,7 +96,7 @@
       "immat": "",
       "marque": "",
       "achat": "",
-      "vente": "",
+      "vente": "5000",
       "prepa": "",
       "facture": false
     }
