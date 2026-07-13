@@ -95,9 +95,9 @@
       "vendeur": "BAUDIN",
       "immat": "EY519BR",
       "marque": "DAF ",
-      "achat": "25000",
-      "vente": "",
-      "prepa": "",
+      "achat": "25001",
+      "vente": "30500",
+      "prepa": "1000",
       "facture": false
     }
   ],
