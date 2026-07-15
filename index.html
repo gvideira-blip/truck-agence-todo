@@ -13,6 +13,7 @@
     })();
   </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -477,6 +478,7 @@ function save() {
         pendingSave = false;
       }
       setSyncStatus('ok');
+      rtNotify('tasks'); // prévient instantanément les autres appareils
     } catch(e) {
       setSyncStatus('error');
     }
@@ -684,6 +686,33 @@ function kpOk() {
   closeKeypad();
   render();
 }
+
+
+// ─── Temps réel (Supabase Realtime) ──────────────────────────
+// Chaque sauvegarde envoie un signal aux autres appareils connectés,
+// qui rechargent aussitôt leurs données. Le rafraîchissement périodique
+// reste en roue de secours si le temps réel est indisponible.
+const RT_URL = 'https://bupktwjiwsovnqhveans.supabase.co';
+const RT_KEY = 'sb_publishable_j2SeTihDgrRh24Ebzraeeg_FW0IUsKR'; // clé publique (sans danger dans le code)
+let rtChannel = null;
+function rtInit(keys, onChange) {
+  try {
+    if (!window.supabase) return; // librairie non chargée → le rafraîchissement périodique prend le relais
+    const client = window.supabase.createClient(RT_URL, RT_KEY);
+    rtChannel = client.channel('app-sync');
+    rtChannel.on('broadcast', { event: 'changed' }, (msg) => {
+      const k = msg && msg.payload && msg.payload.key;
+      if (keys.indexOf(k) !== -1) onChange();
+    }).subscribe();
+  } catch (e) { /* le rafraîchissement périodique prend le relais */ }
+}
+function rtNotify(key) {
+  try {
+    if (rtChannel) rtChannel.send({ type: 'broadcast', event: 'changed', payload: { key } });
+  } catch (e) { /* pas grave : le rafraîchissement périodique des autres prendra le relais */ }
+}
+
+rtInit(['tasks', 'config'], () => poll()); // rechargement instantané quand quelqu'un modifie
 
 // ─── Date ────────────────────────────────────────────────────
 document.getElementById('tdate').textContent =

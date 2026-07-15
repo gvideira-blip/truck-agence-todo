@@ -13,6 +13,7 @@
   })();
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -283,6 +284,20 @@
     .objectif-input { font-size: 1.15rem; width: 100px; }
   }
 
+  /* Sélecteur de mois (historique) */
+  .mois-select {
+    font-size: 12px; font-family: inherit; color: var(--text2);
+    border: 1px solid var(--border); border-radius: var(--rs);
+    padding: 6px 8px; background: var(--bg); cursor: pointer;
+  }
+  .mois-select:hover { border-color: var(--blue); color: var(--blue); }
+  .archive-banner {
+    background: #fdf6e8; border-bottom: 1px solid #f0dfb6;
+    color: #7a5500; font-size: 12px; padding: 8px 18px;
+    display: none;
+  }
+  .archive-banner.show { display: block; }
+
   @media (max-width: 480px) {
     .recap { grid-template-columns: 1fr; }
     .recap[style*="repeat(4"] { grid-template-columns: repeat(2, 1fr) !important; }
@@ -385,13 +400,20 @@
         <div class="sync-dot" id="sdot"></div>
         <span id="slabel">—</span>
       </div>
-      <button class="btn danger" onclick="confirmReset()">
-        <i class="ti ti-refresh"></i> Remise à zéro
+      <select class="mois-select" id="moisSelect" onchange="onMoisChange(this.value)" title="Voir un mois archivé">
+        <option value="courant">Mois en cours</option>
+      </select>
+      <button class="btn danger" id="btnCloture" onclick="confirmCloture()">
+        <i class="ti ti-archive"></i> Clôturer le mois
       </button>
-      <button class="btn primary" onclick="addRow()">
+      <button class="btn primary" id="btnAdd" onclick="addRow()">
         <i class="ti ti-plus"></i> Ajouter
       </button>
     </div>
+  </div>
+
+  <div class="archive-banner" id="archiveBanner">
+    📁 Mois archivé — lecture seule. Repassez sur « Mois en cours » pour modifier les ventes actuelles.
   </div>
 
   <div class="empty" id="empty">
@@ -431,9 +453,12 @@
 
 <script>
 // ─── État global ─────────────────────────────────────────────
-let ventes  = [];
-let objectif = 50000;
-let saveTimer = null;
+let ventes     = [];   // ventes du mois en cours (le tableau actif)
+let objectif   = 50000;
+let historique = [];   // [{ mois: "2026-07", ventes: [...], objectif }]
+let viewMois   = 'courant'; // 'courant' ou un mois archivé "YYYY-MM"
+let saveTimer  = null;
+let pendingSave = false; // verrou : ne pas écraser les modifs locales non confirmées
 
 // ─── Sync status ─────────────────────────────────────────────
 function setSyncStatus(s) {
@@ -442,13 +467,53 @@ function setSyncStatus(s) {
     s === 'ok' ? 'Synchronisé' : s === 'saving' ? 'Enregistrement…' : 'Erreur sync';
 }
 
+// ─── Mois ────────────────────────────────────────────────────
+function currentMois() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+function moisLabel(mois) {
+  const p = (mois || '').split('-');
+  const dt = new Date(parseInt(p[0]), parseInt(p[1]) - 1, 1);
+  return dt.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+}
+function isArchiveView() { return viewMois !== 'courant'; }
+function archiveEntry() { return historique.find(h => h.mois === viewMois); }
+function viewList() {
+  if (!isArchiveView()) return ventes;
+  const e = archiveEntry();
+  return e && Array.isArray(e.ventes) ? e.ventes : [];
+}
+function viewObjectif() {
+  if (!isArchiveView()) return objectif;
+  const e = archiveEntry();
+  return (e && e.objectif) ? e.objectif : objectif;
+}
+
+function renderMoisSelect() {
+  const sel = document.getElementById('moisSelect');
+  const moisTries = historique.map(h => h.mois).sort().reverse();
+  let html = '<option value="courant">Mois en cours</option>';
+  for (const m of moisTries) {
+    html += `<option value="${m}">${moisLabel(m)}</option>`;
+  }
+  sel.innerHTML = html;
+  sel.value = (viewMois === 'courant' || moisTries.indexOf(viewMois) !== -1) ? viewMois : 'courant';
+}
+
+function onMoisChange(val) {
+  viewMois = val;
+  render();
+}
+
 // ─── Init ─────────────────────────────────────────────────────
 async function init() {
-  document.getElementById('monthLabel').textContent =
-    '— ' + new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
   await loadData();
   document.getElementById('loader').style.display = 'none';
+  renderMoisSelect();
   render();
+  setInterval(refresh, 10000);          // roue de secours
+  rtInit(['ventes'], refresh);          // temps réel : rechargement instantané
 }
 
 async function loadData() {
@@ -456,20 +521,47 @@ async function loadData() {
     const r = await fetch('/api/ventes');
     if (!r.ok) throw 0;
     const d = await r.json();
-    ventes   = d.ventes   || [];
-    objectif = d.objectif || 50000;
+    ventes     = d.ventes || [];
+    objectif   = d.objectif || 50000;
+    historique = Array.isArray(d.historique) ? d.historique : [];
     setSyncStatus('ok');
     syncObjectifInput();
   } catch(e) { ventes = []; setSyncStatus('error'); }
 }
 
+// Rafraîchissement (poll de secours + déclenché par le temps réel).
+// Ne JAMAIS écraser les modifs locales : on saute si une sauvegarde est
+// en attente ou si l'utilisateur est en train de taper dans un champ.
+async function refresh() {
+  if (pendingSave) return;
+  const ae = document.activeElement;
+  if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'SELECT' || ae.tagName === 'TEXTAREA')) return;
+  try {
+    const r = await fetch('/api/ventes');
+    if (!r.ok) return;
+    const d = await r.json();
+    if (pendingSave) return;
+    const incoming = JSON.stringify([d.ventes || [], d.objectif || 50000, d.historique || []]);
+    const actuel   = JSON.stringify([ventes, objectif, historique]);
+    if (incoming !== actuel) {
+      ventes     = d.ventes || [];
+      objectif   = d.objectif || 50000;
+      historique = Array.isArray(d.historique) ? d.historique : [];
+      syncObjectifInput();
+      renderMoisSelect();
+      render();
+    }
+    setSyncStatus('ok');
+  } catch(e) { setSyncStatus('error'); }
+}
+
 // ─── Objectif éditable ───────────────────────────────────────
 function syncObjectifInput() {
-  document.getElementById('objectifInput').value = fmtCurrency(objectif);
+  document.getElementById('objectifInput').value = fmtCurrency(viewObjectif());
 }
 
 function onObjectifBlur(el) {
-  // Nettoie la saisie : retire tout sauf chiffres
+  if (isArchiveView()) { el.value = fmtCurrency(viewObjectif()); return; }
   const raw = el.value.replace(/[^0-9]/g, '');
   const val = parseInt(raw, 10);
   if (!isNaN(val) && val > 0) {
@@ -477,22 +569,28 @@ function onObjectifBlur(el) {
     updateRecap();
     scheduleSave();
   }
-  // Reformater l'affichage
   el.value = fmtCurrency(objectif);
 }
 
 // ─── Save ────────────────────────────────────────────────────
 function scheduleSave() {
   setSyncStatus('saving');
+  pendingSave = true;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
+    const snapshot = JSON.stringify({ ventes, objectif, historique });
     try {
-      await fetch('/api/ventes', {
+      const r = await fetch('/api/ventes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ventes, objectif })
+        body: snapshot
       });
+      if (!r.ok) throw 0;
+      if (JSON.stringify({ ventes, objectif, historique }) === snapshot) {
+        pendingSave = false;
+      }
       setSyncStatus('ok');
+      rtNotify('ventes'); // prévient instantanément les autres appareils
     } catch(e) { setSyncStatus('error'); }
   }, 800);
 }
@@ -505,27 +603,34 @@ function calcMarge(v) {
   return ve - a - p;
 }
 
-// ─── Tri : facturés en haut (dans l'ordre de cochage = ordre factureOrder),
-//          puis non facturés (dans l'ordre d'insertion = index dans ventes[])
-function sortedVentes() {
-  const factures   = ventes.filter(v => v.facture);
-  const enAttente  = ventes.filter(v => !v.facture);
+// ─── Tri : facturés en haut, puis non facturés ───────────────
+function sortedVentes(list) {
+  const factures  = list.filter(v => v.facture);
+  const enAttente = list.filter(v => !v.facture);
   return [...factures, ...enAttente];
 }
 
 // ─── Render ──────────────────────────────────────────────────
 function render() {
-  const tbody = document.getElementById('tbody');
-  const empty = document.getElementById('empty');
-  const table = document.getElementById('table');
+  const tbody   = document.getElementById('tbody');
+  const empty   = document.getElementById('empty');
+  const table   = document.getElementById('table');
+  const archive = isArchiveView();
+  const list    = viewList();
+
+  // Interface selon la vue (mois en cours ou archive)
+  document.getElementById('btnCloture').style.display = archive ? 'none' : '';
+  document.getElementById('btnAdd').style.display     = archive ? 'none' : '';
+  document.getElementById('archiveBanner').classList.toggle('show', archive);
+  document.getElementById('objectifInput').disabled = archive;
+  document.getElementById('monthLabel').textContent = archive
+    ? '— ' + moisLabel(viewMois) + ' (archivé)'
+    : '— ' + moisLabel(currentMois());
+  syncObjectifInput();
 
   tbody.innerHTML = '';
 
-  const nonEmpty = ventes.filter(v =>
-    v.acheteur || v.vendeur || v.immat || v.marque || v.achat || v.vente || v.prepa || v.facture
-  );
-
-  if (!ventes.length) {
+  if (!list.length) {
     empty.classList.add('show');
     table.style.display = 'none';
     updateRecap();
@@ -534,19 +639,18 @@ function render() {
   empty.classList.remove('show');
   table.style.display = 'table';
 
-  const sorted = sortedVentes();
-  let lastFacture = null; // Pour tracer la ligne séparatrice
+  const sorted = sortedVentes(list);
+  let lastFacture = null;
+  const ro = archive ? 'disabled' : ''; // lecture seule sur les mois archivés
 
   sorted.forEach((v, displayIdx) => {
-    // Indice réel dans ventes[] (pour les callbacks)
-    const realIdx = ventes.indexOf(v);
+    const realIdx = archive ? displayIdx : ventes.indexOf(v);
     const marge   = calcMarge(v);
     const pct = (parseFloat(v.vente) || 0) > 0
       ? ((marge / (parseFloat(v.vente) || 1)) * 100).toFixed(1) + '%'
       : '—';
     const margeClass = marge >= 0 ? 'pos' : 'neg';
 
-    // Séparateur entre groupe facturé et groupe en attente
     if (lastFacture === true && !v.facture) {
       const sep = document.createElement('tr');
       sep.className = 'separator-row';
@@ -555,47 +659,45 @@ function render() {
     }
     lastFacture = v.facture;
 
-    const rowClass = v.facture ? 'is-facture' : 'is-pending';
-
     const tr = document.createElement('tr');
-    tr.className = rowClass;
+    tr.className = v.facture ? 'is-facture' : 'is-pending';
     tr.innerHTML = `
       <td>${displayIdx + 1}</td>
-      <td><input class="cell-input" type="text"
+      <td><input class="cell-input" type="text" ${ro}
         value="${esc(v.acheteur || '')}" placeholder="ACHETEUR"
         data-i="${realIdx}" data-f="acheteur"></td>
-      <td><input class="cell-input" type="text"
+      <td><input class="cell-input" type="text" ${ro}
         value="${esc(v.vendeur || '')}" placeholder="VENDEUR"
         data-i="${realIdx}" data-f="vendeur"></td>
-      <td><input class="cell-input" type="text"
+      <td><input class="cell-input" type="text" ${ro}
         value="${esc(v.immat || '')}" placeholder="AB-123-CD"
         data-i="${realIdx}" data-f="immat"
         style="font-family:monospace;letter-spacing:1px"></td>
-      <td><input class="cell-input" type="text"
+      <td><input class="cell-input" type="text" ${ro}
         value="${esc(v.marque || '')}" placeholder="VOLVO FH 460"
         data-i="${realIdx}" data-f="marque"></td>
-      <td><input class="cell-input right" type="number"
+      <td><input class="cell-input right" type="number" ${ro}
         value="${v.achat || ''}" placeholder="0"
         data-i="${realIdx}" data-f="achat"></td>
-      <td><input class="cell-input right" type="number"
+      <td><input class="cell-input right" type="number" ${ro}
         value="${v.vente || ''}" placeholder="0"
         data-i="${realIdx}" data-f="vente"></td>
-      <td><input class="cell-input right" type="number"
+      <td><input class="cell-input right" type="number" ${ro}
         value="${v.prepa || ''}" placeholder="0"
         data-i="${realIdx}" data-f="prepa"></td>
       <td class="marge-cell ${margeClass}" id="m-${realIdx}">${fmtCurrency(marge)}</td>
       <td class="pct-cell" id="p-${realIdx}">${pct}</td>
       <td>
         <label class="facture-cell">
-          <input type="checkbox" ${v.facture ? 'checked' : ''}
+          <input type="checkbox" ${v.facture ? 'checked' : ''} ${ro}
             data-i="${realIdx}" data-action="facture">
           <span class="facture-badge ${v.facture ? 'ok' : 'pending'}">
             ${v.facture ? 'OK' : 'En att.'}
           </span>
         </label>
       </td>
-      <td><button class="btn-del" data-i="${realIdx}" data-action="del" title="Supprimer">
-        <i class="ti ti-x"></i></button></td>
+      <td>${archive ? '' : `<button class="btn-del" data-i="${realIdx}" data-action="del" title="Supprimer">
+        <i class="ti ti-x"></i></button>`}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -604,21 +706,19 @@ function render() {
   updateFooter();
 }
 
-// ─── Événements délégués ─────────────────────────────────────
+// ─── Événements délégués (uniquement sur le mois en cours) ───
 document.getElementById('tbody').addEventListener('change', e => {
+  if (isArchiveView()) return;
   const el = e.target;
   const i  = parseInt(el.dataset.i);
   if (isNaN(i)) return;
 
   if (el.dataset.action === 'facture') {
     ventes[i].facture = el.checked;
-    // Pas de render complet ici pour éviter de perdre le focus ;
-    // on déplace la ligne visuellement au prochain render
     render();
     scheduleSave();
   } else if (el.dataset.f) {
     let val = el.value;
-    // Majuscules sur les champs texte (pas les nombres)
     if (el.type !== 'number') val = val.toUpperCase();
     ventes[i][el.dataset.f] = val;
     refreshRow(i);
@@ -627,6 +727,7 @@ document.getElementById('tbody').addEventListener('change', e => {
 });
 
 document.getElementById('tbody').addEventListener('input', e => {
+  if (isArchiveView()) return;
   const el = e.target;
   const i  = parseInt(el.dataset.i);
   if (isNaN(i) || !el.dataset.f) return;
@@ -639,6 +740,7 @@ document.getElementById('tbody').addEventListener('input', e => {
 });
 
 document.getElementById('tbody').addEventListener('click', e => {
+  if (isArchiveView()) return;
   const btn = e.target.closest('[data-action="del"]');
   if (btn) {
     const i = parseInt(btn.dataset.i);
@@ -664,8 +766,10 @@ function refreshRow(i) {
 
 // ─── Recap ───────────────────────────────────────────────────
 function updateRecap() {
+  const list = viewList();
+  const obj  = viewObjectif();
   let mF = 0, mP = 0, cF = 0, cP = 0;
-  ventes.forEach(v => {
+  list.forEach(v => {
     const m = calcMarge(v);
     if (v.facture) { mF += m; cF++; }
     else           { mP += m; cP++; }
@@ -673,9 +777,8 @@ function updateRecap() {
   const cTotal = cF + cP;
   const mTotal = mF + mP;
 
-  // Pourcentages (plafonnés à 100 pour la barre, pas pour le texte)
-  const pctVente   = objectif > 0 ? (mTotal / objectif * 100) : 0;
-  const pctFacture = objectif > 0 ? (mF     / objectif * 100) : 0;
+  const pctVente   = obj > 0 ? (mTotal / obj * 100) : 0;
+  const pctFacture = obj > 0 ? (mF     / obj * 100) : 0;
 
   document.getElementById('rFacturee').textContent     = fmtCurrency(mF);
   document.getElementById('rPotentiel').textContent    = fmtCurrency(mP);
@@ -692,7 +795,6 @@ function updateRecap() {
   document.getElementById('rPctFactureSub').textContent = fmtCurrency(mF) + ' facturés';
   document.getElementById('rBarFacture').style.width   = Math.min(pctFacture, 100) + '%';
 
-  // Indicateurs véhicules & moyennes
   const moyVendu   = cTotal > 0 ? mTotal / cTotal : null;
   const moyFacture = cF     > 0 ? mF     / cF     : null;
 
@@ -709,12 +811,13 @@ function updateRecap() {
 }
 
 function updateFooter() {
-  const total = ventes.reduce((s, v) => s + calcMarge(v), 0);
+  const total = viewList().reduce((s, v) => s + calcMarge(v), 0);
   document.getElementById('footMarge').textContent = fmtCurrency(total);
 }
 
 // ─── Actions ─────────────────────────────────────────────────
 function addRow() {
+  if (isArchiveView()) return;
   ventes.push({ acheteur:'', vendeur:'', immat:'', marque:'', achat:'', vente:'', prepa:'', facture: false });
   render();
   setTimeout(() => {
@@ -724,21 +827,40 @@ function addRow() {
   scheduleSave();
 }
 
-function confirmReset() {
-  if (!confirm('Remettre à zéro toutes les ventes du mois ?')) return;
-  ventes = [];
+// Clôture du mois : les ventes FACTURÉES partent dans l'historique,
+// les non facturées restent sur le tableau (elles suivent le mois en cours).
+function confirmCloture() {
+  if (isArchiveView()) return;
+  const facturees = ventes.filter(v => v.facture);
+  const restantes = ventes.filter(v => !v.facture);
+  if (!facturees.length) {
+    alert('Aucune vente facturée à archiver pour le moment.\n\nSeules les ventes cochées « Facturé » partent dans l\'historique.');
+    return;
+  }
+  const mois  = currentMois();
+  const marge = facturees.reduce((s, v) => s + calcMarge(v), 0);
+  if (!confirm(
+    'Clôturer ' + moisLabel(mois) + ' ?\n\n' +
+    '• ' + facturees.length + ' vente(s) facturée(s) — ' + fmtCurrency(marge) + ' de marge — partent dans l\'historique.\n' +
+    '• ' + restantes.length + ' vente(s) non facturée(s) restent sur le tableau.'
+  )) return;
+
+  const entry = historique.find(h => h.mois === mois);
+  if (entry) {
+    entry.ventes = (entry.ventes || []).concat(facturees);
+    entry.objectif = objectif;
+  } else {
+    historique.push({ mois, ventes: facturees, objectif });
+  }
+  ventes = restantes;
+  renderMoisSelect();
   render();
   scheduleSave();
 }
 
 // ─── Formatage ───────────────────────────────────────────────
-/**
- * Formate un nombre en monnaie française : 7000 → "7 000 €"
- * Utilise Intl mais force le symbole € à la fin avec espace insécable.
- */
 function fmtCurrency(n) {
   const num = Math.round(n);
-  // Intl.NumberFormat fr-FR produit "7 000 €" avec espace fine insécable avant €
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: 'EUR',
@@ -749,6 +871,30 @@ function fmtCurrency(n) {
 
 function esc(s) {
   return String(s).replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+// ─── Temps réel (Supabase Realtime) ──────────────────────────
+// Chaque sauvegarde envoie un signal aux autres appareils connectés,
+// qui rechargent aussitôt leurs données. Le rafraîchissement périodique
+// reste en roue de secours si le temps réel est indisponible.
+const RT_URL = 'https://bupktwjiwsovnqhveans.supabase.co';
+const RT_KEY = 'sb_publishable_j2SeTihDgrRh24Ebzraeeg_FW0IUsKR'; // clé publique (sans danger dans le code)
+let rtChannel = null;
+function rtInit(keys, onChange) {
+  try {
+    if (!window.supabase) return; // librairie non chargée → le rafraîchissement périodique prend le relais
+    const client = window.supabase.createClient(RT_URL, RT_KEY);
+    rtChannel = client.channel('app-sync');
+    rtChannel.on('broadcast', { event: 'changed' }, (msg) => {
+      const k = msg && msg.payload && msg.payload.key;
+      if (keys.indexOf(k) !== -1) onChange();
+    }).subscribe();
+  } catch (e) { /* le rafraîchissement périodique prend le relais */ }
+}
+function rtNotify(key) {
+  try {
+    if (rtChannel) rtChannel.send({ type: 'broadcast', event: 'changed', payload: { key } });
+  } catch (e) { /* pas grave : le rafraîchissement périodique des autres prendra le relais */ }
 }
 
 // ─── Démarrage ───────────────────────────────────────────────
