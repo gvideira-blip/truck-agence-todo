@@ -657,12 +657,8 @@ function editText(ri, ci, val) {
   save();
 }
 function clearCell(ri, ci) {
-  const c = cellAt(ri, ci);
-  if (c.text.trim() !== '') {
-    const nom = COMMS[ci] ? COMMS[ci].nom : '';
-    const extrait = c.text.length > 60 ? c.text.slice(0, 60) + '…' : c.text;
-    if (!confirm('Effacer cette tâche' + (nom ? ' de ' + nom : '') + ' ?\n\n« ' + extrait + ' »\n\n(En cas d\'erreur, le bouton « Annuler » permet de la récupérer.)')) return;
-  }
+  // Pas de confirmation ici : le bouton « Annuler » (Ctrl+Z) suffit
+  // pour récupérer une tâche effacée par erreur.
   pushUndo();
   const arr = colArr(ci);
   if (arr[ri]) arr[ri] = { text: '', done: false, prio: '' };
