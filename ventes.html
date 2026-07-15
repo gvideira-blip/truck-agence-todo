@@ -130,6 +130,7 @@
   .btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
   .btn.primary:hover { background: #003560; }
   .btn.danger:hover { border-color: var(--red); color: var(--red); }
+  .btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
 
   /* TABLE */
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -400,6 +401,9 @@
         <div class="sync-dot" id="sdot"></div>
         <span id="slabel">—</span>
       </div>
+      <button class="btn" id="btnUndo" onclick="undoLast()" disabled title="Annuler la dernière action (Ctrl+Z)">
+        <i class="ti ti-arrow-back-up"></i> Annuler
+      </button>
       <select class="mois-select" id="moisSelect" onchange="onMoisChange(this.value)" title="Voir un mois archivé">
         <option value="courant">Mois en cours</option>
       </select>
@@ -459,6 +463,54 @@ let historique = [];   // [{ mois: "2026-07", ventes: [...], objectif }]
 let viewMois   = 'courant'; // 'courant' ou un mois archivé "YYYY-MM"
 let saveTimer  = null;
 let pendingSave = false; // verrou : ne pas écraser les modifs locales non confirmées
+
+// ─── Annulation (retour en arrière instantané) ───────────────
+// Avant chaque action, on mémorise l'état complet. Le bouton
+// « Annuler » (ou Ctrl+Z) restaure l'état précédent, jusqu'à
+// 20 actions en arrière. La pile est vidée quand des modifications
+// faites par quelqu'un d'autre arrivent (pour ne pas les écraser).
+let undoStack = [];
+let preEdit = null; // état capturé quand on entre dans un champ texte
+
+function snapshotState() {
+  return JSON.stringify({ ventes, objectif, historique });
+}
+function pushUndo(etat) {
+  undoStack.push(etat !== undefined ? etat : snapshotState());
+  if (undoStack.length > 20) undoStack.shift();
+  updateUndoBtn();
+}
+function clearUndo() {
+  undoStack = [];
+  preEdit = null;
+  updateUndoBtn();
+}
+function updateUndoBtn() {
+  const b = document.getElementById('btnUndo');
+  if (b) b.disabled = undoStack.length === 0;
+}
+function undoLast() {
+  if (!undoStack.length || isArchiveView()) return;
+  const s = JSON.parse(undoStack.pop());
+  ventes = s.ventes; objectif = s.objectif; historique = s.historique;
+  preEdit = null;
+  syncObjectifInput();
+  renderMoisSelect();
+  render();
+  scheduleSave();
+  updateUndoBtn();
+}
+// Ctrl+Z (seulement hors d'un champ de saisie, pour laisser
+// l'annulation native du navigateur fonctionner dans les champs)
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+    const ae = document.activeElement;
+    if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+    if (isArchiveView()) return;
+    e.preventDefault();
+    undoLast();
+  }
+});
 
 // ─── Sync status ─────────────────────────────────────────────
 function setSyncStatus(s) {
@@ -547,6 +599,7 @@ async function refresh() {
       ventes     = d.ventes || [];
       objectif   = d.objectif || 50000;
       historique = Array.isArray(d.historique) ? d.historique : [];
+      clearUndo(); // des modifs d'un autre appareil sont arrivées : on ne doit plus les écraser
       syncObjectifInput();
       renderMoisSelect();
       render();
@@ -564,7 +617,8 @@ function onObjectifBlur(el) {
   if (isArchiveView()) { el.value = fmtCurrency(viewObjectif()); return; }
   const raw = el.value.replace(/[^0-9]/g, '');
   const val = parseInt(raw, 10);
-  if (!isNaN(val) && val > 0) {
+  if (!isNaN(val) && val > 0 && val !== objectif) {
+    pushUndo(); // objectif pas encore modifié : état d'avant
     objectif = val;
     updateRecap();
     scheduleSave();
@@ -621,6 +675,7 @@ function render() {
   // Interface selon la vue (mois en cours ou archive)
   document.getElementById('btnCloture').style.display = archive ? 'none' : '';
   document.getElementById('btnAdd').style.display     = archive ? 'none' : '';
+  document.getElementById('btnUndo').style.display    = archive ? 'none' : '';
   document.getElementById('archiveBanner').classList.toggle('show', archive);
   document.getElementById('objectifInput').disabled = archive;
   document.getElementById('monthLabel').textContent = archive
@@ -714,15 +769,26 @@ document.getElementById('tbody').addEventListener('change', e => {
   if (isNaN(i)) return;
 
   if (el.dataset.action === 'facture') {
+    pushUndo(); // ventes[i].facture n'est pas encore modifié : c'est bien l'état d'avant
     ventes[i].facture = el.checked;
     render();
     scheduleSave();
   } else if (el.dataset.f) {
+    // L'état d'avant la saisie a été capturé à l'entrée dans le champ
+    if (preEdit) { pushUndo(preEdit); preEdit = null; }
     let val = el.value;
     if (el.type !== 'number') val = val.toUpperCase();
     ventes[i][el.dataset.f] = val;
     refreshRow(i);
     scheduleSave();
+  }
+});
+
+// Capture de l'état AVANT modification d'un champ texte (pour Annuler)
+document.getElementById('tbody').addEventListener('focusin', e => {
+  if (isArchiveView()) return;
+  if (e.target.classList && e.target.classList.contains('cell-input')) {
+    preEdit = snapshotState();
   }
 });
 
@@ -744,6 +810,11 @@ document.getElementById('tbody').addEventListener('click', e => {
   const btn = e.target.closest('[data-action="del"]');
   if (btn) {
     const i = parseInt(btn.dataset.i);
+    const v = ventes[i];
+    if (!v) return;
+    const desc = [v.acheteur, v.immat, v.marque].filter(Boolean).join(' — ') || 'cette ligne (vide)';
+    if (!confirm('Supprimer la vente :\n\n' + desc + ' ?\n\n(En cas d\'erreur, le bouton « Annuler » permet de la récupérer.)')) return;
+    pushUndo();
     ventes.splice(i, 1);
     render();
     scheduleSave();
@@ -818,6 +889,7 @@ function updateFooter() {
 // ─── Actions ─────────────────────────────────────────────────
 function addRow() {
   if (isArchiveView()) return;
+  pushUndo();
   ventes.push({ acheteur:'', vendeur:'', immat:'', marque:'', achat:'', vente:'', prepa:'', facture: false });
   render();
   setTimeout(() => {
@@ -845,6 +917,7 @@ function confirmCloture() {
     '• ' + restantes.length + ' vente(s) non facturée(s) restent sur le tableau.'
   )) return;
 
+  pushUndo();
   const entry = historique.find(h => h.mois === mois);
   if (entry) {
     entry.ventes = (entry.ventes || []).concat(facturees);
