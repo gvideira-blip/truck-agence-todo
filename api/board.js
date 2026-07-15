@@ -1,65 +1,36 @@
-const GH_OWNER = 'gvideira-blip';
-const GH_REPO = 'truck-agence-todo';
-const GH_PATH = 'data/board.json';
-const GH_BRANCH = 'main';
+// api/board.js — Tableau blanc, stocké dans Supabase.
+//
+// Format des données (clé 'board' dans Supabase) : { strokes: [...] }
+// Identique à l'ancien format — seule la façon de stocker change.
 
-async function ghGet() {
-  const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}?ref=${GH_BRANCH}`;
-  const r = await fetch(url, {
-    headers: {
-      'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
-      'Accept': 'application/vnd.github+json',
-      'User-Agent': 'truck-agence-todo'
-    }
-  });
-  if (r.status === 404) return { data: null, sha: null };
-  if (!r.ok) throw new Error(`GitHub GET ${r.status}: ${await r.text()}`);
-  const j = await r.json();
-  const content = Buffer.from(j.content, 'base64').toString('utf8');
-  return { data: JSON.parse(content), sha: j.sha };
-}
-
-async function ghPut(data, sha) {
-  const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`;
-  const body = {
-    message: `update board ${new Date().toISOString()}`,
-    content: Buffer.from(JSON.stringify(data)).toString('base64'),
-    branch: GH_BRANCH
-  };
-  if (sha) body.sha = sha;
-  const r = await fetch(url, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
-      'Accept': 'application/vnd.github+json',
-      'User-Agent': 'truck-agence-todo',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
-  if (!r.ok) throw new Error(`GitHub PUT ${r.status}: ${await r.text()}`);
-}
+import { dbGetOrSeed, dbSet, fetchOldGithubJson, cors } from '../lib/db.js';
 
 function defaultData() {
   return { strokes: [] };
 }
 
+// Migration automatique depuis l'ancien fichier data/board.json du repo
+async function seedBoard() {
+  const old = await fetchOldGithubJson('board.json');
+  return (old && typeof old === 'object') ? old : defaultData();
+}
+
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
+
   try {
     if (req.method === 'GET') {
-      const { data } = await ghGet();
+      const data = await dbGetOrSeed('board', seedBoard);
       return res.status(200).json(data || defaultData());
     }
+
     if (req.method === 'POST') {
-      const body = req.body;
-      const { sha } = await ghGet();
-      await ghPut(body, sha);
+      const body = (req.body && typeof req.body === 'object') ? req.body : defaultData();
+      await dbSet('board', body);
       return res.status(200).json({ ok: true });
     }
+
     return res.status(405).end();
   } catch (e) {
     return res.status(500).json({ error: e.message });

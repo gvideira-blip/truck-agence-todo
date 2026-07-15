@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Configuration — Truck Agence</title>
+<script>
+(function() {
+  const until = parseInt(localStorage.getItem('ta_auth_until') || '0');
+  if (until <= Date.now()) {
+    window.location.href = '/login.html?next=' + encodeURIComponent(window.location.pathname);
+  }
+})();
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #ffffff;
+  --bg2: #f5f5f3;
+  --border: rgba(0,0,0,0.1);
+  --text: #1a1a1a;
+  --text2: #777;
+  --text3: #bbb;
+  --blue: #004472;
+  --red: #CD1719;
+  --r: 12px;
+  --rs: 8px;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg2);
+  min-height: 100vh;
+  padding: 24px;
+  color: var(--text);
+}
+/* NAV (identique aux autres pages) */
+.nav {
+  display: flex; justify-content: center; gap: 8px; margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.nav a {
+  font-size: 12px; color: var(--text2); text-decoration: none;
+  padding: 5px 14px; border: 1px solid var(--border); border-radius: 20px;
+  background: var(--bg); transition: all 0.15s;
+  display: flex; align-items: center; gap: 5px;
+}
+.nav a:hover { border-color: var(--blue); color: var(--blue); }
+.nav a.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+.wrap {
+  background: var(--bg); border-radius: var(--r);
+  border: 1px solid var(--border);
+  max-width: 560px; margin: 0 auto;
+}
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  border-radius: var(--r) var(--r) 0 0;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); }
+.title { font-size: 15px; font-weight: 500; }
+.sync { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 5px; }
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; transition: background 0.3s; }
+.sync-dot.ok { background: #5a9a2a; }
+.sync-dot.saving { background: #e0920a; }
+.sync-dot.error { background: #d03030; }
+
+.intro {
+  padding: 14px 18px; font-size: 13px; color: var(--text2);
+  line-height: 1.5; border-bottom: 1px solid var(--border);
+}
+
+.list { padding: 4px 0; }
+.person {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 18px; border-bottom: 1px solid var(--border);
+}
+.person:last-child { border-bottom: none; }
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+}
+.person input {
+  flex: 1; font-size: 15px; font-family: inherit; color: var(--text);
+  border: 1px solid transparent; border-radius: var(--rs);
+  padding: 6px 10px; background: none; outline: none;
+  min-width: 0;
+}
+.person input:hover { border-color: var(--border); }
+.person input:focus { border-color: var(--blue); background: var(--bg2); }
+.btn-del {
+  background: none; border: 1px solid var(--border); border-radius: var(--rs);
+  color: var(--text2); font-size: 12px; padding: 6px 10px;
+  cursor: pointer; display: flex; align-items: center; gap: 4px;
+  flex-shrink: 0; font-family: inherit;
+}
+.btn-del:hover { border-color: var(--red); color: var(--red); background: #fdf1f1; }
+
+.add {
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 18px; background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--r) var(--r);
+}
+.add input {
+  flex: 1; font-size: 14px; font-family: inherit;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--rs); padding: 9px 12px;
+  outline: none; color: var(--text); min-width: 0;
+}
+.add input:focus { border-color: var(--blue); }
+.add input::placeholder { color: var(--text3); }
+.add button {
+  font-size: 14px; background: var(--blue); color: #fff;
+  border: none; border-radius: var(--rs); padding: 9px 16px;
+  cursor: pointer; font-family: inherit; flex-shrink: 0;
+  display: flex; align-items: center; gap: 5px;
+}
+.add button:hover { background: #003560; }
+
+.warning {
+  max-width: 560px; margin: 14px auto 0;
+  font-size: 12px; color: var(--text2); line-height: 1.55;
+  background: #fdf6e8; border: 1px solid #f0dfb6;
+  border-radius: var(--rs); padding: 10px 14px;
+}
+.warning b { color: #7a5500; }
+
+.errbar {
+  max-width: 560px; margin: 10px auto 0;
+  font-size: 13px; color: var(--red); text-align: center;
+  min-height: 18px;
+}
+
+#loader {
+  position: fixed; inset: 0; background: rgba(255,255,255,0.92);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--text2); z-index: 100;
+}
+
+@media (max-width: 768px) {
+  body { padding: 10px; }
+  .nav { gap: 5px; margin-bottom: 12px; }
+  .nav a { font-size: 11px; padding: 5px 10px; gap: 3px; }
+  .add { flex-wrap: wrap; }
+}
+@media (max-width: 480px) {
+  .nav a span { display: none; }
+  .nav a { padding: 6px 10px; }
+}
+</style>
+</head>
+<body>
+<div id="loader">Chargement…</div>
+
+<nav class="nav">
+  <a href="/">✅ <span>Tâches</span></a>
+  <a href="/ventes.html">📊 <span>Ventes</span></a>
+  <a href="/tableau-blanc.html">🖊️ <span>Tableau blanc</span></a>
+  <a href="/instructions.html">📌 <span>Point Gaëtan</span></a>
+  <a href="/config.html" class="active">⚙️ <span>Configuration</span></a>
+</nav>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="dot"></div>
+      <span class="title">Équipe commerciale</span>
+    </div>
+    <div class="sync">
+      <div class="sync-dot" id="sdot"></div>
+      <span id="slabel">—</span>
+    </div>
+  </div>
+
+  <div class="intro">
+    Chaque commercial a sa colonne dans le tableau des tâches et apparaît
+    dans le menu « Qui ? » de la page Point Gaëtan. Les changements sont
+    appliqués immédiatement pour toute l'équipe.
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <div class="add">
+    <input id="newName" placeholder="Prénom du nouveau commercial…" maxlength="30"
+           onkeydown="if(event.key==='Enter'){event.preventDefault();addPerson();}"/>
+    <button onclick="addPerson()"><i class="ti ti-plus"></i> Ajouter</button>
+  </div>
+</div>
+
+<div class="errbar" id="errbar"></div>
+
+<div class="warning">
+  <b>Attention :</b> supprimer un commercial efface <b>définitivement</b> sa
+  colonne du tableau des tâches (les tâches encore ouvertes sont perdues).
+  Pensez à les traiter ou à les recopier dans une autre colonne avant.
+  Renommer quelqu'un est sans risque : ses tâches sont conservées.
+</div>
+
+<script>
+// Palette partagée avec les autres pages (index par "couleur")
+const PALETTE = [
+  { bg: '#deeefb', fg: '#0a4a7c' }, // 0 bleu
+  { bg: '#d6f0e6', fg: '#08503e' }, // 1 vert
+  { bg: '#eae8fc', fg: '#3a338a' }, // 2 violet
+  { bg: '#fde8ef', fg: '#8a2a55' }, // 3 rose
+  { bg: '#d8f1f4', fg: '#0b5d68' }, // 4 turquoise
+  { bg: '#fde4d2', fg: '#8a4210' }, // 5 orange
+  { bg: '#e6f2cf', fg: '#4a6314' }, // 6 vert clair
+  { bg: '#e9e9e9', fg: '#555555' }  // 7 gris
+];
+function pal(i) { return PALETTE[(i >= 0 && i < 8) ? i : 7]; }
+function initiales(nom) {
+  const s = (nom || '').trim();
+  if (!s) return '?';
+  return s.charAt(0).toUpperCase() + (s.charAt(1) || '').toLowerCase();
+}
+function escapeHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let commerciaux = [];
+
+function setSyncStatus(s) {
+  document.getElementById('sdot').className = 'sync-dot ' + s;
+  document.getElementById('slabel').textContent =
+    s === 'ok' ? 'Synchronisé' : s === 'saving' ? 'Enregistrement…' : 'Erreur sync';
+}
+function showError(msg) {
+  document.getElementById('errbar').textContent = msg || '';
+}
+
+async function load() {
+  try {
+    const r = await fetch('/api/config');
+    if (!r.ok) throw 0;
+    const j = await r.json();
+    commerciaux = Array.isArray(j.commerciaux) ? j.commerciaux : [];
+    setSyncStatus('ok');
+  } catch(e) {
+    commerciaux = [];
+    setSyncStatus('error');
+    showError('Impossible de charger la configuration. Rechargez la page.');
+  }
+  document.getElementById('loader').style.display = 'none';
+  render();
+}
+
+async function saveConfig() {
+  setSyncStatus('saving');
+  showError('');
+  try {
+    const r = await fetch('/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ commerciaux })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || 'Erreur serveur');
+    // Le serveur peut ajuster ids et couleurs → on reprend sa version
+    if (j.config && Array.isArray(j.config.commerciaux)) {
+      commerciaux = j.config.commerciaux;
+    }
+    setSyncStatus('ok');
+    render();
+  } catch(e) {
+    setSyncStatus('error');
+    showError(e.message || 'Erreur lors de l\'enregistrement.');
+    // On recharge l'état serveur pour rester cohérent
+    load();
+  }
+}
+
+function render() {
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  commerciaux.forEach((c, i) => {
+    const p = pal(c.couleur);
+    const row = document.createElement('div');
+    row.className = 'person';
+    row.innerHTML = `
+      <div class="avatar" style="background:${p.bg};color:${p.fg}">${escapeHtml(initiales(c.nom))}</div>
+      <input value="${escapeHtml(c.nom)}" maxlength="30"
+             onblur="renamePerson(${i}, this.value)"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"/>
+      <button class="btn-del" onclick="removePerson(${i})">
+        <i class="ti ti-trash"></i> Supprimer
+      </button>`;
+    list.appendChild(row);
+  });
+}
+
+function addPerson() {
+  const input = document.getElementById('newName');
+  const nom = input.value.trim();
+  if (!nom) return;
+  if (commerciaux.some(c => c.nom.toLowerCase() === nom.toLowerCase())) {
+    showError('Ce prénom est déjà dans la liste.');
+    return;
+  }
+  commerciaux.push({ nom }); // id et couleur attribués par le serveur
+  input.value = '';
+  input.focus();
+  render();
+  saveConfig();
+}
+
+function renamePerson(i, val) {
+  const nom = (val || '').trim();
+  if (!commerciaux[i]) return;
+  if (!nom) { render(); return; } // vide → on annule
+  if (nom === commerciaux[i].nom) return;
+  commerciaux[i].nom = nom; // l'id ne change pas → tâches conservées
+  render();
+  saveConfig();
+}
+
+function removePerson(i) {
+  const c = commerciaux[i];
+  if (!c) return;
+  if (commerciaux.length <= 1) {
+    showError('Impossible : il faut au moins un commercial.');
+    return;
+  }
+  if (!confirm(
+    'Supprimer ' + c.nom + ' ?\n\n' +
+    'Sa colonne du tableau des tâches sera définitivement effacée, ' +
+    'y compris les tâches encore ouvertes.'
+  )) return;
+  commerciaux.splice(i, 1);
+  render();
+  saveConfig();
+}
+
+load();
+</script>
+</body>
+</html>

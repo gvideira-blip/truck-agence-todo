@@ -112,9 +112,8 @@ body {
   display: inline-flex; align-items: center; gap: 4px;
   padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500;
 }
-.badge.b-c  { background: #deeefb; color: #0a4a7c; }
-.badge.b-ca { background: #d6f0e6; color: #08503e; }
-.badge.b-l  { background: #eae8fc; color: #3a338a; }
+/* Les couleurs des badges des commerciaux sont appliquées dynamiquement
+   depuis la configuration (page ⚙️ Configuration). */
 .badge.b-g  { background: #fdecc8; color: #7a5500; }
 .badge.b-x  { background: #eee; color: #777; }
 
@@ -241,6 +240,7 @@ body {
   <a href="/ventes.html">📊 <span>Ventes</span></a>
   <a href="/tableau-blanc.html">🖊️ <span>Tableau blanc</span></a>
   <a href="/instructions.html" class="active">📌 <span>Point Gaëtan</span></a>
+  <a href="/config.html">⚙️ <span>Configuration</span></a>
 </nav>
 
 <div class="wrap">
@@ -266,9 +266,6 @@ body {
     <select id="author" title="Qui ?">
       <option value="" disabled selected>Qui ?</option>
       <option value="Gaëtan">Gaëtan</option>
-      <option value="Chloé">Chloé</option>
-      <option value="Camille">Camille</option>
-      <option value="Lila">Lila</option>
     </select>
     <input id="newInput" placeholder="Nouveau point… (ex. : vérifier texte annonce LGOT)"
            onkeydown="if(event.key==='Enter'){event.preventDefault();addItem();}"/>
@@ -322,8 +319,39 @@ function setSyncStatus(s) {
     s === 'ok' ? 'Synchronisé' : s === 'saving' ? 'Enregistrement…' : 'Erreur sync';
 }
 
+// ─── Équipe (chargée depuis /api/config, gérée via ⚙️ Configuration) ──
+const PALETTE = [
+  { bg: '#deeefb', fg: '#0a4a7c' }, // 0 bleu
+  { bg: '#d6f0e6', fg: '#08503e' }, // 1 vert
+  { bg: '#eae8fc', fg: '#3a338a' }, // 2 violet
+  { bg: '#fde8ef', fg: '#8a2a55' }, // 3 rose
+  { bg: '#d8f1f4', fg: '#0b5d68' }, // 4 turquoise
+  { bg: '#fde4d2', fg: '#8a4210' }, // 5 orange
+  { bg: '#e6f2cf', fg: '#4a6314' }, // 6 vert clair
+  { bg: '#e9e9e9', fg: '#555555' }  // 7 gris
+];
+let COMMS = []; // [{ id, nom, couleur }]
+
+async function loadConfig() {
+  try {
+    const r = await fetch('/api/config');
+    if (!r.ok) return;
+    const j = await r.json();
+    if (!Array.isArray(j.commerciaux)) return;
+    COMMS = j.commerciaux;
+    // Remplit le menu "Qui ?" : Gaëtan + les commerciaux
+    const sel = document.getElementById('author');
+    const current = sel.value;
+    sel.innerHTML = '<option value="" disabled selected>Qui ?</option>' +
+      '<option value="Gaëtan">Gaëtan</option>' +
+      COMMS.map(c => `<option value="${escapeHtml(c.nom)}">${escapeHtml(c.nom)}</option>`).join('');
+    if (current) sel.value = current;
+  } catch(e) { /* le menu garde au moins Gaëtan */ }
+}
+
 // ─── Chargement & poll (même logique que index.html) ─────────
 async function load() {
+  await loadConfig();
   try {
     const r = await fetch('/api/instructions');
     if (!r.ok) throw 0;
@@ -390,10 +418,13 @@ function renumberPriorities() {
 
 // ─── Rendu ───────────────────────────────────────────────────
 function badgeFor(author) {
-  if (author === 'Gaëtan')  return '<span class="badge b-g">Gaëtan</span>';
-  if (author === 'Chloé')   return '<span class="badge b-c">Chloé</span>';
-  if (author === 'Camille') return '<span class="badge b-ca">Camille</span>';
-  if (author === 'Lila')    return '<span class="badge b-l">Lila</span>';
+  if (author === 'Gaëtan') return '<span class="badge b-g">Gaëtan</span>';
+  const c = COMMS.find(x => x.nom === author);
+  if (c) {
+    const p = PALETTE[(c.couleur >= 0 && c.couleur < 8) ? c.couleur : 7];
+    return `<span class="badge" style="background:${p.bg};color:${p.fg}">${escapeHtml(c.nom)}</span>`;
+  }
+  // Auteur inconnu (ex. : commercial parti) → badge gris, le nom reste lisible
   return '<span class="badge b-x">' + escapeHtml(author || '—') + '</span>';
 }
 function fmtDate(ts) {

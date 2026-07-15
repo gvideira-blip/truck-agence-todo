@@ -97,9 +97,8 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 9px; font-weight: 500;
     }
-    .av-c  { background: #deeefb; color: #0a4a7c; }
-    .av-ca { background: #d6f0e6; color: #08503e; }
-    .av-l  { background: #eae8fc; color: #3a338a; }
+    /* Les couleurs des avatars sont appliquées dynamiquement
+       depuis la configuration (page ⚙️ Configuration). */
 
     tbody td {
       border-left: 1px solid var(--border); border-bottom: 1px solid var(--border);
@@ -287,6 +286,7 @@
   <a href="/ventes.html">📊 Ventes</a>
   <a href="/tableau-blanc.html">🖊️ Tableau blanc</a>
   <a href="/instructions.html">📌 Point Gaëtan</a>
+  <a href="/config.html">⚙️ Configuration</a>
 </nav>
 
 <div class="wrap">
@@ -308,23 +308,13 @@
   </div>
 
   <div class="table-scroll">
-    <table>
+    <table id="ttable">
       <thead>
-        <tr>
-          <th>#</th>
-          <th><div class="th-inner"><div class="avatar av-c">Ch</div>Chloé</div></th>
-          <th><div class="th-inner"><div class="avatar av-ca">Ca</div>Camille</div></th>
-          <th><div class="th-inner"><div class="avatar av-l">Li</div>Lila</div></th>
-        </tr>
+        <tr id="hrow"><th>#</th></tr>
       </thead>
       <tbody id="tbody"></tbody>
       <tfoot>
-        <tr>
-          <td><i class="ti ti-plus" style="font-size:13px;"></i></td>
-          <td><div class="add-cell"><input id="a0" placeholder="Ajouter…" onkeydown="addTask(event,0)"/></div></td>
-          <td><div class="add-cell"><input id="a1" placeholder="Ajouter…" onkeydown="addTask(event,1)"/></div></td>
-          <td><div class="add-cell"><input id="a2" placeholder="Ajouter…" onkeydown="addTask(event,2)"/></div></td>
-        </tr>
+        <tr id="frow"><td><i class="ti ti-plus" style="font-size:13px;"></i></td></tr>
       </tfoot>
     </table>
   </div>
@@ -358,10 +348,33 @@
 </div>
 
 <script>
-const COLS = 3;
-let data = [];
+// ─── Équipe ──────────────────────────────────────────────────
+// La liste des commerciaux vient de /api/config et se gère depuis
+// la page ⚙️ Configuration. L'ordre de la liste = l'ordre des colonnes.
+const PALETTE = [
+  { bg: '#deeefb', fg: '#0a4a7c' }, // 0 bleu
+  { bg: '#d6f0e6', fg: '#08503e' }, // 1 vert
+  { bg: '#eae8fc', fg: '#3a338a' }, // 2 violet
+  { bg: '#fde8ef', fg: '#8a2a55' }, // 3 rose
+  { bg: '#d8f1f4', fg: '#0b5d68' }, // 4 turquoise
+  { bg: '#fde4d2', fg: '#8a4210' }, // 5 orange
+  { bg: '#e6f2cf', fg: '#4a6314' }, // 6 vert clair
+  { bg: '#e9e9e9', fg: '#555555' }  // 7 gris
+];
+function pal(i) { return PALETTE[(i >= 0 && i < 8) ? i : 7]; }
+function initiales(nom) {
+  const s = (nom || '').trim();
+  if (!s) return '?';
+  return s.charAt(0).toUpperCase() + (s.charAt(1) || '').toLowerCase();
+}
+function escapeHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+let COMMS = [];             // [{ id, nom, couleur }]
+let data  = { cols: {} };   // { cols: { <idCommercial>: [ {text,done,prio}, ... ] } }
 let saveTimer = null;
-let kpTarget = null; // { ri, ci }
+let kpTarget = null;        // { ri, ci }
 
 // ─── Verrou anti-écrasement ──────────────────────────────────
 // pendingSave passe à true dès qu'une modif locale est faite et
@@ -370,11 +383,21 @@ let kpTarget = null; // { ri, ci }
 // les données locales (sinon les modifs en rafale "reviennent").
 let pendingSave = false;
 
-// ─── Utilitaires ─────────────────────────────────────────────
-function blank() {
-  return Array.from({ length: 10 }, () =>
-    Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '' }))
-  );
+// ─── Accès aux cellules ──────────────────────────────────────
+function colArr(ci) {
+  const id = COMMS[ci].id;
+  if (!Array.isArray(data.cols[id])) data.cols[id] = [];
+  return data.cols[id];
+}
+function cellAt(ri, ci) {
+  const arr = colArr(ci);
+  while (arr.length <= ri) arr.push({ text: '', done: false, prio: '' });
+  return arr[ri];
+}
+function rowCount() {
+  let m = 10;
+  for (let ci = 0; ci < COMMS.length; ci++) m = Math.max(m, colArr(ci).length);
+  return m;
 }
 
 function setSyncStatus(s) {
@@ -384,14 +407,25 @@ function setSyncStatus(s) {
 }
 
 // ─── Chargement & poll ───────────────────────────────────────
+async function fetchConfig() {
+  const r = await fetch('/api/config');
+  if (!r.ok) throw 0;
+  const j = await r.json();
+  if (!Array.isArray(j.commerciaux) || j.commerciaux.length === 0) throw 0;
+  return j.commerciaux;
+}
+
 async function load() {
   try {
-    const r = await fetch('/api/tasks');
+    const [comms, r] = await Promise.all([fetchConfig(), fetch('/api/tasks')]);
     if (!r.ok) throw 0;
-    data = await r.json();
+    const j = await r.json();
+    COMMS = comms;
+    data = (j && typeof j === 'object' && j.cols) ? j : { cols: {} };
     setSyncStatus('ok');
-  } catch(e) { data = blank(); setSyncStatus('error'); }
+  } catch(e) { setSyncStatus('error'); }
   document.getElementById('loader').style.display = 'none';
+  renderHeader();
   render();
   setInterval(poll, 5000);
 }
@@ -399,24 +433,28 @@ async function load() {
 async function poll() {
   if (kpTarget) return;
   // ── Verrou : ne JAMAIS écraser des modifs locales non confirmées ──
-  // Si une sauvegarde est en attente ou en cours, le serveur n'a pas
-  // encore notre dernière version → on saute ce poll.
   if (pendingSave) return;
   if (document.activeElement && (
     document.activeElement.tagName === 'TEXTAREA' ||
     document.activeElement.tagName === 'INPUT'
   )) return;
   try {
-    const r = await fetch('/api/tasks');
+    const [comms, r] = await Promise.all([fetchConfig(), fetch('/api/tasks')]);
     if (!r.ok) return;
     const newData = await r.json();
-    // Re-vérification du verrou APRÈS le fetch : l'utilisateur a pu
-    // modifier quelque chose pendant que la requête était en vol.
+    // Re-vérification du verrou APRÈS le fetch
     if (pendingSave) return;
-    if (JSON.stringify(newData) !== JSON.stringify(data)) {
-      data = newData;
-      render();
+    let dirty = false;
+    if (JSON.stringify(comms) !== JSON.stringify(COMMS)) {
+      COMMS = comms;          // l'équipe a changé (page Configuration)
+      renderHeader();
+      dirty = true;
     }
+    if (JSON.stringify(newData) !== JSON.stringify(data)) {
+      data = (newData && newData.cols) ? newData : { cols: {} };
+      dirty = true;
+    }
+    if (dirty) render();
     setSyncStatus('ok');
   } catch(e) { setSyncStatus('error'); }
 }
@@ -424,14 +462,10 @@ async function poll() {
 // ─── Save ────────────────────────────────────────────────────
 function save() {
   setSyncStatus('saving');
-  // Lève le verrou immédiatement : à partir d'ici, le poll laisse
-  // les données locales tranquilles jusqu'à confirmation serveur.
   pendingSave = true;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
-    // On capture l'état envoyé pour savoir, à la réponse, si
-    // l'utilisateur a encore modifié quelque chose entre-temps.
-    const snapshot = JSON.stringify(data);
+    const snapshot = JSON.stringify(data); // data = { cols: {...} }
     try {
       const r = await fetch('/api/tasks', {
         method: 'POST',
@@ -439,61 +473,39 @@ function save() {
         body: snapshot
       });
       if (!r.ok) throw 0;
-      // Le verrou ne se libère que si AUCUNE nouvelle modif n'a eu
-      // lieu pendant l'envoi. Sinon un autre save() est déjà
-      // programmé et gardera le verrou actif.
       if (JSON.stringify(data) === snapshot) {
         pendingSave = false;
       }
       setSyncStatus('ok');
     } catch(e) {
-      // En cas d'échec réseau, on garde le verrou : les données
-      // locales restent prioritaires, un prochain save() retentera.
       setSyncStatus('error');
     }
   }, 700);
 }
 
-// ─── Renumbering des priorités ───────────────────────────────
-/**
- * Après qu'une priorité est modifiée dans une colonne, on renumérote
- * toutes les tâches ayant une priorité dans cette colonne
- * en gardant leur ordre relatif mais en compactant les numéros : 1, 2, 3…
- *
- * Exemple : si les priorités existantes sont [3, 1, 5, 2],
- * l'ordre visuel (trié) serait [1, 2, 3, 5] → on renumérote en [1, 2, 3, 4].
- *
- * @param {number} ci - Index de la colonne à renumeroter
- */
+// ─── Renumbering des priorités (par colonne, inchangé) ───────
 function renumberPriorities(ci) {
-  // Récupérer toutes les cellules de cette colonne qui ont une priorité
+  const arr = colArr(ci);
   const cells = [];
-  for (let ri = 0; ri < data.length; ri++) {
-    const cell = data[ri][ci];
+  for (let ri = 0; ri < arr.length; ri++) {
+    const cell = arr[ri];
     if (cell.prio !== '' && cell.text !== '') {
       cells.push({ ri, prio: parseFloat(cell.prio) });
     }
   }
-
-  if (cells.length === 0) return; // Rien à renuméroter
-
-  // Trier par priorité actuelle
+  if (cells.length === 0) return;
   cells.sort((a, b) => a.prio - b.prio);
-
-  // Réassigner 1, 2, 3… dans l'ordre
-  cells.forEach((c, idx) => {
-    data[c.ri][ci].prio = String(idx + 1);
-  });
+  cells.forEach((c, idx) => { arr[c.ri].prio = String(idx + 1); });
 }
 
 // ─── Tri & rendu ─────────────────────────────────────────────
 function buildSortedIndexes() {
-  const maxRows = data.length;
-  const result  = Array.from({ length: maxRows }, () => new Array(COLS));
-  for (let ci = 0; ci < COLS; ci++) {
+  const maxRows = rowCount();
+  const result  = Array.from({ length: maxRows }, () => new Array(COMMS.length));
+  for (let ci = 0; ci < COMMS.length; ci++) {
     const entries = [];
-    for (let ri = 0; ri < data.length; ri++) {
-      entries.push({ ri, cell: data[ri][ci] });
+    for (let ri = 0; ri < maxRows; ri++) {
+      entries.push({ ri, cell: cellAt(ri, ci) });
     }
     const withPrio = entries.filter(e => e.cell.prio !== '' && e.cell.text !== '');
     const noPrio   = entries.filter(e => e.cell.prio === '' && e.cell.text !== '');
@@ -507,16 +519,36 @@ function buildSortedIndexes() {
   return result;
 }
 
+function renderHeader() {
+  let h = '<th>#</th>';
+  for (const c of COMMS) {
+    const p = pal(c.couleur);
+    h += `<th><div class="th-inner"><div class="avatar" style="background:${p.bg};color:${p.fg}">${escapeHtml(initiales(c.nom))}</div>${escapeHtml(c.nom)}</div></th>`;
+  }
+  document.getElementById('hrow').innerHTML = h;
+
+  let f = '<td><i class="ti ti-plus" style="font-size:13px;"></i></td>';
+  for (let ci = 0; ci < COMMS.length; ci++) {
+    f += `<td><div class="add-cell"><input id="a${ci}" placeholder="Ajouter…" onkeydown="addTask(event,${ci})"/></div></td>`;
+  }
+  document.getElementById('frow').innerHTML = f;
+
+  // Largeur mini : force le scroll horizontal si trop de colonnes
+  document.getElementById('ttable').style.minWidth =
+    (36 + 175 * Math.max(COMMS.length, 1)) + 'px';
+}
+
 function render() {
   const tb  = document.getElementById('tbody');
   tb.innerHTML = '';
+  if (COMMS.length === 0) return;
   const idx = buildSortedIndexes();
   for (let di = 0; di < idx.length; di++) {
     const tr  = document.createElement('tr');
     let html  = `<td>${di + 1}</td>`;
-    for (let ci = 0; ci < COLS; ci++) {
+    for (let ci = 0; ci < COMMS.length; ci++) {
       const ri   = idx[di][ci];
-      const cell = data[ri][ci];
+      const cell = cellAt(ri, ci);
       const prioDisplay = cell.prio
         ? cell.prio
         : '<span class="placeholder">P</span>';
@@ -529,7 +561,7 @@ function render() {
               onblur="editText(${ri},${ci},this.value)"
               oninput="resize(this)"
               onkeydown="handleTab(event, ${di}, ${ci})"
-            >${cell.text}</textarea>
+            >${escapeHtml(cell.text)}</textarea>
             <button class="del" onclick="clearCell(${ri},${ci})" aria-label="Effacer">
               <i class="ti ti-x"></i>
             </button>
@@ -543,10 +575,8 @@ function render() {
     }
     tr.innerHTML = html;
     tb.appendChild(tr);
-    for (let ci = 0; ci < COLS; ci++) {
-      const ta = tr.querySelectorAll('textarea')[ci];
-      if (ta) setTimeout(() => resize(ta), 0);
-    }
+    const tas = tr.querySelectorAll('textarea');
+    tas.forEach(ta => setTimeout(() => resize(ta), 0));
   }
 }
 
@@ -556,7 +586,7 @@ function handleTab(e, di, ci) {
   e.preventDefault();
   const ta  = e.target;
   const ri  = buildSortedIndexes()[di][ci];
-  if (ri !== undefined) data[ri][ci].text = ta.value;
+  if (ri !== undefined) cellAt(ri, ci).text = ta.value;
   const allRows = document.querySelectorAll('#tbody tr');
   const nextDi  = e.shiftKey ? di - 1 : di + 1;
   if (nextDi >= 0 && nextDi < allRows.length) {
@@ -570,11 +600,11 @@ function handleTab(e, di, ci) {
 }
 
 function resize(el) { el.style.height = 'auto'; el.style.height = Math.max(28, el.scrollHeight) + 'px'; }
-function toggle(ri, ci) { data[ri][ci].done = !data[ri][ci].done; save(); render(); }
-function editText(ri, ci, val) { data[ri][ci].text = val; save(); }
+function toggle(ri, ci) { const c = cellAt(ri, ci); c.done = !c.done; save(); render(); }
+function editText(ri, ci, val) { cellAt(ri, ci).text = val; save(); }
 function clearCell(ri, ci) {
-  data[ri][ci] = { text: '', done: false, prio: '' };
-  // Renumeroter la colonne après suppression de priorité
+  const arr = colArr(ci);
+  if (arr[ri]) arr[ri] = { text: '', done: false, prio: '' };
   renumberPriorities(ci);
   save(); render();
 }
@@ -584,36 +614,33 @@ function addTask(e, ci) {
   e.preventDefault();
   const val = e.target.value.trim();
   if (!val) return;
-  const emptyRi = data.findIndex(row => !row[ci].text);
-  if (emptyRi >= 0) { data[emptyRi][ci].text = val; }
-  else {
-    const nr = Array.from({ length: COLS }, () => ({ text: '', done: false, prio: '' }));
-    nr[ci].text = val;
-    data.push(nr);
+  const arr = colArr(ci);
+  const max = rowCount();
+  let placed = false;
+  for (let ri = 0; ri < max; ri++) {
+    if (!cellAt(ri, ci).text) { arr[ri].text = val; placed = true; break; }
   }
+  if (!placed) arr.push({ text: val, done: false, prio: '' });
   e.target.value = '';
   save(); render();
 }
 
 function resetAll() {
   if (!confirm('Remettre à zéro toutes les cases ?')) return;
-  data = data.map(row => row.map(c => ({ ...c, done: false, prio: '' })));
+  for (let ci = 0; ci < COMMS.length; ci++) {
+    colArr(ci).forEach(c => { c.done = false; c.prio = ''; });
+  }
   save(); render();
 }
 
 // ─── Keypad modal ────────────────────────────────────────────
 function openKeypad(ri, ci) {
   kpTarget = { ri, ci };
+  const arr = colArr(ci);
   const input = document.getElementById('modal-input');
-  input.value = data[ri][ci].prio || '';
-  // Calculer le prochain numéro disponible pour cette colonne
-  const usedPrios = data
-    .filter((row, r) => r !== ri && row[ci].prio !== '' && row[ci].text !== '')
-    .map(row => parseInt(row[ci].prio))
-    .filter(n => !isNaN(n));
-  const nextAvail = usedPrios.length > 0 ? Math.max(...usedPrios) + 1 : 1;
+  input.value = cellAt(ri, ci).prio || '';
+  const existingCount = arr.filter((c, r) => c.prio !== '' && c.text !== '').length;
   const info = document.getElementById('renumberInfo');
-  const existingCount = data.filter((row, r) => row[ci].prio !== '' && row[ci].text !== '').length;
   if (existingCount > 0) {
     info.textContent = `${existingCount} priorité(s) existante(s) — seront renumérotées automatiquement`;
     info.classList.add('show');
@@ -649,18 +676,10 @@ function kpOk() {
   if (!kpTarget) return;
   const { ri, ci } = kpTarget;
   const val = document.getElementById('modal-input').value;
-
-  // Appliquer la nouvelle valeur
-  data[ri][ci].prio = val;
-
-  // ── Renumbering automatique ──────────────────────────────
-  // Si une valeur a été saisie, on renumérote toute la colonne
-  // pour garantir une séquence 1, 2, 3… sans trous ni doublons.
+  cellAt(ri, ci).prio = val;
   if (val !== '') {
     renumberPriorities(ci);
   }
-  // ─────────────────────────────────────────────────────────
-
   save();
   closeKeypad();
   render();

@@ -6,6 +6,5 @@
     "deploymentEnabled": {
       "main": true
     }
-  },
-  "ignoreCommand": "bash ignore-build.sh"
+  }
 }
