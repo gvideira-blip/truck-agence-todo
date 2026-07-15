@@ -79,6 +79,7 @@
       cursor: pointer; display: flex; align-items: center; gap: 4px;
     }
     .btn-reset:hover { background: var(--bg2); }
+    .btn-reset:disabled { opacity: 0.4; pointer-events: none; }
 
     table { width: 100%; border-collapse: collapse; table-layout: auto; }
 
@@ -302,6 +303,9 @@
         <div class="sync-dot" id="sdot"></div>
         <span id="slabel">—</span>
       </div>
+      <button class="btn-reset" id="btnUndo" onclick="undoLast()" disabled title="Annuler la dernière action (Ctrl+Z)">
+        <i class="ti ti-arrow-back-up"></i> Annuler
+      </button>
       <button class="btn-reset" onclick="resetAll()">
         <i class="ti ti-refresh"></i> Reset
       </button>
@@ -384,6 +388,46 @@ let kpTarget = null;        // { ri, ci }
 // les données locales (sinon les modifs en rafale "reviennent").
 let pendingSave = false;
 
+// ─── Annulation (retour en arrière instantané) ───────────────
+// Avant chaque action, on mémorise l'état complet du tableau.
+// Le bouton « Annuler » (ou Ctrl+Z) restaure l'état précédent,
+// jusqu'à 20 actions en arrière. La pile est vidée quand des
+// modifications d'un autre appareil arrivent.
+let undoStack = [];
+let preEdit = null; // état capturé quand on entre dans une case texte
+
+function snapshotState() { return JSON.stringify(data); }
+function pushUndo(etat) {
+  undoStack.push(etat !== undefined ? etat : snapshotState());
+  if (undoStack.length > 20) undoStack.shift();
+  updateUndoBtn();
+}
+function clearUndo() {
+  undoStack = [];
+  preEdit = null;
+  updateUndoBtn();
+}
+function updateUndoBtn() {
+  const b = document.getElementById('btnUndo');
+  if (b) b.disabled = undoStack.length === 0;
+}
+function undoLast() {
+  if (!undoStack.length) return;
+  data = JSON.parse(undoStack.pop());
+  preEdit = null;
+  render();
+  save();
+  updateUndoBtn();
+}
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+    const ae = document.activeElement;
+    if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+    e.preventDefault();
+    undoLast();
+  }
+});
+
 // ─── Accès aux cellules ──────────────────────────────────────
 function colArr(ci) {
   const id = COMMS[ci].id;
@@ -453,6 +497,7 @@ async function poll() {
     }
     if (JSON.stringify(newData) !== JSON.stringify(data)) {
       data = (newData && newData.cols) ? newData : { cols: {} };
+      clearUndo(); // des modifs d'un autre appareil sont arrivées : on ne doit plus les écraser
       dirty = true;
     }
     if (dirty) render();
@@ -588,7 +633,8 @@ function handleTab(e, di, ci) {
   e.preventDefault();
   const ta  = e.target;
   const ri  = buildSortedIndexes()[di][ci];
-  if (ri !== undefined) cellAt(ri, ci).text = ta.value;
+  if (ri !== undefined) editText(ri, ci, ta.value); // passe par editText pour l'annulation
+
   const allRows = document.querySelectorAll('#tbody tr');
   const nextDi  = e.shiftKey ? di - 1 : di + 1;
   if (nextDi >= 0 && nextDi < allRows.length) {
@@ -602,20 +648,39 @@ function handleTab(e, di, ci) {
 }
 
 function resize(el) { el.style.height = 'auto'; el.style.height = Math.max(28, el.scrollHeight) + 'px'; }
-function toggle(ri, ci) { const c = cellAt(ri, ci); c.done = !c.done; save(); render(); }
-function editText(ri, ci, val) { cellAt(ri, ci).text = val; save(); }
+function toggle(ri, ci) { pushUndo(); const c = cellAt(ri, ci); c.done = !c.done; save(); render(); }
+function editText(ri, ci, val) {
+  const c = cellAt(ri, ci);
+  if (c.text === val) return; // rien n'a changé
+  if (preEdit) { pushUndo(preEdit); preEdit = null; } // état d'avant la saisie
+  c.text = val;
+  save();
+}
 function clearCell(ri, ci) {
+  const c = cellAt(ri, ci);
+  if (c.text.trim() !== '') {
+    const nom = COMMS[ci] ? COMMS[ci].nom : '';
+    const extrait = c.text.length > 60 ? c.text.slice(0, 60) + '…' : c.text;
+    if (!confirm('Effacer cette tâche' + (nom ? ' de ' + nom : '') + ' ?\n\n« ' + extrait + ' »\n\n(En cas d\'erreur, le bouton « Annuler » permet de la récupérer.)')) return;
+  }
+  pushUndo();
   const arr = colArr(ci);
   if (arr[ri]) arr[ri] = { text: '', done: false, prio: '' };
   renumberPriorities(ci);
   save(); render();
 }
 
+// Capture de l'état AVANT modification d'une case texte (pour Annuler)
+document.getElementById('tbody').addEventListener('focusin', e => {
+  if (e.target.tagName === 'TEXTAREA') preEdit = snapshotState();
+});
+
 function addTask(e, ci) {
   if (e.key !== 'Enter') return;
   e.preventDefault();
   const val = e.target.value.trim();
   if (!val) return;
+  pushUndo();
   const arr = colArr(ci);
   const max = rowCount();
   let placed = false;
@@ -629,6 +694,7 @@ function addTask(e, ci) {
 
 function resetAll() {
   if (!confirm('Remettre à zéro toutes les cases ?')) return;
+  pushUndo();
   for (let ci = 0; ci < COMMS.length; ci++) {
     colArr(ci).forEach(c => { c.done = false; c.prio = ''; });
   }
@@ -678,6 +744,7 @@ function kpOk() {
   if (!kpTarget) return;
   const { ri, ci } = kpTarget;
   const val = document.getElementById('modal-input').value;
+  if (cellAt(ri, ci).prio !== val) pushUndo(); // état d'avant le changement de priorité
   cellAt(ri, ci).prio = val;
   if (val !== '') {
     renumberPriorities(ci);
