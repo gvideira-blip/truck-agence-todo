@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Idées — Truck Agence</title>
+<script>
+(function() {
+  const until = parseInt(localStorage.getItem('ta_auth_until') || '0');
+  if (until <= Date.now()) {
+    window.location.href = '/login.html?next=' + encodeURIComponent(window.location.pathname);
+  }
+})();
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #ffffff;
+  --bg2: #f5f5f3;
+  --border: rgba(0,0,0,0.1);
+  --text: #1a1a1a;
+  --text2: #777;
+  --text3: #bbb;
+  --blue: #004472;
+  --red: #CD1719;
+  --r: 12px;
+  --rs: 8px;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg2);
+  min-height: 100vh;
+  padding: 24px;
+  color: var(--text);
+}
+/* NAV (identique aux autres pages) */
+.nav {
+  display: flex; justify-content: center; gap: 8px; margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.nav a {
+  font-size: 12px; color: var(--text2); text-decoration: none;
+  padding: 5px 14px; border: 1px solid var(--border); border-radius: 20px;
+  background: var(--bg); transition: all 0.15s;
+  display: flex; align-items: center; gap: 5px;
+}
+.nav a:hover { border-color: var(--blue); color: var(--blue); }
+.nav a.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+.wrap {
+  background: var(--bg); border-radius: var(--r);
+  border: 1px solid var(--border);
+  max-width: 760px; margin: 0 auto;
+}
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  border-radius: var(--r) var(--r) 0 0;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); }
+.title { font-size: 15px; font-weight: 500; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.sync { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 5px; }
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; transition: background 0.3s; }
+.sync-dot.ok { background: #5a9a2a; }
+.sync-dot.saving { background: #e0920a; }
+.sync-dot.error { background: #d03030; }
+.btn {
+  font-size: 12px; background: none; border: 1px solid var(--border);
+  border-radius: var(--rs); padding: 5px 12px;
+  cursor: pointer; display: flex; align-items: center; gap: 4px;
+  color: var(--text2); font-family: inherit;
+}
+.btn:hover { background: var(--bg2); }
+.btn:disabled { opacity: 0.4; pointer-events: none; }
+
+/* LISTE DES IDÉES */
+.list { padding: 4px 0; }
+.empty {
+  text-align: center; color: var(--text3); font-size: 14px;
+  padding: 40px 20px;
+}
+.idea {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 16px 18px; border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+.idea:last-child { border-bottom: none; }
+.idea:hover { background: #fafafa; }
+.idea-icon {
+  font-size: 18px; flex-shrink: 0; margin-top: 4px;
+  opacity: 0.7;
+}
+.idea-body { flex: 1; min-width: 0; }
+.idea-title {
+  width: 100%;
+  font-size: 15px; font-weight: 600; color: var(--text);
+  font-family: inherit;
+  border: none; outline: none; background: none;
+  padding: 2px 0; border-radius: 4px;
+}
+.idea-title::placeholder { color: var(--text3); font-weight: 400; }
+.idea-title:focus { background: var(--bg2); }
+.idea-desc {
+  width: 100%;
+  font-size: 13.5px; line-height: 1.5; color: var(--text2);
+  font-family: inherit;
+  border: none; outline: none; resize: none; background: none;
+  padding: 4px 0 0; overflow: hidden;
+  min-height: 22px; border-radius: 4px;
+}
+.idea-desc::placeholder { color: var(--text3); }
+.idea-desc:focus { background: var(--bg2); color: var(--text); }
+.idea-meta { font-size: 11px; color: var(--text3); margin-top: 6px; }
+
+.del {
+  background: none; border: none; cursor: pointer;
+  color: var(--text3); font-size: 15px;
+  padding: 4px; border-radius: 4px;
+  opacity: 0; transition: opacity 0.15s; flex-shrink: 0; margin-top: 2px;
+}
+.idea:hover .del { opacity: 1; }
+.del:hover { color: var(--red); }
+
+/* AJOUT */
+.add {
+  display: flex; justify-content: center;
+  padding: 14px 16px; background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--r) var(--r);
+}
+.add button {
+  font-size: 14px; background: var(--blue); color: #fff;
+  border: none; border-radius: var(--rs); padding: 9px 18px;
+  cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; gap: 6px;
+}
+.add button:hover { background: #003560; }
+
+#loader {
+  position: fixed; inset: 0; background: rgba(255,255,255,0.92);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--text2); z-index: 100;
+}
+
+@media (max-width: 768px) {
+  body { padding: 10px; }
+  .nav { gap: 5px; margin-bottom: 12px; }
+  .nav a { font-size: 11px; padding: 5px 10px; gap: 3px; }
+  .topbar { flex-wrap: wrap; gap: 8px; }
+}
+@media (max-width: 480px) {
+  .nav a span { display: none; }
+  .nav a { padding: 6px 10px; }
+}
+</style>
+</head>
+<body>
+<div id="loader">Chargement…</div>
+
+<nav class="nav">
+  <a href="/">✅ <span>Tâches</span></a>
+  <a href="/ventes.html">📊 <span>Ventes</span></a>
+  <a href="/tableau-blanc.html">🖊️ <span>Tableau blanc</span></a>
+  <a href="/instructions.html">📌 <span>Point Gaëtan</span></a>
+  <a href="/idees.html" class="active">💡 <span>Idées</span></a>
+  <a href="/config.html">⚙️ <span>Configuration</span></a>
+</nav>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="dot"></div>
+      <span class="title">Boîte à idées</span>
+    </div>
+    <div class="topbar-right">
+      <div class="sync">
+        <div class="sync-dot" id="sdot"></div>
+        <span id="slabel">—</span>
+      </div>
+      <button class="btn" id="btnUndo" onclick="undoLast()" disabled title="Annuler la dernière action (Ctrl+Z)">
+        <i class="ti ti-arrow-back-up"></i> Annuler
+      </button>
+    </div>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <div class="add">
+    <button onclick="addIdea()"><i class="ti ti-bulb"></i> Nouvelle idée</button>
+  </div>
+</div>
+
+<script>
+let data = [];        // [{ id, titre, texte, ts }]
+let saveTimer = null;
+let pendingSave = false;
+let knownIds = [];    // ids connus à la dernière synchro serveur (pour la fusion)
+
+// ─── Annulation (retour en arrière instantané) ───────────────
+let undoStack = [];
+let preEdit = null;
+
+function snapshotState() { return JSON.stringify(data); }
+function pushUndo(etat) {
+  undoStack.push(etat !== undefined ? etat : snapshotState());
+  if (undoStack.length > 20) undoStack.shift();
+  updateUndoBtn();
+}
+function clearUndo() { undoStack = []; preEdit = null; updateUndoBtn(); }
+function updateUndoBtn() {
+  const b = document.getElementById('btnUndo');
+  if (b) b.disabled = undoStack.length === 0;
+}
+function undoLast() {
+  if (!undoStack.length) return;
+  data = JSON.parse(undoStack.pop());
+  preEdit = null;
+  render();
+  save();
+  updateUndoBtn();
+}
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+    const ae = document.activeElement;
+    if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+    e.preventDefault();
+    undoLast();
+  }
+});
+
+// ─── Statut de synchro ───────────────────────────────────────
+function setSyncStatus(s) {
+  document.getElementById('sdot').className = 'sync-dot ' + s;
+  document.getElementById('slabel').textContent =
+    s === 'ok' ? 'Synchronisé' : s === 'saving' ? 'Enregistrement…' : 'Erreur sync';
+}
+
+// ─── Chargement & poll (même logique que Point Gaëtan) ───────
+async function load() {
+  try {
+    const r = await fetch('/api/idees');
+    if (!r.ok) throw 0;
+    const j = await r.json();
+    data = Array.isArray(j) ? j : [];
+    knownIds = data.map(it => it.id);
+    setSyncStatus('ok');
+  } catch(e) { data = []; setSyncStatus('error'); }
+  document.getElementById('loader').style.display = 'none';
+  render();
+  setInterval(poll, 5000);
+}
+
+async function poll() {
+  if (pendingSave) return;
+  if (document.activeElement && (
+      document.activeElement.tagName === 'TEXTAREA' ||
+      document.activeElement.tagName === 'INPUT')) return;
+  try {
+    const r = await fetch('/api/idees');
+    if (!r.ok) return;
+    const newData = await r.json();
+    if (pendingSave) return;
+    const safeNew = Array.isArray(newData) ? newData : [];
+    knownIds = safeNew.map(it => it.id);
+    if (JSON.stringify(safeNew) !== JSON.stringify(data)) {
+      data = safeNew;
+      clearUndo(); // des modifs d'un autre appareil sont arrivées
+      render();
+    }
+    setSyncStatus('ok');
+  } catch(e) { setSyncStatus('error'); }
+}
+
+// ─── Sauvegarde (debounce + verrou anti-écrasement) ──────────
+function save() {
+  setSyncStatus('saving');
+  pendingSave = true;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    const snapshot = JSON.stringify(data);
+    try {
+      const r = await fetch('/api/idees', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: data, knownIds })
+      });
+      if (!r.ok) throw 0;
+      if (JSON.stringify(data) === snapshot) pendingSave = false;
+      setSyncStatus('ok');
+      rtNotify('idees'); // prévient instantanément les autres appareils
+    } catch(e) { setSyncStatus('error'); }
+  }, 700);
+}
+
+// ─── Rendu ───────────────────────────────────────────────────
+function escapeHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmtDate(ts) {
+  if (!ts) return '';
+  try {
+    return new Date(ts).toLocaleDateString('fr-FR',
+      { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  } catch(e) { return ''; }
+}
+
+function render() {
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  if (data.length === 0) {
+    list.innerHTML = '<div class="empty">Aucune idée pour le moment.<br>Cliquez sur <strong>💡 Nouvelle idée</strong> pour lancer la première !</div>';
+    return;
+  }
+  // Les plus récentes en haut
+  const sorted = [...data].sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  sorted.forEach(it => {
+    const row = document.createElement('div');
+    row.className = 'idea';
+    row.innerHTML = `
+      <div class="idea-icon">💡</div>
+      <div class="idea-body">
+        <input class="idea-title" placeholder="Titre de l'idée…" maxlength="120"
+               value="${escapeHtml(it.titre)}"
+               onblur="editField('${it.id}', 'titre', this.value)"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"/>
+        <textarea class="idea-desc" rows="1" placeholder="Développe ton idée ici…"
+                  onblur="editField('${it.id}', 'texte', this.value)"
+                  oninput="resize(this)">${escapeHtml(it.texte)}</textarea>
+        <div class="idea-meta">${fmtDate(it.ts)}</div>
+      </div>
+      <button class="del" onclick="removeIdea('${it.id}')" aria-label="Supprimer">
+        <i class="ti ti-x"></i>
+      </button>`;
+    list.appendChild(row);
+    const ta = row.querySelector('.idea-desc');
+    if (ta) setTimeout(() => resize(ta), 0);
+  });
+}
+
+function resize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.max(22, el.scrollHeight) + 'px';
+}
+
+// Capture de l'état AVANT modification d'un champ (pour Annuler)
+document.getElementById('list').addEventListener('focusin', e => {
+  if (e.target.classList && (e.target.classList.contains('idea-title') || e.target.classList.contains('idea-desc'))) {
+    preEdit = snapshotState();
+  }
+});
+
+// ─── Interactions ────────────────────────────────────────────
+function addIdea() {
+  pushUndo();
+  data.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    titre: '', texte: '', ts: Date.now()
+  });
+  render();
+  save();
+  // Focus sur le titre de la nouvelle idée (la plus récente = en haut)
+  setTimeout(() => {
+    const first = document.querySelector('.idea-title');
+    if (first) first.focus();
+  }, 50);
+}
+
+function editField(id, champ, val) {
+  const it = data.find(x => x.id === id);
+  if (!it || it[champ] === val) return;
+  if (preEdit) { pushUndo(preEdit); preEdit = null; }
+  it[champ] = val;
+  save();
+}
+
+function removeIdea(id) {
+  // Pas de confirmation : le bouton « Annuler » permet de récupérer
+  pushUndo();
+  data = data.filter(x => x.id !== id);
+  render();
+  save();
+}
+
+// ─── Temps réel (Supabase Realtime) ──────────────────────────
+// Chaque sauvegarde envoie un signal aux autres appareils connectés,
+// qui rechargent aussitôt leurs données. Le rafraîchissement périodique
+// reste en roue de secours si le temps réel est indisponible.
+const RT_URL = 'https://bupktwjiwsovnqhveans.supabase.co';
+const RT_KEY = 'sb_publishable_j2SeTihDgrRh24Ebzraeeg_FW0IUsKR'; // clé publique (sans danger dans le code)
+let rtChannel = null;
+function rtInit(keys, onChange) {
+  try {
+    if (!window.supabase) return;
+    const client = window.supabase.createClient(RT_URL, RT_KEY);
+    rtChannel = client.channel('app-sync');
+    rtChannel.on('broadcast', { event: 'changed' }, (msg) => {
+      const k = msg && msg.payload && msg.payload.key;
+      if (keys.indexOf(k) !== -1) onChange();
+    }).subscribe();
+  } catch (e) { /* le rafraîchissement périodique prend le relais */ }
+}
+function rtNotify(key) {
+  try {
+    if (rtChannel) rtChannel.send({ type: 'broadcast', event: 'changed', payload: { key } });
+  } catch (e) { /* pas grave */ }
+}
+rtInit(['idees'], () => poll());
+
+load();
+</script>
+</body>
+</html>
